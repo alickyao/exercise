@@ -74,19 +74,11 @@
             },
             columns: [[
                 { title: '选择', field: 'departmentId', checkbox: true },
-                { field: 'pathText', title: '所在部门', width: 300 },
-                {
-                    field: 'isCaption', title: '是否主管',align:'right', width: 80, editor: {
-                        type: 'checkbox',
-                        options: { on: true, off: false }
-                    }, formatter: function (value, row) {
-                        return value=="true" ? "是" : "否";
-                    }
-                }
+                { field: 'pathText', title: '所属小类', width: 300 }
             ]],
             toolbar: [
                 {
-                    text: '保存用户所在的部门',
+                    text: '保存用户所属小类',
                     iconCls: 'icon-save',
                     handler: function () {
                         UserDepGrid.datagrid("acceptChanges");
@@ -117,7 +109,7 @@
                             });
                         }
                         else {
-                            $.messager.alert('提示', '请为用户至少选择一个部门', 'warning');
+                            $.messager.alert('提示', '请为用户至少选择一个小类', 'warning');
                         }
                     }
                 },
@@ -143,10 +135,10 @@
                     }
                 },
                 {
-                    text: '如何修改用户当前所在的部门？',
+                    text: '如何修改用户所属的小类？',
                     iconCls: 'icon-help',
                     handler: function () {
-                        $.messager.alert('提示', '您可以勾选删除用户所在的部门<br />也可以在下方的部门检索功能中为用户添加新的部门', 'info');
+                        $.messager.alert('提示', '您可以勾选删除用户所在的小类<br />也可以在下方的类别检索功能中为用户添加新的小类', 'info');
                     }
                 }
             ]
@@ -180,7 +172,7 @@
             selectOnCheck:true,
             columns: [[
                 { title: '选择', field: 'depmentid', checkbox: true },
-                { title: '部门', field: 'caption', width: 250 }
+                { title: '小类', field: 'caption', width: 250 }
             ]],
             toolbar: [
                 {
@@ -218,7 +210,7 @@
                             });
                         }
                         else {
-                            $.messager.alert('提示', '请至少勾选一个部门', 'warning');
+                            $.messager.alert('提示', '请至少勾选一个小类', 'warning');
                         }
                     }
                 }
@@ -238,7 +230,7 @@
             checkOnSelect: false,
             idField: "depmentid",
             columns: [[
-                { field: 'caption', title: '组织名称', width: 200 }
+                { field: 'caption', title: '大类名称', width: 200 }
             ]],
             onClickRow: function (rowIndex, rowData) {
                 //加载属性网格
@@ -616,7 +608,7 @@
     <div data-options="region:'east',border:false" style="width:70%">
         <div class="easyui-layout" data-options="fit:true,border:false">
             <div data-options="region:'north',border:false,height:'170'" style="padding:5px;">
-                <div class="easyui-panel" title="用户当前所在部门" data-options="fit:true">
+                <div class="easyui-panel" title="用户当前的分类" data-options="fit:true">
                     <table id="@(PageId)UserDepGrid"></table>
                 </div>
             </div>
@@ -629,7 +621,7 @@
                                     <form id="@(PageId)SearchOrgGridFrom">
                                         <table>
                                             <tr>
-                                                <td>组织名称</td>
+                                                <td>大类名称</td>
                                                 <td><input type="text" class="easyui-textbox" name="caption" style="width:100px;" /></td>
                                                 <td>
                                                     <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)OrgGridSearchBtn" data-options="iconCls:'icon-search'">查询</a>

@@ -282,76 +282,57 @@
         </form>
     </div>
     <div data-options="region:'west',border:false" style="padding:5px; width:30%">
-        <div class="easyui-panel" title="组织详情" data-options="fit:true" style="padding:10px;">
-            <div class="easyui-tabs">
-                <div title="组织基础信息" style="padding:20px;">
-                    <form id="@(PageId)orgbaseinfoform">
-                        <input type="hidden" name="depmentid" value="@orginfo.baseInfo.depmentid" />
-                        <table class="formtable">
-                            <tr>
-                                <td>组织ID</td>
-                                <td>@orginfo.baseInfo.depmentid</td>
-                            </tr>
-                            <tr>
-                                <td>创建时间</td>
-                                <td>@orginfo.baseInfo.modifiedon.ToString("yyyy-MM-dd HH:mm")</td>
-                            </tr>
-                            <tr>
-                                <td>名称</td>
-                                <td><input type="text" name="caption" value="" class="easyui-textbox" data-options="required:true" validType="orgcaption['@orginfo.baseInfo.depmentid']" /></td>
-                            </tr>
-                            <tr>
-                                <td>禁用</td>
-                                <td>
-                                    <select name="isdisabled" class="easyui-combobox" data-options="editable:false">
-                                        <option value="true">是</option>
-                                        <option value="false">否</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>前端网站显示</td>
-                                <td>
-                                    <select name="isshow" class="easyui-combobox" data-options="editable:false">
-                                        <option value="true">是</option>
-                                        <option value="false">否</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>所有者</td>
-                                <td><input type="text" id="@(PageId)SelectLinkMan" name="linkUserId" data-options="required:true" /></td>
-                            </tr>
-                            <tr>
-                                <td>用户数量</td>
-                                <td>@orginfo.baseInfo.memberNumCount 人</td>
-                            </tr>
-                        </table>
-                        <table class="btntable">
-                            <tr>
-                                <td><a href="javascript:void(0)" id="@(PageId)orginfoFormSaveBtn" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存组织基础信息</a></td>
-                                <td></td>
-                            </tr>
-                        </table>
-                    </form>
-                </div>
-                <div title="所有者信息" style="padding:20px;">
+        <div class="easyui-panel" title="大类详情" data-options="fit:true" style="padding:10px;">
+            <div title="大类基础信息" class="easyui-panel" style="padding:5px;">
+                <form id="@(PageId)orgbaseinfoform">
+                    <input type="hidden" name="depmentid" value="@orginfo.baseInfo.depmentid" />
                     <table class="formtable">
-                        
                         <tr>
-                            <td>姓名：</td>
-                            <td>@orginfo.baseInfo.linkUserinfo.FullName</td>
+                            <td>大类ID</td>
+                            <td>@orginfo.baseInfo.depmentid</td>
                         </tr>
                         <tr>
-                            <td>电话：</td>
-                            <td>@orginfo.baseInfo.linkUserinfo.MobilePhone</td>
+                            <td>创建时间</td>
+                            <td>@orginfo.baseInfo.modifiedon.ToString("yyyy-MM-dd HH:mm")</td>
                         </tr>
                         <tr>
-                            <td>登录名：</td>
-                            <td>@orginfo.baseInfo.linkUserinfo.LoginName</td>
+                            <td>名称</td>
+                            <td><input type="text" name="caption" value="" class="easyui-textbox" data-options="required:true" validType="orgcaption['@orginfo.baseInfo.depmentid']" /></td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td>禁用</td>
+                            <td>
+                                <select name="isdisabled" class="easyui-combobox" data-options="editable:false">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td>前端网站显示</td>
+                            <td>
+                                <select name="isshow" class="easyui-combobox" data-options="editable:false">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr style="display:none;">
+                            <td>所有者</td>
+                            <td><input type="text" id="@(PageId)SelectLinkMan" name="linkUserId" data-options="required:true" /></td>
+                        </tr>
+                        <tr>
+                            <td>用户数量</td>
+                            <td>@orginfo.baseInfo.memberNumCount 人</td>
                         </tr>
                     </table>
-                </div>
+                    <table class="btntable">
+                        <tr>
+                            <td><a href="javascript:void(0)" id="@(PageId)orginfoFormSaveBtn" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存大类基础信息</a></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </form>
             </div>
             <h4>组织扩展信息</h4>
             <div class="easyui-panel" data-options="height:300,noheader:true">
@@ -360,7 +341,7 @@
         </div>
     </div>
     <div data-options="region:'east',border:false" style="width:70%; padding:5px;">
-        <div class="easyui-panel" title="部门详情" data-options="fit:true,loadingMessage:'加载中...',href:'/PCCCMembers/deplist?departmentId=@orgId'">
+        <div class="easyui-panel" title="小类详情" data-options="fit:true,loadingMessage:'加载中...',href:'/PCCCMembers/deplist?departmentId=@orgId'">
         </div>
     </div>
 </div>
