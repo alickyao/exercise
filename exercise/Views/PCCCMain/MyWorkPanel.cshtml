@@ -1,147 +1,9 @@
 ﻿@{ 
-    //酒店查询初始请求参数
-    SearchHotelListRequestModel hotelSearchConditon = ViewBag.hotelSearchConditon;
-    string hsc = Newtonsoft.Json.JsonConvert.SerializeObject(hotelSearchConditon);
-    //机票查询初始请求参数
-    SearchFlightInfoListRequestModel flightSearchCondtion = ViewBag.flightSearchCondtion;
-    string fsc = Newtonsoft.Json.JsonConvert.SerializeObject(flightSearchCondtion);
+    
 }
 <script>
     $.get("/PCCCMain/HelloWord", function (Mut) {
-        var hcs = $.parseJSON('@Html.Raw(hsc)');//酒店查询参数
-        var SearchHotelForm = $("#SearchHotelForm");//酒店查询表单
-        var SearchHotelCityId = $("#SearchHotelForm input[name='SelectHotelcityId']");//酒店查询城市选择框
-        var SearchHotelSelectCity = $("#SearchHotelForm input[name='cityId']");
-        var hotelArrivalDate = $("#SearchHotelArrivalDate");//酒店查询入住时间
-        var hotelDepartureDate = $("#SearchHotelDepartureDate");//酒店查询离店时间
-        var SearchHotelBtn = $("#SearchHotelBtn");//酒店检索按钮
-
-
-        //酒店日历框
-        hotelArrivalDate.datebox({
-            onSelect: function (date) {
-                var newdate = new Date(date.setDate(date.getDate() + 1));
-                if (newdate >= new Date(hotelDepartureDate.datebox("getValue"))) {
-                    //设置离店时间为当前时间的后一天
-                    hotelDepartureDate.datebox("setValue", new Date(newdate.setDate(newdate.getDate() + 1)).Format("yyyy-MM-dd"));
-                }
-            }
-        });
-        hotelDepartureDate.datebox({
-            onSelect: function (date) {
-                if (date <= new Date(hotelArrivalDate.datebox("getValue"))) {
-                    //设置入住为当前时间的前一天
-                    hotelArrivalDate.datebox("setValue", date.Format("yyyy-MM-dd"));
-                }
-            }
-        });
-        //表单赋值
-        SearchHotelForm.form("load", hcs);
-        //酒店城市下拉选择框
-        SearchHotelCityId.combobox({
-            url: '/api/ApiLocation/SearchCityByKeyWords',
-            mode: 'remote',
-            method:'get',
-            valueField: 'CityCode',
-            textField: 'CityName',
-            onSelect: function (record) {
-                SearchHotelSelectCity.val(record.CityCode);
-            }
-        });
-        //酒店查询按钮
-        SearchHotelBtn.click(function () {
-            SearchHotelForm.form('submit', {
-                onSubmit: function () {
-                    var Reg = $(this).form('enableValidation').form('validate');
-                    if (Reg) {
-                        var d = $(this).serializeObject();
-                        if (d.cityId != "") {
-                            var q = $(this).serialize();
-                            console.log(q);
-                            var cityname = SearchHotelCityId.combobox("getText");
-                            $("#MainCenterTabs").tabs('add', {
-                                title: "[" + cityname + "]酒店查询",
-                                href: "/PCCCHotel/elongHotelList?" + q,
-                                closable: true
-                            });
-                        }
-                        else {
-                            Reg = false;
-                            $.messager.alert('错误', '查询酒店<br />请选择一个查询城市', 'error');
-                        }
-                    }
-                    return false;
-                }
-            });
-        });
-        //机票
-        var fsc = $.parseJSON('@Html.Raw(fsc)');//机票查询请求参数
-        var SearchFlightForm = $("#SearchFlightForm");//机票查询表单
-        var SearchFlightBtn = $("#SearchFlightBtn");//机票查询栏按钮
-        var SelectFlightdepCity = $("#SearchFlightForm input[name='SelectflightdepcityId']");//出发
-        var SelectFlightarrCity = $("#SearchFlightForm input[name='SelectflightarrcityId']");//到达
-        var SearchFlightAirPortRequst = {
-            "sorttype": 3,
-            "showOtherAirport": false
-        };
-        //初始化城市选择
-        $.post("/api/ApiFlightResource/GetFlightAirPortList", SearchFlightAirPortRequst, function (json) {
-            SelectFlightdepCity.combobox({
-                valueField: 'code',
-                textField: 'city',
-                data: json,
-                filter: function (q, n) {
-                    q = q.toLowerCase();
-                    if (n.city.indexOf(q) >= 0 || n.pinyin.toLowerCase().indexOf(q) >= 0 || n.PY.toLowerCase().indexOf(q) >= 0 || n.caption.toLowerCase().indexOf(q) >= 0) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                onSelect: function (record) {
-                    SearchFlightForm.find("input[name='depCityCode']").val(record.code);
-                }
-            });
-            SelectFlightarrCity.combobox({
-                valueField: 'code',
-                textField: 'city',
-                data: json,
-                filter: function (q, n) {
-                    q = q.toLowerCase();
-                    if (n.city.indexOf(q) >= 0 || n.pinyin.toLowerCase().indexOf(q) >= 0 || n.PY.toLowerCase().indexOf(q) >= 0 || n.caption.toLowerCase().indexOf(q) >= 0) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                },
-                onSelect: function (record) {
-                    SearchFlightForm.find("input[name='arrCityCode']").val(record.code);
-                }
-            });
-        });
-        //机票查询栏表单
-        SearchFlightForm.form("load", fsc);
-        SearchFlightBtn.click(function () {
-            var Reg = SearchFlightForm.form('enableValidation').form('validate');
-            if (Reg) {
-                var d = SearchFlightForm.serializeObject();
-                if (d.depCityCode != "" && d.arrCityCode != "") {
-                    var q = SearchFlightForm.serialize();
-                    var depcity = SelectFlightdepCity.combobox("getText");
-                    var arrcity = SelectFlightarrCity.combobox("getText");
-                    $("#MainCenterTabs").tabs('add', {
-                        title: "航班查询["+ depcity +"-"+ arrcity +"]",
-                        href: "/PCCCFlightSearch/FlightList?" + q,
-                        closable: true
-                    });
-                }
-                else {
-                    $.messager.alert('错误', '查询航班<br />请选择出发与到达的城市', 'error');
-                }
-            }
-        });
+        
     });
 </script>
 
@@ -150,83 +12,13 @@
         <table>
             <tr>
                 <td>
-                    <!--酒店查询栏-->
-                    <div class="easyui-panel" title="酒店查询" style="padding:10px;">
-                        <form id="SearchHotelForm">
-                            <table class="formtable">
-                                <tr>
-                                    <td>城市</td>
-                                    <td>
-                                        <input type="text" name="SelectHotelcityId" data-options="required:true,prompt:'城市,拼音'" />
-                                        <input type="hidden" name="cityId" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>入住&nbsp;<a href="javascript:void(0)" title="凌晨查询，凌晨入住请选入住时间为昨天" data-options="position:'right'" class="easyui-tooltip" style="font-weight:bold;">提示</a></td>
-                                    <td><input type="text" name="arrivalDate" id="SearchHotelArrivalDate" class="easyui-datebox" data-options="editable:false,required:true" validType="checkthisdate[-1]" /></td>
-                                </tr>
-                                <tr>
-                                    <td>离店</td>
-                                    <td><input type="text" name="departureDate" id="SearchHotelDepartureDate" class="easyui-datebox" validType="checkthisdate[0]" data-options="editable:false,required:true," /></td>
-                                </tr>
-                                <tr>
-                                    <td>关键字</td>
-                                    <td><input type="text" name="queryText" class="easyui-textbox" data-options="prompt:'酒店名称/品牌/商圈/地标'" /></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="SearchHotelBtn" data-options="iconCls:'icon-search'">查询酒店</a></td>
-                                </tr>
-                            </table>
-                        </form>
-                    </div>
+                    
                 </td>
                 <td>
-                    <!--机票查询栏-->
-                    <div class="easyui-panel" title="机票查询" style="padding:10px;">
-                        <form id="SearchFlightForm">
-                            <table class="formtable">
-                                <tr>
-                                    <td>出发</td>
-                                    <td>
-                                        <input type="text" name="SelectflightdepcityId" data-options="required:true,prompt:'城市,拼音,机场'" />
-                                        <input type="hidden" name="depCityCode" value="" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>到达</td>
-                                    <td>
-                                        <input type="text" name="SelectflightarrcityId" data-options="required:true,prompt:'城市,拼音,机场'" />
-                                        <input type="hidden" name="arrCityCode" value="" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>日期</td>
-                                    <td>
-                                        <input type="text" name="depDate" id="" class="easyui-datebox" data-options="editable:false,required:true" validType="checkthisdate[0]" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>舱位</td>
-                                    <td>
-                                        <select class="easyui-combobox" name="seatType" data-options="editable:false,required:true">
-                                            <option value="0">全部</option>
-                                            <option value="1">公务舱/头等舱</option>
-                                        </select>
-                                        <input type="hidden" name="companyCode" value="" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="SearchFlightBtn" data-options="iconCls:'icon-search'">查询机票</a></td>
-                                </tr>
-                            </table>
-                        </form>
-                    </div>
+                    
                 </td>
             </tr>
         </table>
-        
     </div>
     <div data-options="region:'south',border:false" style="height:80px;background:#eef8fe; padding:5px;">What News</div>
 </div>

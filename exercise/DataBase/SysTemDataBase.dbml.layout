@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 35.625, 16.875" name="UsungSysTemDataBase">
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 29.875, 8.5" name="UsungSysTemDataBase">
   <DataContextMoniker Name="/UsungSysTemDataBaseDataContext" />
   <nestedChildShapes>
     <classShape Id="4e7833f5-369a-4d94-abab-8d7104e2da2c" absoluteBounds="2.875, 0.5, 2, 1.3525109863281251">
@@ -99,66 +99,10 @@
         <elementListCompartment Id="d65b286c-bfe0-47aa-95c9-39b4cfbf1333" absoluteBounds="10.015, 2.96, 1.9700000000000002, 1.346893310546875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="9530f212-3172-49f5-a78b-fa654e9dc1ac" absoluteBounds="7.625, 5.125, 2, 1.7220992024739581">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_Brands" />
-      <nestedChildShapes>
-        <elementListCompartment Id="258fb22f-5e68-4e70-a907-2282d05466b8" absoluteBounds="7.6400000000000006, 5.585, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <classShape Id="a09e27b2-14d8-4dff-80b8-391c7205f6f4" absoluteBounds="7.625, 7.375, 2, 9.29865763346354">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_Hotel" />
-      <nestedChildShapes>
-        <elementListCompartment Id="1c7a4879-75fb-440f-bbda-83ab42221480" absoluteBounds="7.6400000000000006, 7.8350000000000009, 1.9700000000000002, 8.7386576334635411" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <classShape Id="b3b2b621-5176-44a5-945a-c0767f97dad4" absoluteBounds="10.25, 7.375, 2, 2.2764815266927085">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_HotelImages" />
-      <nestedChildShapes>
-        <elementListCompartment Id="06cc4c54-79ce-4563-a269-a11a792d8ddf" absoluteBounds="10.265, 7.8350000000000009, 1.9700000000000002, 1.7164815266927085" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <classShape Id="d59c8fc8-55a8-4e3c-a735-5df90bc76b9a" absoluteBounds="10.25, 10.25, 2, 3.0156579589843751">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_HotelRooms" />
-      <nestedChildShapes>
-        <elementListCompartment Id="193d173a-65fc-48e8-b979-6972a50da151" absoluteBounds="10.265, 10.71, 1.9700000000000002, 2.455657958984375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <associationConnector edgePoints="[(9.625 : 8.51324076334635); (10.25 : 8.51324076334635)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_Hotel/ElongHotel_Hotel_ElongHotel_HotelImages" />
-      <nodes>
-        <classShapeMoniker Id="a09e27b2-14d8-4dff-80b8-391c7205f6f4" />
-        <classShapeMoniker Id="b3b2b621-5176-44a5-945a-c0767f97dad4" />
-      </nodes>
-    </associationConnector>
-    <associationConnector edgePoints="[(9.625 : 11.7578289794922); (10.25 : 11.7578289794922)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_Hotel/ElongHotel_Hotel_ElongHotel_HotelRooms" />
-      <nodes>
-        <classShapeMoniker Id="a09e27b2-14d8-4dff-80b8-391c7205f6f4" />
-        <classShapeMoniker Id="d59c8fc8-55a8-4e3c-a735-5df90bc76b9a" />
-      </nodes>
-    </associationConnector>
-    <classShape Id="ff5947fe-f3e9-4bfe-9ad3-26c4e1577c33" absoluteBounds="20, 2.875, 2, 2.4612756347656251">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsFlightAirport" />
-      <nestedChildShapes>
-        <elementListCompartment Id="44a831c9-72a5-4a18-976e-e93d608af186" absoluteBounds="20.015, 3.335, 1.9700000000000002, 1.901275634765625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <classShape Id="40207c39-2ef7-4feb-b468-2e1a145c30df" absoluteBounds="20, 0.5, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsFlightAirCompany" />
-      <nestedChildShapes>
-        <elementListCompartment Id="0a74343c-c89b-4d78-91b1-ecbcbb52fcff" absoluteBounds="20.015, 0.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
     <classShape Id="464adf98-e5ca-4e78-9a39-4ba1c6ae809f" absoluteBounds="23, 0.5, 2, 2.0916874186197916">
       <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsTraveller" />
       <nestedChildShapes>
         <elementListCompartment Id="64194a92-c620-4f22-b6d9-564e271d69d1" absoluteBounds="23.015, 0.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <classShape Id="8a623183-8541-4e94-b6d7-0ee517e8121f" absoluteBounds="30.875, 0.5, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentSms" />
-      <nestedChildShapes>
-        <elementListCompartment Id="842cfbce-e8a6-435c-a3e1-e650c31c38e6" absoluteBounds="30.89, 0.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="f4e741b0-0cff-48e6-96d0-c0c9f7a6cb98" absoluteBounds="23, 2.875, 2, 2.6460697428385416">
@@ -187,19 +131,19 @@
         <classShapeMoniker Id="6b845b38-605c-4fd2-ba0c-3b69b1c31f94" />
       </nodes>
     </associationConnector>
-    <classShape Id="a34dad59-1ad3-44b6-8e57-515cad2813f8" absoluteBounds="33.375, 0.5, 2, 2.6460697428385416">
+    <classShape Id="a34dad59-1ad3-44b6-8e57-515cad2813f8" absoluteBounds="27.625, 0.5, 2, 2.6460697428385416">
       <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentPush" />
       <nestedChildShapes>
-        <elementListCompartment Id="df5e6d01-8651-4483-ac2f-96c2e692b991" absoluteBounds="33.39, 0.96, 1.9700000000000002, 2.0860697428385415" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="df5e6d01-8651-4483-ac2f-96c2e692b991" absoluteBounds="27.64, 0.96, 1.9700000000000002, 2.0860697428385415" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="f935029d-8916-49e0-89b7-94f78bdb7a86" absoluteBounds="33.375, 3.625, 2, 1.7220992024739581">
+    <classShape Id="f935029d-8916-49e0-89b7-94f78bdb7a86" absoluteBounds="27.625, 4.125, 2, 1.7220992024739581">
       <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentPushDetail" />
       <nestedChildShapes>
-        <elementListCompartment Id="4ae42a9b-d186-4a96-88fd-0f6f07543bc3" absoluteBounds="33.39, 4.085, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="4ae42a9b-d186-4a96-88fd-0f6f07543bc3" absoluteBounds="27.64, 4.585, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(34.375 : 3.14606974283854); (34.375 : 3.625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+    <associationConnector edgePoints="[(28.625 : 3.14606974283854); (28.625 : 4.125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
       <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentPush/Us_RunSentPush_Us_RunSentPushDetail" />
       <nodes>
         <classShapeMoniker Id="a34dad59-1ad3-44b6-8e57-515cad2813f8" />

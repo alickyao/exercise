@@ -186,23 +186,6 @@
                     }
                 },
                 {
-                    text: '发送短信',
-                    iconCls: 'icon-redo',
-                    handler: function () {
-                        var row = Grid.datagrid('getSelected');
-                        if (row != null) {
-                            var smswin = $("#@(PageId)sendsmsdialog");
-                            smswin.dialog({
-                                href: '/PCCCSms/sendsmsbyusers?depid=' + row.depmentid + "&getchild=true"
-                            });
-                            smswin.dialog("open");
-                        }
-                        else {
-                            $.messager.alert('提示', '请先选择一行', 'warning');
-                        }
-                    }
-                },
-                {
                     text: '发送推送',
                     iconCls: 'icon-redo',
                     handler: function () {

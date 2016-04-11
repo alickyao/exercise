@@ -86,13 +86,6 @@ namespace cyclonestyle.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Admin,Users")]
         public ActionResult MyWorkPanel() {
-            //初始化酒店查询参数
-            SearchHotelListRequestModel hotelSearchConditon = new SearchHotelListRequestModel();
-            ViewBag.hotelSearchConditon = hotelSearchConditon;
-
-            //初始化机票查询参数
-            SearchFlightInfoListRequestModel flightSearchCondtion = new SearchFlightInfoListRequestModel();
-            ViewBag.flightSearchCondtion = flightSearchCondtion;
 
             return View();
         }

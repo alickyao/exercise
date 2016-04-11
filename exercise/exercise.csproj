@@ -494,37 +494,8 @@
     <Content Include="scripts\locale\easyui-lang-tr.js" />
     <Content Include="scripts\locale\easyui-lang-zh_CN.js" />
     <Content Include="scripts\locale\easyui-lang-zh_TW.js" />
-    <None Include="Service References\getAvailableFlightWithPriceAndCommisionService\configuration91.svcinfo" />
-    <None Include="Service References\getAvailableFlightWithPriceAndCommisionService\configuration.svcinfo" />
     <Content Include="scripts\UserCode.js" />
-    <Content Include="Service References\getAvailableFlightWithPriceAndCommisionService\cyclonestyle.getAvailableFlightWithPriceAndCommisionService.availableFlightWithPriceAndCommisionReply.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Content>
-    <Content Include="Service References\getAvailableFlightWithPriceAndCommisionService\cyclonestyle.getAvailableFlightWithPriceAndCommisionService.getAvailableFlightWithPriceAndCommisionResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Content>
-    <None Include="Service References\getAvailableFlightWithPriceAndCommisionService\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <None Include="Service References\MandaoSmsService\configuration91.svcinfo" />
-    <None Include="Service References\MandaoSmsService\configuration.svcinfo" />
-    <Content Include="Service References\MandaoSmsService\cyclonestyle.MandaoSmsService.MOBody.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Content>
-    <Content Include="Service References\MandaoSmsService\cyclonestyle.MandaoSmsService.RegistryInfo.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Content>
-    <Content Include="Service References\MandaoSmsService\cyclonestyle.MandaoSmsService.RegistryInfo2.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Content>
-    <None Include="Service References\MandaoSmsService\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
     <Content Include="Web.config" />
-    <None Include="Service References\getAvailableFlightWithPriceAndCommisionService\GetAvailableFlightWithPriceAndCommisionServiceImpl_1_0Service.wsdl" />
-    <None Include="Service References\MandaoSmsService\webservice.wsdl" />
     <Content Include="Views\WebHome\AuthorizeError.cshtml" />
     <Content Include="Views\WebHome\Index.cshtml" />
     <Content Include="Views\Shared\PcWeb_BootStrapLayout.cshtml" />
@@ -558,9 +529,6 @@
     <Content Include="Views\PCCCPublicResource\UserInputRuleSet.cshtml" />
     <Content Include="Views\PCCCSms\pushhistory.cshtml" />
     <Content Include="Views\PCCCSms\sendpushbyusers.cshtml" />
-    <Content Include="Views\PCCCSms\sendsms.cshtml" />
-    <Content Include="Views\PCCCSms\sendsmsbyusers.cshtml" />
-    <Content Include="Views\PCCCSms\smshistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -593,42 +561,27 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="BLL\BaiDuPushInterFaceService.cs" />
     <Compile Include="BLL\DocumentResourceService.cs" />
     <Compile Include="BLL\easemobInterFaceService.cs" />
-    <Compile Include="BLL\ElongHotelBaseService.cs" />
-    <Compile Include="BLL\ElongHotelService.cs" />
-    <Compile Include="BLL\Flight51BookInterFaceService.cs" />
-    <Compile Include="BLL\FlightService.cs" />
     <Compile Include="BLL\GTuiPushInterFaceService.cs" />
     <Compile Include="BLL\Helps.cs" />
     <Compile Include="BLL\LocationService.cs" />
-    <Compile Include="BLL\MandaoSmsInterFaceService.cs" />
     <Compile Include="BLL\MembersExService.cs" />
     <Compile Include="BLL\MembersService.cs" />
     <Compile Include="BLL\PublicResourceService.cs" />
     <Compile Include="BLL\PushService.cs" />
-    <Compile Include="BLL\SmsService.cs" />
-    <Compile Include="BLL\SynOldInfoService.cs" />
     <Compile Include="BLL\SysManagerService.cs" />
     <Compile Include="Controllers\ApiAddressController.cs" />
     <Compile Include="Controllers\ApiDepartmentsController.cs" />
     <Compile Include="Controllers\ApiDocumentResourceController.cs" />
     <Compile Include="Controllers\ApiEasemobController.cs" />
-    <Compile Include="Controllers\ApiElongHotelController.cs" />
-    <Compile Include="Controllers\ApiFlightResourceController.cs" />
-    <Compile Include="Controllers\ApiFlightSearchController.cs" />
     <Compile Include="Controllers\ApiLocationController.cs" />
     <Compile Include="Controllers\ApiMembersController.cs" />
     <Compile Include="Controllers\ApiPublicResourceController.cs" />
     <Compile Include="Controllers\ApiPushController.cs" />
-    <Compile Include="Controllers\ApiSmsController.cs" />
     <Compile Include="Controllers\ApiSysManagerController.cs" />
     <Compile Include="Controllers\ApiTravellerController.cs" />
     <Compile Include="Controllers\PCCCDocumentResourceController.cs" />
-    <Compile Include="Controllers\PCCCFlightResourceController.cs" />
-    <Compile Include="Controllers\PCCCFlightSearchController.cs" />
-    <Compile Include="Controllers\PCCCHotelController.cs" />
     <Compile Include="Controllers\PCCCMainController.cs" />
     <Compile Include="Controllers\PCCCMembersController.cs" />
     <Compile Include="Controllers\PCCCPublicResourceController.cs" />
@@ -651,9 +604,6 @@
     <Compile Include="Models\CatTree.cs" />
     <Compile Include="Models\DocumentsResource.cs" />
     <Compile Include="Models\Easemob.cs" />
-    <Compile Include="Models\ElongHotel.cs" />
-    <Compile Include="Models\Flight.cs" />
-    <Compile Include="Models\Hotel.cs" />
     <Compile Include="Models\Location.cs" />
     <Compile Include="Models\MembersDepartments.cs" />
     <Compile Include="Models\MembersModel.cs" />
@@ -661,20 +611,9 @@
     <Compile Include="Models\Push.cs" />
     <Compile Include="Models\ResourceUserInputRule.cs" />
     <Compile Include="Models\RsInfoEx.cs" />
-    <Compile Include="Models\Sms.cs" />
     <Compile Include="Models\Traveller.cs" />
     <Compile Include="Models\UsersLogon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service References\getAvailableFlightWithPriceAndCommisionService\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
-    <Compile Include="Service References\MandaoSmsService\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
@@ -720,13 +659,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\getAvailableFlightWithPriceAndCommisionService\" />
-    <WCFMetadataStorage Include="Service References\MandaoSmsService\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

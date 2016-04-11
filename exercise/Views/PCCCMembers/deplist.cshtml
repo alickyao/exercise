@@ -200,28 +200,6 @@
                     }
                 },
                 {
-                    text: '发送短信',
-                    iconCls: 'icon-redo',
-                    handler: function () {
-                        var rows = Grid.datagrid("getChecked");
-                        if (rows.length > 0) {
-                            var depids = "";
-                            $.each(rows, function (i, n) {
-                                depids += n.depmentid + ",";
-                            });
-                            depids = depids.substring(0, depids.length - 1);
-                            console.log(depids);
-                            var smswin = $("#@(PageId)sendsmsdialog");
-                            smswin.dialog({
-                                href: '/PCCCSms/sendsmsbyusers?depid=' + depids + "&getchild=false"
-                            });
-                            smswin.dialog("open");
-                        } else {
-                            $.messager.alert('提示', '请至少勾选一个部门', 'warning');
-                        }
-                    }
-                },
-                {
                     text: '发送推送',
                     iconCls: 'icon-redo',
                     handler: function () {

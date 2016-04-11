@@ -250,40 +250,6 @@
                     }
                 },
                 {
-                    text: '发送短信',
-                    iconCls: 'icon-redo',
-                    handler: function () {
-                        if (editrow == undefined) {
-                            var rows = Grid.datagrid("getChecked");
-                            if (rows.length > 0) {
-                                var phones = "";
-                                var userids = "";
-                                $.each(rows, function (i, n) {
-                                    if (n.MobilePhone != null && n.MobilePhone != "") {
-                                        phones += n.MobilePhone + ",";
-                                        userids += n.UserId + ",";
-                                    }
-                                });
-                                if (phones != "") {
-                                    var smswin = $("#@(PageId)sendsmsdialog");
-                                    smswin.dialog({
-                                        href: '/PCCCSms/sendsmsbyusers?userIds='+userids
-                                    });
-                                    smswin.dialog("open");
-                                }
-                                else {
-                                    $.messager.alert('提示', '所勾选的用户无手机号码可用', 'warning');
-                                }
-                            } else {
-                                $.messager.alert('提示', '请勾选用户', 'warning');
-                            }
-                        }
-                        else {
-                            $.messager.alert('提示', '请先退出编辑状态数据', 'warning');
-                        }
-                    }
-                },
-                {
                     text: '发送推送',
                     iconCls: 'icon-redo',
                     handler: function () {
