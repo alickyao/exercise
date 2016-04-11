@@ -506,12 +506,6 @@
     <Content Include="Views\PCCCSysManger\SysUserLog.cshtml" />
     <Content Include="Views\PCCCSysManger\SysUserSet.cshtml" />
     <Content Include="Views\PCCCDocumentResource\DocumentsGrid.cshtml" />
-    <Content Include="Views\PCCCFlightResource\AirCompany.cshtml" />
-    <Content Include="Views\PCCCFlightResource\Airport.cshtml" />
-    <Content Include="Views\PCCCFlightSearch\FlightList.cshtml" />
-    <Content Include="Views\PCCCHotel\elongHotelCreateOrder.cshtml" />
-    <Content Include="Views\PCCCHotel\elongHotelDetail.cshtml" />
-    <Content Include="Views\PCCCHotel\elongHotelList.cshtml" />
     <Content Include="Views\PCCCMain\Home.cshtml" />
     <Content Include="Views\PCCCMain\LogOn.cshtml" />
     <Content Include="Views\PCCCMain\MyWorkPanel.cshtml" />
