@@ -1,0 +1,223 @@
+﻿@{
+    string PageId = ViewBag.PageId;
+    SearchResourceUserInputRuleRequestModel condtion = ViewBag.condtion;
+}
+
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var request = {
+            "Ids": "@condtion.Ids",
+            "ordertype": "@condtion.ordertype",
+            "Page": "@condtion.Page",
+            "PageSize": "@condtion.PageSize"
+        };
+        $.post("/api/ApiPublicResource/SearchUserInputRuleList", request, function (json) {
+            console.log(json);
+            var Grid = $("#@(PageId)Grid");
+            var editIndex = undefined;
+
+            function endedit() {
+                if (editIndex == undefined) {
+                    return true;
+                }
+                else {
+                    if (Grid.datagrid('validateRow', editIndex)) {
+                        Grid.datagrid('endEdit', editIndex);
+                        editIndex = undefined;
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            Grid.datagrid({
+                pagination: true,
+                pageSize: parseInt(request.PageSize),
+                pageNumber: parseInt(request.Page),
+                rownumbers: true,
+                border: false,
+                fit: true,  //自动大小
+                singleSelect: true,
+                selectOnCheck: false,
+                checkOnSelect: false,
+                idField: "RuleId",
+                data: json,
+                columns: [[
+                    { field: "", checkbox: true },
+                    { field: 'RuleId', title: '标识', width: 120 },
+                    { field: 'Caption', title: '标题', width: 120, editor: { type: "textbox", options: { required: true } } },
+                    { field: 'Sort', title: '排序', width: 60, editor: { type: "numberbox" } },
+                    {
+                        field: 'InputType', title: '输入类型', width: 120, editor: {
+                            type: "combobox", options: {
+                                valueField: 'id',
+                                textField: 'text',
+                                method: 'GET',
+                                url: '/api/ApiPublicResource/GetUserInputRuleTypes',
+                                multiple: false,
+                                editable: true,
+                                required: true
+                            }
+                        }
+                    },
+                    { field: 'OptionsString', title: '可选项', width: 400, editor: { type: "textbox" } },
+                    {
+                        field: 'ModifiedOn', title: '添加/编辑时间', width: 140, formatter: function (value, row) {
+                            if (value != null) {
+                                return new Date(value).Format("yyyy-MM-dd hh:mm");
+                            }
+                        }
+                    }
+                ]],
+                toolbar: [
+                    {
+                        text: '新增',
+                        iconCls: 'icon-add',
+                        handler: function () {
+                            if (editIndex == undefined) {
+                                Grid.datagrid('insertRow', {
+                                    index: 0, row: {
+                                        "RuleId": null,
+                                        "Caption": null,
+                                        "InputType": null,
+                                        "OptionsString": null,
+                                        "Sort": null
+                                    }
+                                });
+                                editIndex = 0;
+                                Grid.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+                            }
+                            else {
+                                Grid.datagrid("selectRow", editIndex);
+                            }
+                        }
+                    },
+                    {
+                        text: '编辑',
+                        iconCls: 'icon-edit',
+                        handler: function () {
+                            var row = Grid.datagrid('getSelected');
+                            if (row != null) {
+                                var rowindex = Grid.datagrid('getRowIndex', row);
+                                if (editIndex == undefined) {
+                                    console.log(row);
+                                    Grid.datagrid('beginEdit', rowindex);
+                                    editIndex = rowindex;
+                                }
+                                else {
+                                    Grid.datagrid("selectRow", editIndex);
+                                }
+                            }
+                            else {
+                                $.messager.alert('提示', '请先选择一行', 'warning');
+                            }
+                        }
+                    },
+                    {
+                        text: '保存',
+                        iconCls: 'icon-save',
+                        handler: function () {
+                            if (editIndex != undefined) {
+                                Grid.datagrid("selectRow", editIndex);
+                                var row = Grid.datagrid("getSelected");
+                                var saveindex = editIndex;
+                                if (endedit()) {
+                                    console.log(row);
+                                    $.post("/api/ApiPublicResource/SaveUserInputRule", row, function (json) {
+                                        console.log(json);
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', "保存成功", 'info');
+                                            if (row.RuleId == null) {
+                                                //新增的行,将新增返回的ID赋值到行ID字段
+                                                console.log(saveindex);
+                                                Grid.datagrid('getRows')[saveindex]['RuleId'] = json.ReturnMessage;
+                                                Grid.datagrid('refreshRow', saveindex);
+                                            }
+                                            Grid.datagrid('acceptChanges');
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                }
+                            }
+                            else {
+                                $.messager.alert('提示', '没有数据需要保存', 'warning');
+                            }
+                        }
+                    },
+                    {
+                        text: '取消编辑',
+                        iconCls: 'icon-undo',
+                        handler: function () {
+                            if (editIndex != undefined) {
+                                Grid.datagrid('selectRow', editIndex);
+                                var row = Grid.datagrid('getSelected');
+                                Grid.datagrid('cancelEdit', editIndex);
+                                if (row.RuleId == null) {
+                                    Grid.datagrid('deleteRow', editIndex);
+                                }
+                                Grid.datagrid("unselectAll");
+                                editIndex = undefined;
+                            }
+                        }
+                    },
+                    {
+                        text: '标记删除',
+                        iconCls: 'icon-clear',
+                        handler: function () {
+                            var rows = Grid.datagrid("getChecked");
+                            console.log(rows);
+                            if (rows.length > 0) {
+                                $.messager.confirm('请确认', '确认删除勾选的行？', function (r) {
+                                    if (r) {
+                                        //刷新网格
+                                        $.post("/api/ApiPublicResource/DelUserInputRules", { rows: rows }, function (json) {
+                                            console.log(json);
+                                            if (json.ReturnCode == 0) {
+                                                $.messager.alert('Success', json.ReturnMessage, 'info');
+                                                //刷新网格
+                                                Grid.datagrid("loading");
+                                                $.post("/api/ApiPublicResource/SearchUserInputRuleList", request, function (json) {
+                                                    Grid.datagrid("loaded");
+                                                    Grid.datagrid("uncheckAll");
+                                                    Grid.datagrid("loadData", json);
+                                                });
+                                            }
+                                            else {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            else {
+                                $.messager.alert('提示', '请勾选需要删除的行', 'warning');
+                            }
+                        }
+                    }
+                ]
+            });
+
+            //翻页设置
+            Grid.datagrid('getPager').pagination({
+                onSelectPage: function (pPageIndex, pPageSize) {
+                    request.Page = pPageIndex;
+                    request.PageSize = pPageSize;
+                    $.post("/api/ApiPublicResource/SearchUserInputRuleList", request, function (json) {
+
+                        Grid.datagrid("loadData", json);//加载数据
+                        //加载后重置单元格编辑（翻页后忽略前一页的编辑项与选择项）
+                        editIndex = undefined;
+                        Grid.datagrid('acceptChanges');
+                        Grid.datagrid('unselectAll');
+                        Grid.datagrid("uncheckAll");
+                    });
+                }
+            });
+        });
+    });
+</script>
+<table id="@(PageId)Grid"></table>

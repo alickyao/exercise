@@ -1,0 +1,342 @@
+﻿@{
+    Layout = null;
+    GetElongHotelInfoReponseModel result = ViewBag.result;
+    string PageId = ViewBag.PageId;
+}
+<div style="padding:5px;">
+    @if (result.ReturnCode == EnumErrorCode.Success)
+    {
+        ElongHotelInfoModel info = result.hoteldetail[0];
+
+        <!-- 酒店信息 -->
+        <div class="easyui-tabs" title="酒店基本信息" style="margin-bottom:5px;">
+            <div title="酒店基本信息" style="padding:5px;">
+                <table class="formtable">
+                    <tr>
+                        <td>酒店ID</td>
+                        <td>@result.request.hotelId</td>
+                        <td>入住日期</td>
+                        <td><strong style="color:red">@result.request.arrivalDate.ToShortDateString()</strong></td>
+                        <td>离店日期</td>
+                        <td colspan="3"><strong style="color:red">@result.request.departureDate.ToShortDateString()</strong></td>
+                    </tr>
+                    <tr>
+                        <td>酒店名称：</td>
+                        <td>@info.hotelName</td>
+                        <td>电话：</td>
+                        <td>@info.phone</td>
+                        <td>挂牌星级：</td>
+                        <td>
+                            @switch (info.starRate)
+                            {
+                                case "0":
+                                    <span>无</span>
+                                    break;
+                                case "1":
+                                    <span>一星级</span>
+                                    break;
+                                case "2":
+                                    <span>二星级</span>
+                                    break;
+                                case "3":
+                                    <span>三星级</span>
+                                    break;
+                                case "4":
+                                    <span>四星级</span>
+                                    break;
+                                case "5":
+                                    <span>五星级</span>
+                                    break;
+                            }
+                        </td>
+                        <td>艺龙推荐星级：</td>
+                        <td>
+                            @switch (info.category)
+                            {
+                                case "-1":
+                                case "0":
+                                case "1":
+                                    <span>经济型 (@info.category 星)</span>
+                                    break;
+                                case "2":
+                                case "3":
+                                    <span>舒适型 (@info.category 星)</span>
+                                    break;
+                                case "4":
+                                case "5":
+                                    <span>豪华型 (@info.category 星)</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>开业时间：</td>
+                        <td>@info.establishmentDate</td>
+                        <td>重新装修时间：</td>
+                        <td colspan="6">@info.renovationDate</td>
+                    </tr>
+                    <tr>
+                        <td>所在地区：</td>
+                        <td>@info.locationInfo.cityInfo.CityName - @info.locationInfo.District (@info.locationInfo.BusinessZone)</td>
+                        <td>详细地址：</td>
+                        <td colspan="6">@info.address</td>
+                    </tr>
+                    <tr>
+                        <td>位置：</td>
+                        <td colspan="7">
+                            <div id="@(PageId)BaiduMap" style="width:300px; height:300px;"></div>
+                        </td>
+                    </tr>
+                </table>
+                <script>
+                $.get("/PCCCMain/HelloWord", function (Mut) {
+                    var map = new BMap.Map("@(PageId)BaiduMap"); // 创建地图实例
+                    var point = new BMap.Point(@(info.baiduPosition.lng), @(info.baiduPosition.lat));  // 创建点坐标
+                    map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
+                    var marker = new BMap.Marker(point);        // 创建标注
+                    map.addOverlay(marker);                     // 将标注添加到地图中
+                    map.addControl(new BMap.NavigationControl());
+                });
+                </script>
+            </div>
+            <div title="酒店描述与服务设施" style="padding:5px;">
+                <table class="formtable" style="width:70%">
+                    <tr>
+                        <td style="width:90px;">支持的信用卡：</td>
+                        <td>@info.facilities.creditCards</td>
+                    </tr>
+                    <tr>
+                        <td>酒店介绍：</td>
+                        <td>@info.facilities.introEditor</td>
+                    </tr>
+                    <tr>
+                        <td>酒店描述：</td>
+                        <td>@info.facilities.description</td>
+                    </tr>
+                    <tr>
+                        <td>服务设施：</td>
+                        <td>@info.facilities.generalAmenities</td>
+                    </tr>
+                    <tr>
+                        <td>休闲设施：</td>
+                        <td>@info.facilities.recreationAmenities</td>
+                    </tr>
+                    <tr>
+                        <td>会议设施：</td>
+                        <td>@info.facilities.conferenceAmenities</td>
+                    </tr>
+                    <tr>
+                        <td>餐饮设施：</td>
+                        <td>@info.facilities.diningAmenities</td>
+                    </tr>
+                    <tr>
+                        <td>周边交通：</td>
+                        <td>@info.facilities.traffic</td>
+                    </tr>
+                    <tr>
+                        <td>周边信息：</td>
+                        <td>@info.facilities.surroundings</td>
+                    </tr>
+                    <tr>
+                        <td>房间设施：</td>
+                        <td>@info.facilities.roomAmenities</td>
+                    </tr>
+                    <tr>
+                        <td>设施列表：</td>
+                        <td>
+                            @if (info.facilities.facilities.Count() > 0)
+                        {
+                            foreach (string fac in info.facilities.facilities)
+                            {
+                                <span style="margin-right:5px;">@fac</span>
+                            }
+                        }
+                    </td>
+                </tr>
+            </table>
+            </div>
+        </div>
+        <!-- 房型与预定 -->
+        <div class="easyui-panel" title="房型/预定" style="margin-bottom:5px; padding:5px;">
+            <table class="formtable" style="max-width:60%;">
+                <tr>
+                    <th style="width:80px">房型编号</th>
+                    <th>图片</th>
+                    <th>名称</th>
+                    <th>面积</th>
+                    <th>楼层</th>
+                    <th>是否有宽带</th>
+                    <th>宽带是否收费</th>
+                    <th>床型</th>
+                    <th>最低价格</th>
+                </tr>
+                @foreach (ElongHotelRoomInfoModel room in info.rooms)
+                {
+                    <tr style="background-color:#efefef">
+                        <td>@room.id</td>
+                        <td><img src="@room.imageUrl" style="height:100px;" /></td>
+                        <td><strong>@room.name</strong></td>
+                        <td style="text-align:center;">@(room.area)㎡</td>
+                        <td style="text-align:center;">@room.floor<br />楼</td>
+                        <td style="text-align:center;">@(room.broadnetAccess == 1?"有宽带":(room.broadnetAccess==2?"有WIFI":"无"))</td>
+                        <td style="text-align:center;">@(room.broadnetFee==0?"免费上网":"上网不免费")</td>
+                        <td style="text-align:center;">@room.bedType</td>
+                        <td style="text-align:center">￥@room.lowPrice.ToString("0.##")</td>
+                    </tr>
+                    <tr style="background-color:#efefef">
+                        <td>房型描述</td>
+                        <td colspan="8">@room.description @room.comments</td>
+                    </tr>
+                    if (room.hasRatePlan) {
+                        <tr>
+                            <td colspan="9">
+                                <table style="margin:0 0 0 auto;" class="formtable">
+                                    @foreach (ListRatePlan rate in room.ratePlans) {
+                                        //即时确认,担保，促销等
+                                        string InstantConfirmation = rate.InstantConfirmation ? "<span style='color:#666'>即时确认<span>&nbsp;" : "";
+                                        //担保
+                                        string GuaranteeRule = "<a href='javascript:void(0)' class='" + PageId + "showlinktitle' title='预订该产品无需担保'>无需担保</a>&nbsp;";
+                                        if (!string.IsNullOrEmpty(rate.GuaranteeRuleIds)) {
+                                            string[] ids = rate.GuaranteeRuleIds.Split(',');
+                                            string Description = "";
+                                            int GuaranteeRuleId = int.Parse(rate.GuaranteeRuleIds);
+                                            GuaranteeRule GuaranteeRuleRow = info.guaranteeRules.SingleOrDefault(p => p.GuranteeRuleId == GuaranteeRuleId);
+                                            if (GuaranteeRuleRow != null)
+                                            {
+                                                Description = GuaranteeRuleRow.Description;
+                                                var GuarantType = "";
+                                                if (GuaranteeRuleRow.IsTimeGuarantee == false && GuaranteeRuleRow.IsAmountGuarantee == false)
+                                                {
+                                                    GuarantType = "无条件担保";
+                                                }
+                                                else if (GuaranteeRuleRow.IsTimeGuarantee == true && GuaranteeRuleRow.IsAmountGuarantee == false)
+                                                {
+                                                    GuarantType = "到店时间担保";
+                                                }
+                                                else if (GuaranteeRuleRow.IsTimeGuarantee == false && GuaranteeRuleRow.IsAmountGuarantee == true)
+                                                {
+                                                    GuarantType = "房量担保";
+                                                }
+                                                else {
+                                                    GuarantType = "到店时间或房量担保";
+                                                }
+                                                GuaranteeRule = "<a href='javascript:void(0)' class='" + PageId + "showlinktitle' title='" + Description + "'>"+ GuarantType + "</a>&nbsp;";
+                                            }
+                                        }
+                                        //预订
+                                        string BookingRule = "";
+                                        if (!string.IsNullOrEmpty(rate.BookingRuleIds)) {
+                                            string[] ids = rate.BookingRuleIds.Split(',');
+                                            string Description = "";
+                                            foreach (string id in ids) {
+                                                long BookingRuleId = long.Parse(id);
+                                                BookingRule BookingRuleRow = info.bookingRules.SingleOrDefault(p => p.BookingRuleId == BookingRuleId);
+                                                if (BookingRuleRow != null)
+                                                {
+                                                    Description += BookingRuleRow.Description + " ";
+                                                }
+                                            }
+                                            BookingRule = "<a href='javascript:void(0)' class='" + PageId + "showlinktitle' title='" + Description + "'>预订规则</a>&nbsp;";
+                                        }
+                                        //增值服务
+                                        string ValueAdd = "";
+                                        if (!string.IsNullOrEmpty(rate.ValueAddIds)) {
+                                            string[] ids = rate.ValueAddIds.Split(',');
+                                            string Description = "";
+                                            foreach (string id in ids) {
+                                                ValueAdd ValueAddRow = info.valueAdds.SingleOrDefault(p => p.ValueAddId == id);
+                                                if (ValueAddRow != null)
+                                                {
+                                                    Description += ValueAddRow.Description + " ";
+                                                }
+                                            }
+                                            ValueAdd = "<span style='color:#666'>" + Description + "</span><br />";
+                                        }
+                                        //促销
+                                        string DrrRule = "";
+                                        if (!string.IsNullOrEmpty(rate.DrrRuleIds)) {
+                                            string[] ids = rate.DrrRuleIds.Split(',');
+                                            string Description = "";
+                                            foreach (string id in ids) {
+                                                int DrrRuleId = int.Parse(id);
+                                                DrrRule DrrRuleRow = info.drrRules.SingleOrDefault(p => p.DrrRuleId == DrrRuleId);
+                                                if (DrrRuleRow != null)
+                                                {
+                                                    Description += DrrRuleRow.Description + " ";
+                                                }
+                                            }
+                                            DrrRule = "<a href='javascript:void(0)' class='" + PageId + "showlinktitle' title='" + Description + "'>促销</a>&nbsp;";
+                                        }
+                                        <tr>
+                                            <td style="font-size:0.8em">@rate.RatePlanName<br />@Html.Raw(ValueAdd)@Html.Raw(InstantConfirmation)@Html.Raw(GuaranteeRule)@Html.Raw(BookingRule)@Html.Raw(DrrRule)</td>
+                                            <td>￥@rate.AverageRate.ToString("0.##") 元 （间/晚）</td>
+                                            <td style="text-align:right;">
+                                                @if (rate.Status)
+                                                {
+                                                    string k = string.IsNullOrEmpty(rate.GuaranteeRuleIds) ? "预订" : "担保预订";
+                                                    k += "/" + (rate.PaymentType == EnumPaymentType.SelfPay ? "前台付现" : "预付");
+                                                            <a href="javascript:void(0)" paymentType="@rate.PaymentType" roomTypeId="@rate.RoomTypeId" ratePlanId="@rate.RatePlanId" roomName="@room.name" class="easyui-linkbutton @(PageId)createorderbtn" data-options="iconCls:'icon-edit'">@k</a>
+                                                }
+                                                else {
+                                                    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-clear',disabled:true">不可预订/满房</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+            <script>
+                $.get("/PCCCMain/HelloWord", function (Mut) {
+                    $(".@(PageId)showlinktitle").click(function(){
+                        $.messager.alert('详情', $(this).attr("title"), 'info');
+                        return false;
+                    });
+                    $(".@(PageId)createorderbtn").click(function(){
+                        //创建订单
+                        var btn = $(this);
+                        if (btn.attr("paymentType")=="Prepay"){
+                            $.messager.alert('提示', "预付类型暂不能在线预订", 'warning');
+                        }
+                        else{
+                            var createrquest = {
+                                paymentType : btn.attr("paymentType"),
+                                roomTypeId : btn.attr("roomTypeId"),
+                                ratePlanId : btn.attr("ratePlanId"),
+                                roomName:btn.attr("roomName"),
+                                hotelId:"@result.request.hotelId",
+                                arrivalDate:"@result.request.arrivalDate.ToShortDateString()",
+                                departureDate:"@result.request.departureDate.ToShortDateString()"
+                            };
+                            var url = "/PCCCHotel/elongHotelCreateOrder?arrivalDate=" + createrquest.arrivalDate + "&departureDate=" + createrquest.departureDate + "&hotelId=" + createrquest.hotelId+"&paymentType="+ createrquest.paymentType +"&roomTypeId="+ createrquest.roomTypeId +"&ratePlanId="+createrquest.ratePlanId;
+                            console.log(url);
+                            $("#MainCenterTabs").tabs('add', {
+                                title: "@(info.hotelName)["+ createrquest.roomName +"]预订",
+                                href: url,
+                                closable: true
+                            });
+                        }
+                        return false;
+                    });
+                });
+            </script>
+        </div>
+        <!--图片-->
+        <div class="easyui-panel" title="酒店图集">
+            <table>
+                <tr>
+                    @foreach (ElongHotelImageModel img in info.images)
+                                {
+                        <td style="margin-right:10px;"><a href="@img.url" target="_blank"><img src="@img.url" style="height:200px;" /></a></td>
+                    }
+                </tr>
+            </table>
+        </div>
+    }
+    else {
+        <div>@result.ReturnMessage</div>
+    }
+</div>

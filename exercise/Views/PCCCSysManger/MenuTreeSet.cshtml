@@ -1,0 +1,257 @@
+﻿<script>
+    $.getJSON("/api/ApiSysManager/GetSysMenuList", function (json) {
+        //所有角色数据
+        var RolesList = undefined;
+        $.getJSON("/api/ApiSysManager/GetSysRoleAllRowList", function (roleslise) {
+            RolesList = roleslise;
+
+            var editingId = undefined;//当前编辑的行
+
+            var SelectId = undefined //当前选中的行
+
+            var Grid = $("#MenuTreeSetGrid");//网格树
+            var data = new Object();//树网格特殊操作
+            data.rows = json;//树形网格特殊操作
+
+            $("#MenuTreeSetGrid").treegrid({
+                rownumbers: false,
+                animate: true,
+                collapsible: true,
+                data: data,
+                fit: true,
+                idField: 'MenuId',
+                treeField: 'Name',
+                lines: true,
+                onClickRow: function (row) {
+                    if (row.MenuId == SelectId) {
+                        Grid.treegrid('unselect', SelectId);
+                        SelectId = undefined;
+                    }
+                    else {
+                        SelectId = row.MenuId;
+                    }
+                },
+                columns: [[
+                    { title: '菜单ID', field: 'MenuId', width: 60 },
+                    { title: '名称', field: 'Name', width: 200, editor: { type: "textbox", options: { required: true } } },
+                    { title: '图标', field: 'Icon', width: 100, editor: 'text' },
+                    { title: '排序', field: 'Sort', width: 40, align: 'right', editor: 'numberbox' },
+                    { title: '指向路径', field: 'Url', width: 300, editor: 'text' },
+                    {
+                        title: '访问角色权限', field: 'Roles', width: 150, editor: {
+                            type: 'combobox',
+                            options: {
+                                valueField: 'RoleId',
+                                textField: 'RoleName',
+                                method: 'GET',
+                                url: '/PCCCSysManger/GetRoles',
+                                multiple: true,
+                                editable: false
+                            }
+                        },
+                        formatter: function (value, row) {
+                            if (value != "" && value != null) {
+                                var roleids = value.split(",");
+                                var str = "";
+                                for (var i = 0; i < roleids.length; i++) {
+                                    for (var j = 0; j < RolesList.length; j++) {
+                                        if (roleids[i] == RolesList[j].RoleId) {
+                                            str += RolesList[j].RoleName+",";
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (str != "") {
+                                    str = str.substring(0, str.length - 1);
+                                }
+                                return str;
+                            }
+                        }
+                    },
+                    {
+                        title: '创建/编辑时间', field: 'ModifiedOn', width: 150, formatter: function (value) {
+                            if (value != null) {
+                                return new Date(value).Format("yyyy-MM-dd hh:mm");
+                            }
+                        }
+                    }
+                ]],
+                toolbar: [
+                    {
+                        text: '新增行',
+                        iconCls: 'icon-add',
+                        handler: function () {
+                            if (editingId == undefined) {
+                                var node = Grid.treegrid('getSelected');
+                                Grid.treegrid('append', {
+                                    parent: node == null ? null : node.MenuId,  // the node has a 'id' value that defined through 'idField' property
+                                    data: [{
+                                        MenuId: 0,
+                                        _parentId: node == null ? null : node.MenuId
+                                    }]
+                                });
+                                editingId = 0;
+                                Grid.treegrid('select', editingId).treegrid('beginEdit', editingId);
+                            }
+                        }
+                    },
+                    {
+                        text: '编辑',
+                        iconCls: 'icon-edit',
+                        handler: function () {
+                            if (editingId != undefined) {
+                                Grid.treegrid('select', editingId);
+                                return;
+                            }
+                            var row = Grid.treegrid('getSelected');
+                            if (row) {
+                                editingId = row.MenuId
+                                Grid.treegrid('beginEdit', editingId);
+                            }
+                        }
+                    },
+                    {
+                        text: '保存',
+                        iconCls: 'icon-save',
+                        handler: function () {
+                            if (editingId != undefined) {
+                                if (Grid.treegrid('validateRow', editingId)) {
+                                    Grid.treegrid('select', editingId);
+                                    Grid.treegrid('endEdit', editingId);
+                                    editingId = undefined;
+                                    var rows = Grid.treegrid('getSelected');
+                                    $.post("/api/ApiSysManager/EditSysMenu", rows, function (json) {
+                                        if (json.ReturnCode != 0) {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                    Grid.treegrid('acceptChanges');
+                                }
+                            }
+                            else {
+                                $.messager.alert('错误', '没有数据需要保存', 'error');
+                            }
+                        }
+                    },
+                    {
+                        text: '取消编辑',
+                        iconCls: 'icon-undo',
+                        handler: function () {
+                            if (editingId != undefined) {
+                                Grid.treegrid('select', editingId);
+                                var row = Grid.treegrid('getSelected');
+                                Grid.treegrid('cancelEdit', editingId);
+                                if (row.MenuId == 0) {
+                                    Grid.datagrid('deleteRow', editingId);
+                                }
+                                editingId = undefined;
+                            }
+                        }
+                    },
+                    {
+                        text: '刷新',
+                        iconCls: 'icon-reload',
+                        handler: function () {
+                            $.getJSON("/api/ApiSysManager/GetSysMenuList", function (json) {
+                                var data = new Object();//树网格特殊操作
+                                data.rows = json;//树形网格特殊操作
+                                Grid.treegrid('loadData', data);
+                            });
+                        }
+                    },
+                    {
+                        text: '节点位置调整',
+                        iconCls:'icon-filter',
+                        handler: function () {
+                            $("#SortMenuTreeWindow").window("open");
+                            $('#SortMenuTreeWindowTree').tree({
+                                url: '/api/ApiSysManager/GetSysMenuTreeModel',
+                                method:'post',
+                                animate: true,
+                                lines: true,
+                                dnd: true,
+                                onDrop: function (target, source, point) {
+                                    //父节点确认
+                                    var ParentNode = null;
+                                    if (point == "append") {
+                                        //被放到某节点内部，获取该节点信息
+                                        ParentNode = $('#SortMenuTreeWindowTree').tree("getNode", target);
+                                    }
+                                    else {
+                                        //被放到某节点内部，获取该节点信息
+                                        ParentNode = $('#SortMenuTreeWindowTree').tree("getParent", target);
+                                    }
+                                    var Pid = null;
+                                    if (ParentNode != null) {
+                                        Pid = ParentNode.id;
+                                    }
+                                    console.log("新的父节点ID：" + Pid);
+                                    $.ajax({
+                                        async: false, //同步开关
+                                        type: "POST",
+                                        url: "/api/ApiSysManager/ChangeSysMenuPid",
+                                        data: { MenuId: source.id, ParentId: Pid },
+                                        success: function (json) {
+                                            if (json.ReturnCode != 0) {
+                                                //错误
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                                $("#SortMenuTreeWindow").window("close");
+                                            }
+                                            console.log(json);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: '删除',
+                        iconCls: 'icon-clear',
+                        handler: function () {
+                            if (SelectId != undefined) {
+                                var ThisRow = Grid.treegrid('getSelected');
+                                $.messager.confirm('请确认', '确定要删除菜单：[' + ThisRow.Name + "]？<br />其子节点将会一并删除", function (r) {
+                                    if (r) {
+                                        var ChildRow = Grid.treegrid('getChildren', ThisRow.MenuId);
+                                        var delids = ThisRow.MenuId + '';
+                                        if (ChildRow.length > 0) {
+                                            for (var i = 0; i < ChildRow.length; i++) {
+                                                delids += ',' + ChildRow[i].MenuId;
+                                            }
+                                        }
+                                        //删除操作
+                                        $.getJSON("/api/ApiSysManager/DelSysMenus?Ids=" + delids, function (json) {
+                                            if (json.ReturnCode != 0) {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                            Grid.treegrid('remove', ThisRow.MenuId);
+                                        });
+                                    }
+                                });
+                                SelectId = undefined;
+                            }
+                            else {
+                                $.messager.alert('错误', '请先选择一行', 'error');
+                            }
+                        }
+                    }
+                ]
+            });
+            $("#SortMenuTreeWindow").window({
+                onClose: function () {
+                    $("#SortMenuTreeWindowTree").html("");//清空树
+                    $.getJSON("/api/ApiSysManager/GetSysMenuList", function (json) {//刷新网格树
+                        var data = new Object();//树网格特殊操作
+                        data.rows = json;//树形网格特殊操作
+                        Grid.treegrid('loadData', data);
+                    });
+                }
+            });
+        });
+    });
+</script>
+<div id="SortMenuTreeWindow" class="easyui-window" title="节点位置调整" data-options="collapsible:false,minimizable:false,maximizable:false,closed:true,resizable:false,modal:true,inline:true" style="width:300px;height:350px;padding:10px;">
+    <div class="tr"><a href="javascript:void(0)" title="拖拽节点调整位置" class="easyui-tooltip easyui-linkbutton" data-options="iconCls:'icon-tip'">提示</a></div>
+    <ul id="SortMenuTreeWindowTree"></ul>
+</div>
+<table id="MenuTreeSetGrid"></table>

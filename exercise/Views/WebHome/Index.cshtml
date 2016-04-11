@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/PcWeb_BootStrapLayout.cshtml";
+}
+<script>
+    $(function () {
+        var SearchDocumentsResourceListRequest = {
+            "GroupName": [
+                "UpdataWeb"
+            ],
+            "KeyWords": "",
+            "OrderType": 0,
+            "GetContent": false,
+            "ContentLength": 25,
+            "GetDisabled": false,
+            "Page": "1",
+            "PageSize": "15"
+        };
+
+        $(document).on("click", ".updatalogbtn", function () {
+            var btn = $(this);
+            var Tap = $(this).find("span");
+            var row = $(this).parent().parent();
+            var id = $(this).attr("title");
+            btn.attr("disabled", "disabled");
+            if (Tap.attr("title") == "close") {
+                Tap.removeClass("glyphicon-zoom-in");
+                Tap.addClass("glyphicon-zoom-out");
+                SearchDocumentsResourceListRequest.DocumentId = id;
+                SearchDocumentsResourceListRequest.GetContent = true;
+                $.post("/api/ApiDocumentResource/SearchDocument", SearchDocumentsResourceListRequest, function (json) {
+                    console.log(json);
+                    row.after("<tr><td colspan='3'>" + json.rowlist[0].Content + "</td></tr>");
+                    Tap.attr("title", "open");
+                    btn.removeAttr("disabled");
+                });
+            }
+            else {
+                Tap.attr("title", "close");
+                Tap.removeClass("glyphicon-zoom-out");
+                Tap.addClass("glyphicon-zoom-in");
+                row.next().remove();
+                btn.removeAttr("disabled");
+            }
+        });
+
+        $.post("/api/ApiDocumentResource/SearchDocument", SearchDocumentsResourceListRequest, function (json) {
+            console.log("获取更新文档");
+            console.log(json);
+            var Table = $("#SysUpdataLogInfoListTable");
+            Table.html("");
+            var ListView = "";
+            if (json.rowlist.length > 0) {
+                for (var i = 0; i < json.rowlist.length; i++) {
+                    ListView += '<tr><td>' + new Date(json.rowlist[i].ModifiedOn).Format("yyyy-MM-dd hh:mm") + '</td><td>' + json.rowlist[i].Content + '</td><td class="text-right"><button class="btn btn-default btn-xs updatalogbtn" title="' + json.rowlist[i].DocumentId + '"><span class="glyphicon glyphicon-zoom-in" title="close"></span></button></td></tr>'
+                }
+                Table.html(ListView);
+            }
+        });
+    });
+</script>
+<div class="container">
+    <div class="page-header">
+        <h1>优翔（U上商侣）<small>服务端信息</small></h1>
+    </div>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-default navbar-inverse">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-align-left"></span>&nbsp;系统导航</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="~/PCCCMain/LogOn" target="_blank">管理后台入口</a></li>
+                    <li><a href="help" target="_blank">API接口说明文档</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">更新日志</div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="col-md-3">时间</th>
+                                <th>描述</th>
+                                <th class="col-md-1"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="SysUpdataLogInfoListTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">系统信息</div>
+                <div class="panel-body">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>描述</th>
+                                <th>版本</th>
+                                <th>文档</th>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>asp.net mvc</td>
+                            <td>4.0</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Microsoft .NET Framework</td>
+                            <td>4.5</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>JQuery</td>
+                            <td>2.14</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>JQuery Mobile</td>
+                            <td>1.4.5</td>
+                            <td><a href="http://www.lampweb.org/jquerymobile/2/" target="_blank">查看</a></td>
+                        </tr>
+                        <tr>
+                            <td>EasyUi</td>
+                            <td>1.4.3</td>
+                            <td><a href="http://www.jeasyui.net/plugins/" target="_blank">查看</a></td>
+                        </tr>
+                        <tr>
+                            <td>BootStrap</td>
+                            <td>3.3.5</td>
+                            <td><a href="http://v3.bootcss.com/css/" target="_blank">查看</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">系统构成</div>
+                <div class="panel-body">
+                    <table class="table">
+                        <tr>
+                            <td>接口</td>
+                            <td>系统所能提供的所有方法</td>
+                        </tr>
+                        <tr>
+                            <td>管理后台模块</td>
+                            <td>数据维护及客服人员工作平台</td>
+                        </tr>
+                        <tr>
+                            <td>网页</td>
+                            <td>些零散的网页，供APP调用</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src='//kefu.easemob.com/webim/easemob.js?tenantId=15310&hide=false' async='async'></script>

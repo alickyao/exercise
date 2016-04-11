@@ -1,0 +1,149 @@
+﻿@{
+    RequestBase condtion = ViewBag.condtion;
+}
+<script>
+    //定义的请求参数
+    var SysRoleGridCondtion = new Object();
+    SysRoleGridCondtion.Page = @condtion.Page;
+    SysRoleGridCondtion.PageSize = @condtion.PageSize;
+    $.post("/api/ApiSysManager/GetSysRoleList", SysRoleGridCondtion, function (json) {
+        //当前选中或编辑的行
+        var SysRoleGrideditIndex = undefined;
+
+        function SysRoleGridEndEditing(){
+            if (SysRoleGrideditIndex == undefined){return true}
+            if ($('#SysRoleGrid').datagrid('validateRow', SysRoleGrideditIndex)){
+                $('#SysRoleGrid').datagrid('endEdit', SysRoleGrideditIndex);
+                SysRoleGrideditIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        //刷新网格数据
+        function loadgriddata(){
+            $.post("/api/ApiSysManager/GetSysRoleList", SysRoleGridCondtion, function (json) {
+                $('#SysRoleGrid').datagrid("loadData", { "total": json.total, "rows": json.RowList });//加载数据
+            });
+        }
+
+        //网格初始化
+        $('#SysRoleGrid').datagrid({
+            columns: [[
+                { field: 'RoleId', title: '角色ID', width: 100 },
+                { field: 'RoleName', title: '角色名称', width: 150,editor:{type:"textbox",options:{required:true}} },
+                { field: 'RoleDescribe', title: '角色描述', width: 500,editor:{type:"textbox"} }
+            ]],
+            pagination: true,
+            pageSize: @condtion.PageSize,
+            pageNumber: @condtion.Page,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect:true,
+            idField:"RoleId",
+            data:{ "total": json.total, "rows": json.RowList },
+            toolbar:[
+                    {
+                        text:'新增行',
+                        iconCls:'icon-add',
+                        handler:function(){
+                            if (SysRoleGridEndEditing()){
+                                $('#SysRoleGrid').datagrid('insertRow',{index: 0,row:{RoleId:0}});
+                                SysRoleGrideditIndex = 0;
+                                $('#SysRoleGrid').datagrid('selectRow', SysRoleGrideditIndex).datagrid('beginEdit', SysRoleGrideditIndex);
+                            }
+                        }
+                    },
+                    {
+                        text:'保存',
+                        iconCls:'icon-save',
+                        handler:function(){
+                            if (SysRoleGridEndEditing()){
+                                var rows = $('#SysRoleGrid').datagrid('getChanges');
+                                if (rows.length>0){
+                                    var error = false;
+                                    for(var i=0;i<rows.length;i++){
+                                        $.ajax({
+                                            async: false, //同步开关
+                                            type: "POST",
+                                            url: "/api/ApiSysManager/EditSysRole",
+                                            data: rows[i],
+                                            success:function(json){
+                                                if (json.ReturnCode != 0){
+                                                    $.messager.alert('错误',json.ReturnMessage,'error');
+                                                    error = true;
+                                                }
+                                            }
+                                        });
+                                        if (error){
+                                            break;
+                                        }
+                                    }
+                                    if (!error){
+                                        $.messager.alert('Success','数据保存成功','info');
+                                        $('#SysRoleGrid').datagrid('acceptChanges');//保存成功后更细变更
+                                    }
+                                    loadgriddata();
+                                }
+                                else{
+                                    $.messager.alert('提示','没有数据需要保存','warning');
+                                }
+                            }
+                        }
+                    },
+                    {
+                        text:'删除',
+                        iconCls:'icon-clear',
+                        handler:function(){
+                            if (SysRoleGrideditIndex == undefined){return}
+                            var row = $('#SysRoleGrid').datagrid('getSelected');
+                            if (row.RoleId != 0){//判断是否为新增的行
+                                $.messager.confirm('请确认', '确定要删除系统角色：'+row.RoleName, function(r){
+                                    if (r){
+                                        $.getJSON("/api/ApiSysManager/DelSysRole/"+row.RoleId,function(json){
+                                            if (json.ReturnCode == 0){
+                                                $.messager.alert('Success','删除成功','info');
+                                                $('#SysRoleGrid').datagrid('cancelEdit', SysRoleGrideditIndex).datagrid('deleteRow', SysRoleGrideditIndex);
+                                                SysRoleGrideditIndex = undefined;
+                                            }
+                                            else{
+                                                $.messager.alert('错误',json.ReturnMessage,'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            }else{
+                                //新增的行直接删除
+                                $('#SysRoleGrid').datagrid('cancelEdit', SysRoleGrideditIndex).datagrid('deleteRow', SysRoleGrideditIndex);
+                                SysRoleGrideditIndex = undefined;
+                            }
+                        }
+                    }
+                ],
+            onClickRow:function(index){
+                if (SysRoleGridEndEditing != index){
+                    if (SysRoleGridEndEditing()){
+                        $('#SysRoleGrid').datagrid('selectRow', index).datagrid('beginEdit', index);
+                        SysRoleGrideditIndex = index;
+                    } else {
+                        $('#SysRoleGrid').datagrid('selectRow', SysRoleGrideditIndex);
+                    }
+                }
+            }
+        });
+        //翻页设置
+        $('#SysRoleGrid').datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                SysRoleGridCondtion.Page = pPageIndex;
+                SysRoleGridCondtion.PageSize = pPageSize;
+                $.post("/api/ApiSysManager/GetSysRoleList", SysRoleGridCondtion, function (json) {
+                    $('#SysRoleGrid').datagrid("loadData", { "total": json.total, "rows": json.RowList });//加载数据
+                });
+            }
+        });
+    });
+
+</script>
+<table id="SysRoleGrid"></table>

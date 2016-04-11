@@ -1,0 +1,343 @@
+﻿@{
+    SearchDocumentsResourceListRequestModel condtion = ViewBag.condtion;
+}
+<script>
+    var SearchDocumentsResourceListRequest = {
+        "DocumentId": "",
+        "GroupName": [
+        ],
+        "KeyWords": "@condtion.KeyWords",
+        "OrderType": 0,
+        "GetContent": false,
+        "ContentLength": 20,
+        "GetDisabled": true,
+        "Page": "@condtion.Page",
+        "PageSize": "@condtion.PageSize"
+    };
+    $.post("/api/ApiDocumentResource/SearchDocument", SearchDocumentsResourceListRequest, function (json) {
+        console.log(json);
+        var Editor = KindEditor.create("textarea[name='Content']", {
+            uploadJson: '/PCCCDocumentResource/EditorImgFileUpload',
+            //uploadJson: '/api/ApiFileManager/HtmlEditorFileUpload',
+            fileManagerJson: '/Scripts/kindeditor/asp.net/file_manager_json.ashx',
+            allowFileManager: true
+        });
+
+        $.each(json.rowlist, function (index, item) {
+            item.IsDisabled = item.IsDisabled ? "true" : "false";
+        });
+
+        //表单
+        var FormWindow = $("#RsDocumentResourceGridFormWindow");
+        var FromTable = $('#RsDocumentResourceGridForm');
+        var Grid = $("#RsDocumentResourceGrid");
+        FormWindow.dialog({
+            toolbar: [{
+                text: '保存',
+                iconCls: 'icon-save',
+                handler: function () {
+                    FromTable.form('submit', {
+                        url: '',
+                        onSubmit: function () {
+                            var Reg = $(this).form('enableValidation').form('validate');
+                            if (Reg) {
+
+                                var d = FromTable.serializeObject();
+                                d.Content = Editor.html();
+                                console.log(d);
+                                $.post("/api/ApiDocumentResource/EditDocument", d, function (data) {
+                                    if (data.ReturnCode == 0) {
+                                        $.post("/api/ApiDocumentResource/SearchDocument", SearchDocumentsResourceListRequest, function (json) {
+                                            $.each(json.rowlist, function (index, item) {
+                                                item.IsDisabled = item.IsDisabled ? "true" : "false";
+                                            });
+                                            Grid.datagrid("loadData", { "total": json.total, "rows": json.rowlist });
+                                            FormWindow.dialog("close");
+                                        });
+                                    }
+                                    else {
+                                        $.messager.alert('错误', data.ReturnMessage, 'error');
+                                    }
+                                });
+                            }
+                            else {
+                                return false;
+                            }
+                        }
+                    });
+                }
+            }, {
+                text: '关闭',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    FormWindow.dialog("close");
+                }
+            }]
+        });
+
+        var EditIndex = undefined;
+
+        function EndEdit() {
+            if (EditIndex == undefined) { return true; }
+            Grid.datagrid('endEdit', EditIndex);
+            EditIndex = undefined;
+            return true;
+        }
+
+        Grid.datagrid({
+            pagination: true,
+            pageSize: SearchDocumentsResourceListRequest.PageSize,
+            pageNumber: SearchDocumentsResourceListRequest.Page,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            idField: "DocumentId",
+            data: { "total": json.total, "rows": json.rowlist },
+            onClickRow: function (index) {//行点击事件
+                if (EndEdit()) {
+                    EditIndex = index;
+                    Grid.datagrid('selectRow', index).datagrid('beginEdit', index);
+                }
+            },
+            columns: [[
+                { field: 'DocumentId', title: '文档Id', width: 120 },
+                { field: 'GroupName', title: '分组', width: 100 },
+                { field: 'Sort', title: '排序', width: 60, editor: { type: "numberbox" } },
+                {
+                    field: 'IsDisabled', title: '是否禁用', width: 60, editor: {
+                        type: 'checkbox',
+                        options: { on: 'true', off: 'false' }
+                    }
+                },
+                { field: 'Caption', title: '标题', width: 180 },
+                { field: 'Content', title: '内容', width: 250 },
+                {
+                    field: 'ModifiedOn', title: '添加/编辑时间', width: 110, formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '新增',
+                    iconCls: 'icon-add',
+                    handler: function () {
+                        //定义表单初始化值
+                        var DefaultRow = {
+                            "DocumentId": "",
+                            "ModifiedOn": "",
+                            "Caption": "",
+                            "Content": "",
+                            "Sort": null,
+                            "GroupName": "",
+                            "IsDisabled": false
+                        };
+                        FromTable.form('load', DefaultRow);
+                        Editor.html(DefaultRow.Content);
+                        FormWindow.dialog("open");
+                    }
+                },
+                {
+                    text: '编辑',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            $.post("/api/ApiDocumentResource/SearchDocument", { DocumentId: row.DocumentId, GetDisabled: true }, function (datarow) {
+                                FromTable.form('load', datarow.rowlist[0]);
+                                Editor.html(datarow.rowlist[0].Content == null ? "" : datarow.rowlist[0].Content);
+                                FormWindow.dialog("open");
+                            });
+                        }
+                        else {
+                            $.messager.alert('Info', "请选择一行", 'info');
+                        }
+                    }
+                },
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        if (EndEdit()) {
+                            var rows = Grid.datagrid('getChanges');
+                            if (rows.length > 0) {
+                                var Request = new Object();
+                                Request.request = rows;
+                                $.post("/api/ApiDocumentResource/SortDocuments", Request, function (json) {
+                                    console.log(json);
+                                    if (json.ReturnCode == 0) {
+                                        $.messager.alert('Success', "保存成功", 'info');
+                                        Grid.datagrid('acceptChanges');
+                                    }
+                                    else {
+                                        $.messager.alert('错误', json.ReturnMessage, 'error');
+                                    }
+                                });
+                            }
+                            else {
+                                $.messager.alert('Info', "没有数据需要保存", 'info');
+                            }
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            $.messager.confirm('请确认', '确定要删除文档：' + row.Caption + "？<br />您可以设置禁用，让该条目不再前台显示", function (r) {
+                                if (r) {
+                                    $.getJSON("/api/ApiDocumentResource/DelDocument/" + row.DocumentId, function (json) {
+                                        console.log(json);
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', '删除成功', 'info');
+                                            Grid.datagrid('cancelEdit', EditIndex).datagrid('deleteRow', EditIndex);
+                                            EditIndex = undefined;
+                                            Grid.datagrid('acceptChanges');
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    })
+                                }
+                            });
+                        } else {
+                            $.messager.alert('Info', "请选择一行", 'info');
+                        }
+                    }
+                }
+            ]
+        });
+        //翻页设置
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                SearchDocumentsResourceListRequest.Page = pPageIndex;
+                SearchDocumentsResourceListRequest.PageSize = pPageSize;
+                $.post("/api/ApiDocumentResource/SearchDocument", SearchDocumentsResourceListRequest, function (json) {
+                    //重构数据
+                    $.each(json.rowlist, function (index, item) {
+                        item.IsDisabled = item.IsDisabled ? "true" : "false";
+                    });
+                    Grid.datagrid("loadData", { "total": json.total, "rows": json.rowlist });//加载数据
+                    //加载后重置单元格编辑（翻页后忽略前一页的编辑项）
+                    EditIndex = undefined;
+                    Grid.datagrid('acceptChanges');
+                });
+            }
+        });
+
+        //查询栏
+        $("#RsDocumentResourceGridSearchClearSearchBtn").click(function () {
+            $("#RsDocumentResourceGridSearchFrom").form('clear');
+        });
+
+        $("#RsDocumentResourceGridSearchBtn").click(function () {
+            console.log("Search...");
+            var d = $("#RsDocumentResourceGridSearchFrom").serializeObject();
+            SearchDocumentsResourceListRequest.Page = "@condtion.Page";
+            SearchDocumentsResourceListRequest.PageSize = "@condtion.PageSize";
+            SearchDocumentsResourceListRequest.KeyWords = d.KeyWords;
+            SearchDocumentsResourceListRequest.GroupName = d.GroupName;
+            console.log(d);
+            $.post("/api/ApiDocumentResource/SearchDocument", SearchDocumentsResourceListRequest, function (json) {
+                //重构数据
+                $.each(json.rowlist, function (index, item) {
+                    item.IsDisabled = item.IsDisabled ? "true" : "false";
+                });
+                Grid.datagrid("loadData", { "total": json.total, "rows": json.rowlist });//加载数据
+                //加载后重置单元格编辑（翻页后忽略前一页的编辑项）
+                EditIndex = undefined;
+                Grid.datagrid('acceptChanges');
+            });
+        });
+
+    });
+</script>
+<div id="RsDocumentResourceGridFormWindow" style="padding: 10px;" class="easyui-dialog" data-options="
+            modal: true,
+            inline: true,
+            closed: true,
+            fit: true,
+            title: '新增/编辑',
+            draggable:true,
+            top:30" >
+    <form id="RsDocumentResourceGridForm" method="post">
+        <table class="formtable">
+            <tr>
+                <td>标题：</td>
+                <td colspan="5">
+                    <input type="text" name="Caption" class="easyui-textbox" data-options="required:true" style="width: 100%" /></td>
+            </tr>
+            <tr>
+                <td>分组：</td>
+                <td>
+                    <input name="GroupName" class="easyui-combobox" data-options="
+                                valueField: 'id',
+		                        extField: 'text',
+                                url:'/api/ApiDocumentResource/GetAllDocumentsGroupInfo',
+                                method:'get'" />
+                </td>
+                <td>排序：</td>
+                <td>
+                    <input type="number" name="Sort" class="easyui-numberbox" /></td>
+                <td>禁用：</td>
+                <td>
+                    <input name="IsDisabled" class="easyui-combobox" data-options="valueField: 'id',
+		                                textField: 'text',
+		                                data: [{
+			                                id: true,
+			                                text: '是'
+		                                },{
+			                                id: false,
+			                                text: '否'
+		                                }],editable:false" />
+                </td>
+            </tr>
+        </table>
+        <table class="formtable" style="width: 100%; margin-top: 10px">
+            <tr>
+                <td>内容</td>
+            </tr>
+            <tr>
+                <td>
+                    <textarea name="Content" style="width: 100%; height: 400px;"></textarea></td>
+            </tr>
+        </table>
+        <input type="hidden" name="DocumentId" />
+    </form>
+</div>
+<div id="RsDocumentResourceGridLayOut" class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'54',border:false">
+        <div class="easyui-panel SearchBox" style="padding: 10px; background: #fafafa;" data-options="fit:true,border:true">
+            <form id="RsDocumentResourceGridSearchFrom">
+                <table>
+                    <tr>
+                        <td>组</td>
+                        <td>
+                            <input name="GroupName" class="easyui-combobox" data-options="
+                                valueField: 'id',
+		                        extField: 'text',
+                                multiple:true,
+                                url:'/api/ApiDocumentResource/GetAllDocumentsGroupInfo',
+                                method:'get'" /></td>
+                        <td>关键字</td>
+                        <td>
+                            <input type="text" name="KeyWords" class="easyui-textbox" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="RsDocumentResourceGridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="RsDocumentResourceGridSearchClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'">
+        <table id="RsDocumentResourceGrid"></table>
+    </div>
+</div>
+

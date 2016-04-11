@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="cyclone" Class="UsungSysTemDataBaseDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=127.0.0.1;Initial Catalog=cyclone;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="cycloneConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Us_SysRole" Member="Us_SysRole">
+    <Type Name="Us_SysRole">
+      <Column Name="Us_SysRoleId" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="RoleName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="RoleDescribe" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Association Name="Us_SysUser_Us_SysRole" Member="Us_SysUser" ThisKey="Us_SysRoleId" OtherKey="Us_SysRoleId" Type="Us_SysUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_SysMenu" Member="Us_SysMenu">
+    <Type Name="Us_SysMenu">
+      <Column Name="Us_SysMenuId" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Sort" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Pid" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="Url" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="Roles" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="ModifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Icon" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_SysUserLog" Member="Us_SysUserLog">
+    <Type Name="Us_SysUserLog">
+      <Column Name="Us_SysUserLogId" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="CreatedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Us_SysUserId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FkId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Describe" Type="System.String" DbType="VarChar(200) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_SysUpdateLog" Member="Us_SysUpdateLog">
+    <Type Name="Us_SysUpdateLog">
+      <Column Name="Us_SysUpdateLogId" Type="System.Int64" DbType="BigInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="SysUserId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="LogType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="LogDescribe" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="CreatedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsDocumentResource" Member="Us_RsDocumentResource">
+    <Type Name="Us_RsDocumentResource">
+      <Column Name="Us_RsDocumentResourceId" Type="System.String" DbType="VarChar(17) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ModifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Caption" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Content" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Sort" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="GroupName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="IsDisabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_SysLog" Member="Us_SysLog">
+    <Type Name="Us_SysLog">
+      <Column Name="Us_SysLogId" Type="System.String" DbType="VarChar(17) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="type" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="condtion" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="errormsg" Type="System.String" DbType="NText" CanBeNull="true" UpdateCheck="Never" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsCatInfo" Member="Us_RsCatInfo">
+    <Type Name="Us_RsCatInfo">
+      <Column Name="Us_RsCatInfoId" Type="System.String" DbType="VarChar(17) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Caption" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Sort" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="parentid" Type="System.String" DbType="VarChar(17)" CanBeNull="true" />
+      <Column Name="ModifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsUserInputRule" Member="Us_RsUserInputRule">
+    <Type Name="Us_RsUserInputRule">
+      <Column Name="Us_RsUserInputRuleId" Type="System.String" DbType="VarChar(17) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Caption" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="InputType" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Options" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="Sort" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ModifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_DepDepartMent" Member="Us_DepDepartMent">
+    <Type Name="Us_DepDepartMent">
+      <Column Name="Us_DepDepartMentId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="IsDisabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Caption" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Pid" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="IsShow" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="ModifiedBy" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="LinkUserId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsExinfo" Member="Us_RsExinfo">
+    <Type Name="Us_RsExinfo">
+      <Column Name="Us_RsExinfoId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="fkId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="catId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="isDelete" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="detail" Type="System.String" DbType="VarChar(300) NOT NULL" CanBeNull="false" />
+      <Column Name="modifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="modifiedBy" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_MemberDepartment" Member="Us_MemberDepartment">
+    <Type Name="Us_MemberDepartment">
+      <Column Name="Us_SysUserId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Us_DepDepartMentRootId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Us_DepDepartMentId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="path" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="pathText" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="isCaption" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="createdOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Association Name="Us_SysUser_Us_MemberDepartment" Member="Us_SysUser" ThisKey="Us_SysUserId" OtherKey="Us_SysUserId" Type="Us_SysUser" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElongHotel_Geos" Member="ElongHotel_Geos">
+    <Type Name="ElongHotel_Geos">
+      <Column Name="Country" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ProvinceName" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ProvinceId" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="CityName" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="CityCode" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="ElongHotel_Geos_ElongHotel_GeoLocations" Member="ElongHotel_GeoLocations" ThisKey="CityCode" OtherKey="PatendId" Type="ElongHotel_GeoLocations" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElongHotel_GeoLocations" Member="ElongHotel_GeoLocations">
+    <Type Name="ElongHotel_GeoLocations">
+      <Column Name="PatendId" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Id" Type="System.String" DbType="NVarChar(20) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="T" Type="System.String" DbType="NVarChar(1) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="ElongHotel_Geos_ElongHotel_GeoLocations" Member="ElongHotel_Geos" ThisKey="PatendId" OtherKey="CityCode" Type="ElongHotel_Geos" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.View_ElongHotelGeos" Member="View_ElongHotelGeos">
+    <Type Name="View_ElongHotelGeos">
+      <Column Name="Country" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ProvinceName" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="ProvinceId" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="CityCode" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="CityName" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="PY" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="PinYin" Type="System.String" DbType="VarChar(8000)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.View_ElongHotelGeosLocations" Member="View_ElongHotelGeosLocations">
+    <Type Name="View_ElongHotelGeosLocations">
+      <Column Name="PatendId" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="Id" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(30) NOT NULL" CanBeNull="false" />
+      <Column Name="T" Type="System.String" DbType="NVarChar(1) NOT NULL" CanBeNull="false" />
+      <Column Name="PY" Type="System.String" DbType="NVarChar(4000)" CanBeNull="true" />
+      <Column Name="PinYin" Type="System.String" DbType="VarChar(8000)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElongHotel_Brands" Member="ElongHotel_Brands">
+    <Type Name="ElongHotel_Brands">
+      <Column Name="BrandId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="GroupId" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="ShortName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Letters" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElongHotel_Hotel" Member="ElongHotel_Hotel">
+    <Type Name="ElongHotel_Hotel">
+      <Column Name="Id" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="Address" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="PostalCode" Type="System.String" DbType="NVarChar(6)" CanBeNull="true" />
+      <Column Name="StarRate" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="Category" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="Phone" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Fax" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="EstablishmentDate" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="RenovationDate" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="GroupId" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="BrandId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IsEconomic" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="IsApartment" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="GoogleLat" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="GoogleLon" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="BaiduLat" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="BaiduLon" Type="System.Double" DbType="Float" CanBeNull="true" />
+      <Column Name="CityId" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="BusinessZone" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="District" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="CreditCards" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="IntroEditor" Type="System.String" DbType="NVarChar(1024)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(1024)" CanBeNull="true" />
+      <Column Name="GeneralAmenities" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="RoomAmenities" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="RecreationAmenities" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="ConferenceAmenities" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="DiningAmenities" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Traffic" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Surroundings" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Facilities" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="SummaryScore" Type="System.Decimal" DbType="Decimal(10,5)" CanBeNull="true" />
+      <Column Name="InstantConfirmScore" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="BookingSuccessScore" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ComplaintScore" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="SummaryRate" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="InstantConfirmRate" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="BookingSuccessRate" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ComplaintRate" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="UpdateDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="HasCoupon" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Column Name="ReviewCount" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ReviewGood" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ReviewPoor" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ReviewScore" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Association Name="ElongHotel_Hotel_ElongHotel_HotelImages" Member="ElongHotel_HotelImages" ThisKey="Id" OtherKey="HotelId" Type="ElongHotel_HotelImages" />
+      <Association Name="ElongHotel_Hotel_ElongHotel_HotelRooms" Member="ElongHotel_HotelRooms" ThisKey="Id" OtherKey="HotelId" Type="ElongHotel_HotelRooms" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElongHotel_HotelImages" Member="ElongHotel_HotelImages">
+    <Type Name="ElongHotel_HotelImages">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="HotelId" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Locations" Type="System.String" DbType="NVarChar(300)" CanBeNull="true" />
+      <Column Name="WaterMark" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="Size" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="RoomId" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Type" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="IsCoverImage" Type="System.String" DbType="NVarChar(10)" CanBeNull="true" />
+      <Association Name="ElongHotel_Hotel_ElongHotel_HotelImages" Member="ElongHotel_Hotel" ThisKey="HotelId" OtherKey="Id" Type="ElongHotel_Hotel" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ElongHotel_HotelRooms" Member="ElongHotel_HotelRooms">
+    <Type Name="ElongHotel_HotelRooms">
+      <Column Name="Id" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Area" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Floor" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="BroadnetAccess" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="BroadnetFee" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="Comments" Type="System.String" DbType="NVarChar(512)" CanBeNull="true" />
+      <Column Name="Description" Type="System.String" DbType="NVarChar(1024)" CanBeNull="true" />
+      <Column Name="BedType" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="Capacity" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="Facilities" Type="System.String" DbType="NVarChar(512)" CanBeNull="true" />
+      <Column Name="HotelId" Type="System.String" DbType="NVarChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Association Name="ElongHotel_Hotel_ElongHotel_HotelRooms" Member="ElongHotel_Hotel" ThisKey="HotelId" OtherKey="Id" Type="ElongHotel_Hotel" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsFlightAirport" Member="Us_RsFlightAirport">
+    <Type Name="Us_RsFlightAirport">
+      <Column Name="Us_RsFlightAirportId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="code" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="city" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="hot" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="PY" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="pinyin" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="caption" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="isOtherPortofTheCity" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="modifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsFlightAirCompany" Member="Us_RsFlightAirCompany">
+    <Type Name="Us_RsFlightAirCompany">
+      <Column Name="Us_RsFlightAirCompanyId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="code" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="caption" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="company" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="imgFilePath" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="modifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="sort" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsTraveller" Member="Us_RsTraveller">
+    <Type Name="Us_RsTraveller">
+      <Column Name="Us_RsTravellerId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="fkId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="fullName" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="idType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="idCard" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="isDefault" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="modifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RunSentSms" Member="Us_RunSentSms">
+    <Type Name="Us_RunSentSms">
+      <Column Name="Us_RunSentSmsId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="mobilePhones" Type="System.String" DbType="NText NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="contentMsg" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="createdBy" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="createdOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="sendState" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="returnMsg" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RsAddress" Member="Us_RsAddress">
+    <Type Name="Us_RsAddress">
+      <Column Name="Us_RsAddressId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="fkId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="cityId" Type="System.String" DbType="NVarChar(10) NOT NULL" CanBeNull="false" />
+      <Column Name="districtId" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
+      <Column Name="address" Type="System.String" DbType="NVarChar(200) NOT NULL" CanBeNull="false" />
+      <Column Name="postCode" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="isDefault" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="linkMan" Type="System.String" DbType="NVarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="linkPhone" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" />
+      <Column Name="modifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_SysUser" Member="Us_SysUser">
+    <Type Name="Us_SysUser">
+      <Column Name="Us_SysUserId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="IsDisabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Us_SysRoleId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="LoginName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PassWords" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FullName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="JobTitle" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="MobilePhone" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="MobilePhones" Type="System.String" DbType="VarChar(245)" CanBeNull="true" />
+      <Column Name="Email" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Sex" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IdType" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IdCard" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="NickName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="UserFace" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="baiduPushUserId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="baiduPushchannelId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="baiduPushdeviceType" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="getuiPushClientId" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="getuiPushDeviceType" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Association Name="Us_SysUser_Us_SysRole" Member="Us_SysRole" ThisKey="Us_SysRoleId" OtherKey="Us_SysRoleId" Type="Us_SysRole" />
+      <Association Name="Us_SysUser_Us_MemberDepartment" Member="Us_MemberDepartment" ThisKey="Us_SysUserId" OtherKey="Us_SysUserId" Type="Us_MemberDepartment" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RunSentPush" Member="Us_RunSentPush">
+    <Type Name="Us_RunSentPush">
+      <Column Name="Us_RunSentPushId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="createdOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="createdBy" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="messageType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="title" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="msg" Type="System.String" DbType="VarChar(500) NOT NULL" CanBeNull="false" />
+      <Column Name="customInfo" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="sentStats" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="sentResultAndroid" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="sentResultIos" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Association Name="Us_RunSentPush_Us_RunSentPushDetail" Member="Us_RunSentPushDetail" ThisKey="Us_RunSentPushId" OtherKey="Us_RunSentPushId" Type="Us_RunSentPushDetail" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_RunSentPushDetail" Member="Us_RunSentPushDetail">
+    <Type Name="Us_RunSentPushDetail">
+      <Column Name="Us_RunSentPushDetailId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Us_RunSentPushId" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="clientId" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="deviceType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
+      <Column Name="sentUserId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Association Name="Us_RunSentPush_Us_RunSentPushDetail" Member="Us_RunSentPush" ThisKey="Us_RunSentPushId" OtherKey="Us_RunSentPushId" Type="Us_RunSentPush" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Function Name="dbo.f_split" Method="f_split" IsComposable="true">
+    <Parameter Name="SourceSql" Parameter="sourceSql" Type="System.String" DbType="VarChar(8000)" />
+    <Parameter Name="StrSeprate" Parameter="strSeprate" Type="System.String" DbType="VarChar(10)" />
+    <ElementType Name="f_splitResult">
+      <Column Name="a" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+    </ElementType>
+  </Function>
+</Database>

@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "LogOn";
+    Layout = "~/Views/Shared/PcWeb_Layout.cshtml";
+}
+
+
+<script>
+    function submitLogonForm() {
+        $("#FormLogon").form('submit', {
+            onSubmit: function () {
+                var Reg = $(this).form('enableValidation').form('validate');
+                if (Reg) {
+                    //自定义POST提交
+                    var d = $("#FormLogon").serializeObject();//序列化为JSON对象格式
+                    d.UserPassWord = md5(d.UserPassWord);//
+                    console.log(d);
+                    $('#LogonBtn').linkbutton('disable');
+                    $("#LogonTip").text("验证中...请稍后");
+                    $.post("/api/ApiSysManager/SysUserLogon", d, function (json) {
+                        if (json.ReturnCode == 0) {
+                            //登陆成功
+                            $("#LogonTip").text("验证成功...页面即将跳转");
+                            window.location.href = "Home";
+                        }
+                        else {
+                            //登陆失败
+                            $("#LogonTip").text(json.ReturnMessage);
+                            $('#LogonBtn').linkbutton('enable');
+                        }
+                    });
+                }
+                return Reg;
+            }
+        });
+    }
+</script>
+<div id="LogonBox">
+    <div class="easyui-panel" title="请登录">
+        <div class="formbox">
+        <form action="LogOn" method="post" id="FormLogon">
+            <table>
+                <tr>
+                    <td>登录名：</td>
+                    <td><input class="easyui-textbox" type="text" name="UserName" data-options="required:true" /></td>
+                </tr>
+                <tr>
+                    <td>密码：</td>
+                    <td><input class="easyui-textbox" type="password" name="UserPassWord" data-options="required:true" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="LogonBtn" onclick="submitLogonForm()">登陆</a>&nbsp;&nbsp;<span id="LogonTip"></span></td>
+                </tr>
+            </table>
+        </form>
+        </div>
+    </div>
+</div>
+
+

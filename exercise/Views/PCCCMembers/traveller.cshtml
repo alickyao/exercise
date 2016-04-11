@@ -1,0 +1,235 @@
+﻿@{
+    Layout = null;
+    string PageId = ViewBag.PageId;
+    GetUserExInfoListRequest condtion = ViewBag.condtion;
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+    string callback = ViewBag.callback;
+    /*
+
+    */
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        //常旅客网格定义
+        var Grid = $("#@(PageId)Grid");//网格对象
+        var request = $.parseJSON('@Html.Raw(r)');//请求参数
+        function loaddata() {
+            //加载网格数据
+            Grid.datagrid('unselectAll');
+            Grid.datagrid("loading");
+            console.log(request);
+            $.post("/api/ApiTraveller/RsGetTravellerInfoByfkid", request, function (json) {
+                console.log(json);
+                editrow = undefined;
+                Grid.datagrid("loaded");
+                Grid.datagrid("loadData", { total: json.length, rows: json });
+            });
+        }
+        var editrow = undefined;
+ 
+        var IdTypeData = undefined;
+        $.getJSON("/Api/ApiTraveller/GetidTypeData", function (json) {
+            IdTypeData = json;
+        });
+        Grid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小 - 不使用
+            singleSelect: true,
+            idField: "ravellerId",
+            columns: [[
+                {
+                    field: 'fullName', title: '姓名', width: 80, align: 'left', editor: { type: "textbox", options: { required: true, validType: "length[1, 10]" } }
+                },
+                {
+                    field: 'idType', title: '证件类型', width: 60, align: 'center', editor: {
+                        type: 'combobox',
+                        options: {
+                            valueField: 'id',
+                            textField: 'text',
+                            method: 'get',
+                            url: '/api/ApiTraveller/GetidTypeData',
+                            required: true
+                        }
+                    }, formatter: function (value, row) {
+                        for (var o in IdTypeData) {
+                            if (IdTypeData[o].id == value) {
+                                return IdTypeData[o].text;
+                            }
+                        }
+                    }
+                },
+                {
+                    field: 'idCard', title: '证件号', width: 120, align: 'left', editor: { type: "textbox", options: { required: true, validType: "length[1, 18]" } }
+                },
+                {
+                    field: 'isDefault', title: '默认', width: 40, align: 'center', formatter: function (value, row) {
+                        return value ? "是" : "否";
+                    }
+                },
+                {
+                    field: 'modifiedOn', title: '创建/注册时间', width: 120, align: 'right', formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '新增',
+                    iconCls: 'icon-add',
+                    handler: function () {
+                        if (editrow == undefined) {
+                            Grid.datagrid("insertRow", { index: 0, row: { id: "", fkid: request.fkId, modifiedOn: new Date() } }).datagrid("beginEdit", 0).datagrid("selectRow", 0);
+                            editrow = 0;
+                        }
+                        else {
+                            Grid.datagrid("selectRow", editrow);
+                        }
+                    }
+                },
+                {
+                    text: '编辑',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        //获取选中的行
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            if (editrow == undefined) {
+                                var rowindex = Grid.datagrid("getRowIndex", row);
+                                Grid.datagrid("beginEdit", rowindex);
+                                editrow = rowindex;
+                            }
+                            else {
+                                Grid.datagrid("selectRow", editrow);
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '取消编辑',
+                    iconCls: 'icon-undo',
+                    handler: function () {
+                        if (editrow != undefined) {
+                            Grid.datagrid("selectRow", editrow).datagrid("cancelEdit", editrow);
+                            var row = Grid.datagrid("getSelected");
+                            if (row.id == "") {
+                                Grid.datagrid("deleteRow", editrow);
+                            }
+                            editrow = undefined;
+                        }
+                    }
+                },
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        if (editrow != undefined) {
+                            var v = Grid.datagrid("validateRow", editrow);
+                            if (v) {
+                                var row = Grid.datagrid("endEdit", editrow).datagrid("selectRow", editrow).datagrid("getSelected"); 
+                                $.post("/Api/ApiTraveller/RsSaveTraveller", row, function (json) { 
+                                    if (json.ReturnCode == 0) {
+                                        $.messager.alert('Success', "保存成功", 'info');
+                                        loaddata();
+                                    }
+                                    else {
+                                        $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        Grid.datagrid("beginEdit", editrow);
+                                    }
+                                });
+                            }
+                            else {
+                                Grid.datagrid("selectRow", editrow);
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '没有数据需要保存', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        if (editrow == undefined) {
+                            var row = Grid.datagrid('getSelected');
+                            if (row != null) {
+                                $.messager.confirm('请确认', '确认删除' + row.fullName + '[' + row.idCard + ']吗？', function (r) {
+                                    if (r) {
+                                        var id = row.ravellerId;
+                                        $.getJSON("/Api/ApiTraveller/DelTraveller?Id=" + id, function (json) {
+                                            if (json.ReturnCode == 0) {
+                                                $.messager.alert('错误', "删除成功", 'info');
+                                                loaddata();
+                                            }
+                                            else {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            else {
+                                $.messager.alert('提示', '请先选择一行', 'warning');
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先结束数据网格的编辑状态', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '设置为默认',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        if (editrow == undefined) {
+                            var row = Grid.datagrid('getSelected');
+                            if (row != null) {
+                                if (row.isDefault == true) {
+                                    $.messager.alert('提示', '该旅客已经是该用户的默认旅客了!', 'warning');
+                                    return;
+                                }
+                                $.messager.confirm('请确认', '确认要将' + row.fullName + '[' + row.idCard + ']设置为默认吗？', function (r) {
+                                    if (r) {
+                                        row.isDefault = true;
+                                        $.post("/Api/ApiTraveller/RsSaveTraveller", row, function (json) { 
+                                            if (json.ReturnCode == 0) {
+                                                $.messager.alert('Success', "设置成功", 'info');
+                                                loaddata();
+                                            }
+                                            else {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            else {
+                                $.messager.alert('提示', '请先选择一行', 'warning');
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先结束数据网格的编辑状态', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '刷新',
+                    iconCls: 'icon-reload',
+                    handler: function () {
+                        loaddata();
+                    }
+                }
+            ]
+        });
+        loaddata();
+    });
+
+</script>
+<table id="@(PageId)Grid"></table>

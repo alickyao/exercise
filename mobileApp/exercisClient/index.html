@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<script src="js/global.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+
+		<!-- 环信集成 -->
+		<script src="js/jquery-1.11.1.js"></script>
+		<script src="js/easemob/strophe.js"></script>
+		<script src="js/easemob/json2.js"></script>
+		<script src="js/easemob/easemob.im-1.0.7.js"></script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title" id="title">exercis</h1>
+		</header>
+		<nav class="mui-bar mui-bar-tab">
+			<a id="defaultTab" class="mui-tab-item mui-active" href="/exercis/list.html">
+				<span class="mui-icon mui-icon-list"></span>
+				<span class="mui-tab-label">活动</span>
+			</a>
+			<a class="mui-tab-item" href="/chat/main.html">
+				<span class="mui-icon mui-icon-chat"><span class="mui-badge">9</span></span>
+				<span class="mui-tab-label">咨询</span>
+			</a>
+			<a class="mui-tab-item" href="/user/home.html">
+				<span class="mui-icon mui-icon-contact"></span>
+				<span class="mui-tab-label">我的</span>
+			</a>
+		</nav>
+		<script>
+			$(function() {
+				//环信初始化
+				var conn = null;
+				conn = new Easemob.im.Connection();
+				window.setTimeout(function() {
+					console.log("开始登录环信...");
+					var username = "test001";
+					var pass = "123456";
+					conn.open({
+						user: username,
+						pwd: pass,
+						appKey: 'xindong#xindongexercis'
+					});
+				}, 1000);
+				conn.init({
+					onOpened: function() {
+						console.log("环信登录成功");
+						var options = {
+							to : "kefu001",
+							msg : "hello...my love",
+							type : "chat"
+						};
+						conn.sendTextMessage(options);
+						conn.setPresence();
+						
+					},
+					//收到消息
+					onTextMessage : function(message){
+						console.log(message);
+						console.log("您收到一条消息");
+					}
+				});
+			});
+			mui.init({
+				swipeBack: false,
+			});
+			var subpages = ['/exercis/list.html', '/chat/main.html', '/user/home.html'];
+			var subpage_style = {
+				top: '45px',
+				bottom: '51px'
+			};
+			var aniShow = {};
+			mui.plusReady(function() {
+				//加载主要的3个页面
+				var self = plus.webview.currentWebview();
+				for (var i = 0; i < 3; i++) {
+					var temp = {};
+					var sub = plus.webview.create(subpages[i], subpages[i], subpage_style);
+					if (i > 0) {
+						sub.hide();
+					} else {
+						temp[subpages[i]] = "true";
+						mui.extend(aniShow, temp);
+					}
+					self.append(sub);
+				}
+				var host = plus.storage.getItem("host");
+				var url = host + "api/ApiMembers/CheckisLogOn"; //远程访问HelloWord
+				mui.getJSON(url, function(json) {
+					console.log("当前用户登录情况" + json);
+				});
+			});
+			var activeTab = subpages[0]; //当前激活的选项（主界面）
+			var title = document.getElementById("title");
+			mui('.mui-bar-tab').on('tap', 'a', function(e) {
+				//底部选项卡点击事件
+				var targetTab = this.getAttribute('href'); //目标页面
+				if (targetTab == activeTab) {
+					return; //重复点击直接返回
+				}
+				//更换标题
+				title.innerHTML = this.querySelector('.mui-tab-label').innerHTML;
+				//显示目标选项卡
+				//若为iOS平台或非首次显示，则直接显示
+				if (mui.os.ios || aniShow[targetTab]) {
+					plus.webview.show(targetTab);
+				} else {
+					//否则，使用fade-in动画，且保存变量
+					var temp = {};
+					temp[targetTab] = "true";
+					mui.extend(aniShow, temp);
+					plus.webview.show(targetTab, "fade-in", 300);
+				}
+				//隐藏当前;
+				plus.webview.hide(activeTab);
+				//更改当前活跃的选项卡
+				activeTab = targetTab;
+			});
+			//首页返回键处理
+			//处理逻辑：1秒内，连续两次按返回键，则退出应用；
+			var first = null;
+			mui.back = function() {
+				//首次按键，提示‘再按一次退出应用’
+				if (!first) {
+					first = new Date().getTime();
+					mui.toast('再按一次退出应用');
+					setTimeout(function() {
+						first = null;
+					}, 1000);
+				} else {
+					if (new Date().getTime() - first < 1000) {
+						plus.runtime.quit();
+					}
+				}
+			};
+		</script>
+	</body>
+
+</html>

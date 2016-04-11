@@ -1,0 +1,82 @@
+﻿@{
+    //通用已选择的用户列表
+    Layout = null;
+    string PageId = ViewBag.PageId;
+    GetMembersListRequstModel condtion = ViewBag.condtion;
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var Grid = $("#@(PageId)selecteduserlistgrid");
+        var request = $.parseJSON('@Html.Raw(r)');
+        function loadgrid() {
+            Grid.datagrid("loading");//显示网格正在加载
+            $.post("/api/ApiMembers/GetMembersList", request, function (json) {
+                Grid.datagrid("loaded");//加载结束
+                Grid.datagrid("loadData", { total: json.length, rows: json });
+            });
+        }
+        //网格初始化
+        Grid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: true,
+            fit: true,  //自动大小
+            singleSelect: false,
+            selectOnCheck: true,
+            checkOnSelect: true,
+            idField: "UserId",
+            columns: [[
+               { field: 'UserId', checkbox: true },
+               { field: 'LoginName', title: '登录名', width: 100 },
+               {
+                   field: 'isDisabled', title: '禁用', align: "center", width: 40, formatter: function (value, row) {
+                       return value ? "是" : "否";
+                   },
+                   styler: function (value, row, index) {
+                       return value ? "color:red" : "";
+                   }
+               },
+               { field: 'NickName', title: '昵称', width: 60 },
+               { field: 'FullName', title: '真实姓名', width: 60 },
+               {
+                   field: 'Sex', title: '性别', width: 40, align: 'center', formatter: function (value, row) {
+                       return EnumSex(value);
+                   }
+               },
+               { field: 'MobilePhone', title: '手机', width: 80 },
+               {
+                   field: 'getuiPushSet', title: '推送', width: 50, align: 'center', formatter: function (value, row) {
+                       return value == null ? "未设置" : "已设置";
+                   },
+                   styler: function (value, row, index) {
+                       return value == null ? "" : "color:blue";
+                   }
+               }
+            ]],
+            toolbar: [
+                {
+                    text: '从列表中移除勾选项',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var rows = Grid.datagrid("getChecked");
+                        if (rows.length > 0) {
+                            var allrowslength = rows.length;//批量删除勾选的行，特殊处理
+                            for (var i = 0; i < allrowslength; i++) {
+                                var row = rows[0];//因为被删除以后rows也会改变，这里永远都是第一行的数据直到删完为止
+                                var rowindex = Grid.datagrid("getRowIndex", row);//获取行的编号
+                                Grid.datagrid("deleteRow", rowindex);//删除行
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先勾选需要从列表中移除的用户', 'warning');
+                        }
+                    }
+                }
+            ]
+        });
+        loadgrid();
+    });
+</script>
+<!-- 通用已经选用户网格 -->
+<table id="@(PageId)selecteduserlistgrid"></table>

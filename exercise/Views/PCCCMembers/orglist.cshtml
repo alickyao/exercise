@@ -1,0 +1,273 @@
+﻿
+@{
+    Layout = null;
+    string PageId = ViewBag.PageId;
+    SearchMemberRootDepartmentRequest request = ViewBag.condtion;
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+
+        var Grid = $("#@(PageId)Grid");
+        var SearchFrom = $("#@(PageId)SearchFrom");//查询栏
+
+        var SearchFromBtn = $("#@(PageId)GridSearchBtn");//查询按钮
+        var ClearFrom = $("#@(PageId)GridClearSearchBtn");//清空查询按钮
+
+        //请求参数
+        var request = $.parseJSON('@Html.Raw(r)');
+        //加载数据
+        function loadgrid(){
+            //加载数据
+            Grid.datagrid("loading");//显示网格正在加载
+            console.log(request);
+            $.post("/api/ApiDepartments/SearchRootDepartments", request, function (json) {
+                console.log(json);
+                Grid.datagrid("loaded");//加载结束
+                Grid.datagrid("loadData", json);
+                Grid.datagrid("acceptChanges");
+                editrow = undefined;
+            });
+        }
+
+        var editrow = undefined;
+
+        //初始化网格
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(request.page.PageSize),
+            pageNumber: parseInt(request.page.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "depmentid",
+            columns: [[
+                { field: 'caption', title: '名称', width: 200, editor: { type: "textbox", options: { required: true,validType:"orgcaption['']" } } },
+                {
+                    field: 'isdisabled', title: '禁用', width: 40, align:'center', formatter: function (value, row) {
+                        return value ? "是" : "否";
+                    }
+                },
+                {
+                    field: 'isshow', title: '前端显示', width: 60,align: 'center', formatter: function (value, row) {
+                        return value ? "是" : "否";
+                    }
+                },
+                {
+                    field: 'memberNumCount', title: '用户数量', width: 60, align: 'right'
+                },
+                {
+                    field: 'modifiedon', title: '创建时间', width: 140, align:'right', formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '新增',
+                    iconCls: 'icon-add',
+                    handler: function () {
+                        if (editrow == undefined) {
+                            Grid.datagrid("insertRow", { index: 0, row: {} }).datagrid("beginEdit", 0).datagrid("selectRow", 0);
+                            editrow = 0;
+                        }
+                        else {
+                            Grid.datagrid("selectRow", editrow);
+                        }
+                    }
+                },
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        if (editrow != undefined) {
+                            var v = Grid.datagrid("validateRow", editrow);
+                            if (v) {
+                                var rows = Grid.datagrid("endEdit", editrow).datagrid("getChanges");
+                                console.log(rows);
+                                var row = rows[0];
+                                $.post("/api/ApiDepartments/CreateDepartment", row, function (json) {
+                                    if (json.ReturnCode == 0) {
+                                        $.messager.alert('Success', "保存成功", 'info');
+                                        Grid.datagrid("acceptChanges");
+                                        editrow = undefined;
+                                        loadgrid();
+                                    }
+                                    else {
+                                        $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        Grid.datagrid("beginEdit", editrow);
+                                    }
+                                });
+                            }
+                            else {
+                                Grid.datagrid("selectRow", editrow);
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '没有需要保存的数据', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var row = Grid.datagrid("getSelected");
+                        if (row != null) {
+                            console.log(row);
+                            if (row.depmentid == undefined) {
+                                console.log("删除还未保存的行");
+                                var a = Grid.datagrid("getRowIndex", row);
+                                Grid.datagrid("cancelEdit", a).datagrid("deleteRow", a);
+                                editrow = undefined;
+                            }
+                            else {
+                                $.messager.confirm('请确认', '确定要删除：' + row.caption, function (r) {
+                                    if (r) {
+                                        $.getJSON("/api/ApiDepartments/DelDepmentById?Ids=" + row.depmentid, function (json) {
+                                            if (json.ReturnCode == 0) {
+                                                $.messager.alert('Success', json.ReturnMessage, 'info');
+                                                loadgrid();
+                                            }
+                                            else {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '详情/编辑',
+                    iconCls: 'icon-edit',
+                    handler:function(){
+                        //获取选中的行
+                        var row = Grid.datagrid('getSelected');
+                        if(row != null){
+                            //跳转到组织详情界面
+                            $("#MainCenterTabs").tabs('add', {
+                                title: "[" + row.caption + "]组织详情",
+                                href: "/PCCCMembers/orgdetail/" + row.depmentid,
+                                closable: true
+                            });
+                        }
+                        else{
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '查看用户',
+                    iconCls: 'icon-search',
+                    handler: function () {
+                        //获取选中的行
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            //跳转到会员列表
+                            $("#MainCenterTabs").tabs('add', {
+                                title: row.caption + "用户列表",
+                                href: "/PCCCMembers/userlist?orgId=" + row.depmentid,
+                                closable: true
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '发送短信',
+                    iconCls: 'icon-redo',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            var smswin = $("#@(PageId)sendsmsdialog");
+                            smswin.dialog({
+                                href: '/PCCCSms/sendsmsbyusers?depid=' + row.depmentid + "&getchild=true"
+                            });
+                            smswin.dialog("open");
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '发送推送',
+                    iconCls: 'icon-redo',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            var pushwin = $("#@(PageId)sendpushdialog");
+                            pushwin.dialog({
+                                href: '/PCCCSms/sendpushbyusers?depid=' + row.depmentid + "&getchild=true"
+                            });
+                            pushwin.dialog("open");
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                }
+            ]
+        });
+        //加载数据
+        loadgrid();
+        //翻页设置
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                request.page.Page = pPageIndex;
+                request.page.PageSize = pPageSize;
+                loadgrid();
+            }
+        });
+
+        //检索按钮
+        SearchFromBtn.click(function () {
+            console.log("Search...");
+            //获取表单值
+            var d = SearchFrom.serializeObject();
+            request.page.Page = "@request.page.Page";
+            request.page.PageSize = "@request.page.PageSize";
+            request.caption = d.caption;
+            loadgrid();
+        });
+        //清除检索栏表单按钮
+        ClearFrom.click(function () {
+            SearchFrom.form('clear');//清空表单
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <!-- 发送短消息 -->
+    <div id="@(PageId)sendsmsdialog" class="easyui-dialog" title="发送短信" data-options="resizable:true,modal:true,inline:true,fit:false,closed:true" style="width:80%; height:80%;"></div>
+    <!-- 发送推送消息 -->
+    <div id="@(PageId)sendpushdialog" class="easyui-dialog" title="发送推送" data-options="resizable:true,modal:true,inline:true,fit:false,closed:true" style="width:80%; height:80%;"></div>
+    <div data-options="region:'north',height:'54',border:false">
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#fafafa;" data-options="fit:true,border:true">
+            <form id="@(PageId)SearchFrom">
+                <table>
+                    <tr>
+                        <td>组织名称</td>
+                        <td><input type="text" class="easyui-textbox" name="caption" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'"><table id="@(PageId)Grid"></table></div>
+</div>

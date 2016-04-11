@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "SysUserLog";
+    Layout = null;
+    RequestSearchSysUserLog condtion = ViewBag.condtion;
+    string PageId = ViewBag.PageId;
+}
+<script>
+
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var RequestSysUserLogModelcondtion = new Object();
+        RequestSysUserLogModelcondtion.KeyWords = "@condtion.KeyWords";
+        RequestSysUserLogModelcondtion.SysUserId = "@condtion.SysUserId";
+        RequestSysUserLogModelcondtion.Page = "@condtion.Page";
+        RequestSysUserLogModelcondtion.PageSize = "@condtion.PageSize";
+        var Grid = $("#@(PageId)SysUserLogGrid");
+        function loadgrid() {
+            Grid.datagrid("loading");
+            console.log(RequestSysUserLogModelcondtion);
+            $.post("/api/ApiSysManager/SearchSysUserLog", RequestSysUserLogModelcondtion, function (json) {
+                console.log(json);
+                Grid.datagrid("loaded");
+                Grid.datagrid("loadData", json);
+            });
+        }
+            
+        //初始化网格
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(RequestSysUserLogModelcondtion.PageSize),
+            pageNumber: parseInt(RequestSysUserLogModelcondtion.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            idField: "LogId",
+            columns: [[
+                { field: 'LogId', title: '记录号', width: 60 },
+                {
+                    field: 'SysUserId', title: '姓名/登录名', width: 90,
+                    formatter: function (value, row) {
+                        var ShowName = "";
+                        if (row.SysUserInfo.FullName != null && row.SysUserInfo.FullName != "") {
+                            ShowName = row.SysUserInfo.FullName;
+                        }
+                        else {
+                            ShowName = row.SysUserInfo.LoginName;
+                        }
+                        return ShowName;
+                    }
+                },
+                {
+                    field: 'RoleName', title: '用户角色', width: 90,
+                    formatter: function (value, row) {
+                        return row.SysUserInfo.SysRole.RoleName;
+                    }
+                },
+                {
+                    field: 'CreatedOn', title: '时间', width: 140, formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                },
+                { field: 'Describe', title: '描述', width: 500 }
+            ]]
+        });
+        loadgrid();
+        //翻页设置
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                RequestSysUserLogModelcondtion.Page = pPageIndex;
+                RequestSysUserLogModelcondtion.PageSize = pPageSize;
+                console.log(RequestSysUserLogModelcondtion);
+                loadgrid();
+            }
+        });
+        //查询栏
+        $("#@(PageId)SysUserLogGridSearchBtn").click(function () {
+            var d = $("#@(PageId)SysUserLogGridSearchFrom").serializeObject();
+            RequestSysUserLogModelcondtion.Page = "@condtion.Page";
+            RequestSysUserLogModelcondtion.PageSize = "@condtion.PageSize";
+            RequestSysUserLogModelcondtion.KeyWords = d.KeyWords;
+            RequestSysUserLogModelcondtion.BeginDate = d.BeginDate;
+            RequestSysUserLogModelcondtion.EndDate = d.EndDate;
+            console.log(RequestSysUserLogModelcondtion);
+            loadgrid();
+        });
+        $("#@(PageId)SysUserLogGridClearSearchBtn").click(function () {
+            $("#@(PageId)SysUserLogGridSearchFrom").form('clear');
+        });
+
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'54',border:false" >
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#fafafa;" data-options="fit:true,border:true">
+            <form id="@(PageId)SysUserLogGridSearchFrom">
+                <table>
+                    <tr>
+                        <td>关键字：</td>
+                        <td><input type="text" class="easyui-textbox" name="KeyWords" /></td>
+                        <td>开始时间：</td>
+                        <td><input type="text" class="easyui-datetimebox" data-options="showSeconds:false" name="BeginDate" /></td>
+                        <td>结束时间：</td>
+                        <td><input type="text" class="easyui-datetimebox" data-options="showSeconds:false" name="EndDate"/></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)SysUserLogGridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)SysUserLogGridClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'"><table id="@(PageId)SysUserLogGrid"></table></div>
+</div>
+
+
+
+
+

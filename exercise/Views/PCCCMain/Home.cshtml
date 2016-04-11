@@ -1,0 +1,194 @@
+﻿@{
+    ViewBag.Title = "U上商侣后台管理系统";
+    Layout = "~/Views/Shared/PcWeb_Layout.cshtml";
+    List<SysMenuTreeModel> SysMenuList = ViewBag.SysMenuList;
+    SysUserModel SysUserInfo = ViewBag.SysUserInfo;
+}
+<script>
+    $(function () {
+        //顶部搜索栏
+        $('#MainSerachTextBox').searchbox({
+            searcher: function (value, name) {
+                if (value != "") {
+                    switch (name) {
+                        case "User":
+                            $("#MainCenterTabs").tabs('add', {
+                                title: "会员用户检索",
+                                href: "/PCCCMembers/userlist?keyWords=" + value,
+                                closable: true
+                            });
+                            break;
+                        case "Order":
+                            $.messager.alert('Info', '订单检索暂未开放', 'info');
+                            break;
+                        case "Topic":
+                            $.messager.alert('Info', '文档检索暂未开放', 'info');
+                            break;
+                    }
+                }
+            },
+            menu: '#MainSerachTextBoxMenu',
+            prompt: '请输入关键字',
+            width:204
+        });
+        //导航菜单
+        $.post("/api/ApiSysManager/GetSysMenuTreeModel", { Pid: $(".LeftMenuChange").first().attr("itemid") }, function (LeftTreeData) {
+            //初始化菜单项目
+            $(".LeftMenuChange").first().linkbutton("select");//选中第一项
+            //左侧菜单项目
+            $('#MainLeftTreeMenuList').tree({
+                data: LeftTreeData,
+                animate: true,
+                lines: true,
+                onClick: function (node) {
+                    if (node.attributes.Url != null) {
+                        //判断标签是否已经被打开
+                        var opened = $("#MainCenterTabs").tabs('exists', node.text);
+                        if (!opened) {
+                            $("#MainCenterTabs").tabs('add', {
+                                title: node.text,
+                                href: node.attributes.Url,
+                                closable: true,
+                                iconCls:node.iconCls
+                            });
+                        }
+                        else {
+                            $("#MainCenterTabs").tabs('select', node.text)
+                        }
+                    }
+                    else {
+                        console.log("菜单项未定义URL参数");
+                    }
+                }
+            });
+
+            //顶部导航菜单点击事件
+            $(".LeftMenuChange").click(function () {
+                $.post("/api/ApiSysManager/GetSysMenuTreeModel", { Pid:$(this).attr("itemid") }, function (LeftTreeData) {
+                    $('#MainLeftTreeMenuList').tree({
+                        data: LeftTreeData
+                    });
+                });
+                return false;
+            });
+        });
+        //初始化主选项卡
+        $('#MainCenterTabs').tabs({
+            border: false,
+            fit: true
+        });
+        //添加一个不能删除的工作台
+        $('#MainCenterTabs').tabs('add', {
+            title: '工作台',
+            href: '/PCCCMain/MyWorkPanel',
+            closable: false,
+            iconCls: 'icon-edit'
+        });
+        //点击事件-修改密码
+        $("#UserChangePwdBtn").click(function () {
+            $("#UserChangePwdWindow").window("open");
+            return false;
+        });
+        //当修改密码关闭时清空表单
+        $("#UserChangePwdWindow").window({
+            'onClose': function () {
+                $("#UserChangePwdForm").form('clear');
+            }
+        });
+        //验证扩展，检验两次密码是否输入一直
+        $.extend($.fn.validatebox.defaults.rules, {
+            equals: {
+                validator: function (value, param) {
+                    return value == $(param[0]).val();
+                },
+                message: '两次密码输入不一致'
+            }
+        });
+        //修改密码提交按钮
+        $("#UserChangePwdSubmitBtn").click(function () {
+            $("#UserChangePwdForm").form('submit', {
+                onSubmit: function () {
+                    var Reg = $(this).form('enableValidation').form('validate');
+                    if (Reg) {
+                        //自定义POST提交
+                        var d = $("#UserChangePwdForm").serializeObject();//序列化为JSON对象格式
+                        d.OldPassword = md5(d.OldPassword);
+                        d.NewPassword = md5(d.NewPassword);
+                        $('#UserChangePwdSubmitBtn').linkbutton('disable');
+                        $.post("/api/ApiSysManager/ChangeSysUserPwd", d, function (json) {
+                            $('#UserChangePwdSubmitBtn').linkbutton('enable');
+                            if (json.ReturnCode == 0) {
+                                $.messager.alert('Success', '密码修改成功<br />下次登录请使用新密码', 'info');
+                            }
+                            else {
+                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                            }
+                        });
+                    }
+                    return Reg;
+                }
+            });
+        });
+
+    });
+</script>
+
+<div id="UserChangePwdWindow" class="easyui-window" title="修改密码" data-options="iconCls:'icon-lock',collapsible:false,minimizable:false,maximizable:false,closed:true,resizable:false,modal:true" style="width:500px;height:200px;padding:10px;">
+		<form id="UserChangePwdForm">
+            <table class="formtable">
+                <tr>
+                    <td>当前密码：</td>
+                    <td><input type="password" name="OldPassword" class="easyui-textbox" data-options="required:true" /></td>
+                </tr>
+                <tr>
+                    <td>新密码：</td>
+                    <td><input type="password" name="NewPassword" id="UserChangeNewPassword" class="easyui-textbox" data-options="required:true" /></td>
+                </tr>
+                <tr>
+                    <td>确认新密码：</td>
+                    <td><input type="password" name="reNewPassword" class="easyui-textbox" required="required" validType="equals['#UserChangeNewPassword']" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="UserChangePwdSubmitBtn">确认修改</a></td>
+                </tr>
+            </table>
+		</form>
+</div>
+
+<div data-options="region:'north',border:false" style="height: 60px;">
+    <div id="MainTitle">
+        <div id="TopLogo"></div>
+        <div id="TopNav">
+            <div id="MainSearch">
+                <input id="MainSerachTextBox" />
+                <div id="MainSerachTextBoxMenu">
+                    <div data-options="name:'User'">用户</div>
+                    <div data-options="name:'Order'">订单</div>
+                    <div data-options="name:'Topic'">文档</div>
+                </div>
+            </div>
+            <div class="easyui-panel" data-options="border:false" style="padding: 5px;">
+                Welcome：@SysUserInfo.FullName&nbsp;[Role：@SysUserInfo.SysRole.RoleName]
+                @foreach (SysMenuTreeModel Menu in SysMenuList)
+                { 
+                    <a href="#" class="easyui-linkbutton LeftMenuChange" itemid="@Menu.id" data-options="group:'TopMenu',toggle:true,plain:true,selected:false,iconCls:'@Menu.iconCls'">@Menu.text</a>
+                }
+                <a href="#" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-lock'" id="UserChangePwdBtn">修改密码</a>
+                <a href="LogOff" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-back'">退出登录</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div data-options="region:'west',split:true,title:'导航'" style="width: 200px; padding: 10px;">
+    <div class="easyui-panel" id="MainLeftTreeMenu" data-options="border:false">
+        <ul id="MainLeftTreeMenuList"></ul>
+    </div>
+</div>
+<div data-options="region:'east',split:true,collapsed:true,title:'更多'" style="width: 200px; padding: 10px;">
+    <div id="MainEastBox"></div>
+</div>
+<div data-options="region:'south',border:false" style="height: 30px; background: #A9FACD; padding: 7px;">U上商侣后台管理系统&nbsp;Power By ChengGuang Group 2015</div>
+<div data-options="region:'center'">
+    <div id="MainCenterTabs" class="easyui-tabs" ></div>
+</div>

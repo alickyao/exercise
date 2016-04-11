@@ -1,0 +1,88 @@
+﻿/*
+    PC版后台系统样式
+    */
+
+body {
+    font-size:0.9em;
+    margin:1px;
+    padding:0;
+}
+
+
+h1 {
+    border-bottom:1px solid #efefef;
+    padding:5px 0;
+    margin:5px 0;
+}
+
+.tl {text-align:left;}
+.tr {text-align:right;}
+.tc {text-align:center;}
+.fl {float:left;}
+.fr {float:right;}
+
+.formbox {
+    padding:10px;
+}
+    .formbox table td{
+        padding:2px;
+    }
+
+/*
+    登陆
+    */
+#LogonBox {
+    width:430px;
+    margin:200px auto;
+}
+
+/*
+    首页头部
+    */
+#MainTitle{
+    width:100%;
+    overflow:hidden;
+}
+    #MainTitle #TopLogo {
+        width:300px;
+        height:60px;
+        float:left;
+        background-image:url('../images/PCLogo.jpg');
+    }
+    #MainTitle #TopNav {
+        float:right;
+        padding-right:2px;
+        padding-top:2px;
+    }
+        #MainTitle #TopNav #MainSearch {
+            text-align:right;
+        }
+
+/*
+    通用的一些样式
+    */
+.formtable {
+    border-collapse:collapse;
+}
+    .formtable td {
+        padding:5px;
+        border:1px dashed #d4d4d4;
+    }
+
+.btntable {
+    margin:10px 0;
+    border-collapse:collapse;
+}
+
+.griddetailtable {
+    margin:5px 0;
+}
+
+.griddetailtable td{
+    padding:3px;
+    vertical-align:top;
+}
+.griddetailtable th {
+    padding:3px;
+    background-color:#e4e4e4
+}

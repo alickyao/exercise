@@ -1,0 +1,393 @@
+﻿@{
+    Layout = null;
+    SearchHotelListRequestModel condtion = ViewBag.condtion;
+    string q = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+    string PageId = ViewBag.PageId;
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var request = $.parseJSON('@Html.Raw(q)');
+        var SearchForm = $("#@(PageId)SearchForm");//查询表单
+        var hotelArrivalDate = $("#@(PageId)SearchHotelArrivalDate");//酒店查询入住时间
+        var hotelDepartureDate = $("#@(PageId)SearchHotelDepartureDate");//酒店查询离店时间
+        var hotelqueryText = SearchForm.find("input[name='queryText']");//关键字
+        var hotelthemeIds = SearchForm.find("select[name='themeIds']");//主题
+        var hotelpricerate = SearchForm.find("select[name='hotelpricerate']");//价格区间
+        var hotelstarRate = SearchForm.find("select[name='starRate']");//星级
+        var hotelSort = SearchForm.find("select[name='Sort']");//排序依据
+        var hoteldistrictId = SearchForm.find("input[name='districtId']");//行政区
+        var hotelSearchBtn = $("#@(PageId)GridSearchBtn");
+
+        //酒店日历框
+        hotelArrivalDate.datebox({
+            onSelect: function (date) {
+                var newdate = new Date(date.setDate(date.getDate() + 1));
+                if (newdate >= new Date(hotelDepartureDate.datebox("getValue"))) {
+                    //设置离店时间为当前时间的后一天
+                    hotelDepartureDate.datebox("setValue", new Date(newdate.setDate(newdate.getDate() + 1)).Format("yyyy-MM-dd"));
+                }
+            }
+        });
+        hotelDepartureDate.datebox({
+            onSelect: function (date) {
+                if (date <= new Date(hotelArrivalDate.datebox("getValue"))) {
+                    //设置入住为当前时间的前一天
+                    hotelArrivalDate.datebox("setValue", date.Format("yyyy-MM-dd"));
+                }
+            }
+        });
+
+        //查询栏表单赋值
+        SearchForm.form("load", request);
+
+        //主题
+        hotelthemeIds.combobox({
+            url: '/api/ApiElongHotel/GetHotelThemes',
+            valueField: 'id',
+            textField: 'text',
+            method: 'get',
+            editable: false
+        });
+        //价格区间
+        hotelpricerate.combobox({
+            url: '/api/ApiElongHotel/GetHotelPriceList',
+            valueField: 'id',
+            textField: 'text',
+            method: 'get',
+            editable: false
+        });
+        hotelpricerate.combobox("setValue", "0,0");
+        //星级
+        hotelstarRate.combobox({
+            multiple: true,
+            editable: false
+        });
+        //排序
+        hotelSort.combobox({
+            editable: false
+        });
+        //格式化查询栏关键字类型
+        function getQueryTextType(type) {
+            var s = "";
+            switch (type) {
+                case 0:
+                    s = "行政区";
+                    break;
+                case 1:
+                    s = "商业区";
+                    break;
+                case 2:
+                    s = "地标";
+                    break;
+                case 3:
+                    s = "品牌";
+                    break;
+            }
+            return s;
+        }
+        //关键字下拉查询栏菜单
+        hotelqueryText.combobox({
+            url: '/api/ApiElongHotel/SearchHotelSItemList/' + request.cityId,
+            valueField: 'id',
+            textField: 'text',
+            mode: 'remote',
+            method: 'get',
+            formatter: function (row) {
+                return "[" + getQueryTextType(row.itemType) + "]" + row.text;
+            },
+            onSelect: function (record) {
+                console.log(record);
+                if (record.itemType == 0) {
+                    hoteldistrictId.val(record.id);
+                }
+                else {
+                    hoteldistrictId.val("");
+                }
+            }
+        });
+
+        //点击查询按钮
+        hotelSearchBtn.click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                console.log("Search...");
+                var Reg = SearchForm.form('enableValidation').form('validate');
+                if (Reg) {
+                    var d = SearchForm.serializeObject();
+
+                    //入住与离店时间
+                    request.arrivalDate = d.arrivalDate;
+                    request.departureDate = d.departureDate;
+
+                    //行政区判断，如果关键字为空，则行政区ID必定为空
+                    d.queryText = hotelqueryText.combobox("getText");
+                    if (d.queryText == "") {
+                        d.districtId = "";
+                    }
+                    //如果行政区ID不为空，则关键字必定为空
+                    if (d.districtId != "") {
+                        d.queryText = "";
+                    }
+                    request.queryText = d.queryText;
+                    request.districtId = d.districtId;
+                    //价格赋值
+                    if (d.hotelpricerate != "") {
+                        var sp = d.hotelpricerate.split(',');
+                        request.lowRate = sp[0];
+                        request.highRate = sp[1];
+                    }
+                    //主题
+                    request.themeIds = d.themeIds;
+                    //星级
+                    if (d.starRate != undefined) {
+                        if (Object.prototype.toString.call(d.starRate) === '[object Array]') {//判断是否为数组
+                            if (d.starRate.length > 0) {
+                                var star = "";
+                                $.each(d.starRate, function (i, n) {
+                                    star += n + ",";
+                                });
+                                star = star.substring(0, star.length - 1);
+                                request.starRate = star;
+                            }
+                        }
+                        else {
+                            request.starRate = d.starRate;
+                        }
+                    }
+                    //排序依据
+                    request.Sort = d.Sort;
+                    //翻页回位
+                    request.Page = 1;
+                    request.PageSize = "@condtion.PageSize";
+                    console.log(request);
+                    loadgrid();
+                }
+                else {
+                    $.messager.alert('错误', "有错误的查询参数设置，请检查", 'error');
+                }
+            }
+            return false;
+        });
+
+        //网格
+        var Grid = $("#@(PageId)Grid");
+        //加载网格
+        function loadgrid() {
+            Grid.datagrid("loading");
+            hotelSearchBtn.linkbutton("disable");
+            $.post("/api/ApiElongHotel/SearchHotelList", request, function (json) {
+                console.log(json);
+                hotelSearchBtn.linkbutton("enable");
+                Grid.datagrid("loaded");
+                if (json.ReturnCode == 0) {
+                    Grid.datagrid("loadData", json);
+                }
+                else {
+                    Grid.datagrid("loadData", {
+                        total: 1, rows: [{
+                            id:"",
+                            hotelName: json.ReturnMessage,
+                            locationInfo: {
+                                cityInfo: {
+                                    CityName: "",
+                                    ProvniceInfo: {
+                                        id: "",
+                                        text: ""
+                                    }
+                                },
+                            },
+                            review: {},
+                            lowRate:0
+                        }]
+                    })
+                }
+            });
+        }
+
+        //网格初始化
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(request.PageSize),
+            pageNumber: parseInt(request.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "id",
+            columns: [[
+                { field: 'id', title: '酒店ID', width: 60 },
+                { field: 'hotelName', title: '酒店名称', width: 150 },
+                {
+                    field: 'starRate', title: '挂牌星级', width: 60, formatter: function (value, row) {
+                        var star = ""
+                        switch (value) {
+                            case "0":
+                                star = "无";
+                                break;
+                            case "1":
+                                star = "一星级";
+                                break;
+                            case "2":
+                                star = "二星级";
+                                break;
+                            case "3":
+                                star = "三星级";
+                                break;
+                            case "4":
+                                star = "四星级";
+                                break;
+                            case "5":
+                                star = "五星级";
+                                break;
+                        }
+                        return star;
+                    }
+                },
+                {
+                    field: 'category', title: '推荐星级', width: 75, formatter: function (value, row) {
+                        var cate = "";
+                        switch (value) {
+                            case "-1":
+                            case "0":
+                            case "1":
+                                cate = "经济型（"+ value +"）"
+                                break;
+                            case "2":
+                            case "3":
+                                cate = "舒适型（" + value + "）"
+                                break;
+                            case "4":
+                            case "5":
+                                cate = "豪华型（" + value + "）"
+                                break;
+                        }
+                        return cate;
+                    }
+                },
+                {
+                    field: 'isEconomic', title: '经济型', width: 50,align:'center', formatter: function (value, row) {
+                        return (value == 1 ? "是" : "否");
+                    }
+                },
+                {
+                    field: 'isApartment', title: '公寓型', width: 50,align:'center', formatter: function (value, row) {
+                        return (value == 1 ? "是" : "否");
+                    }
+                },
+                {
+                    field: 'lowRate', title: '最低价', width: 60, align: 'right', formatter: function (value, row) {
+                        return "￥" + value;
+                    }
+                },
+                {
+                    field: 'isGuarante', title: '需担保', width: 50, align: 'center', formatter: function (value, row) {
+                        return value ? "<span style='color:red'>是</span>" : "否";
+                    }
+                },
+                {
+                    field: 'locationInfo.cityInfo', title: '城市', width: 80, formatter: function (value, row) {
+                        return row.locationInfo.cityInfo.CityName + "(" + row.locationInfo.cityInfo.ProvniceInfo.text + ")";
+                    }
+                },
+                {
+                    field: 'locationInfo.District', title: '行政区', width: 60, formatter: function (value, row) {
+                        return row.locationInfo.District;
+                    }
+                },
+                {
+                    field: 'locationInfo.BusinessZone', title: '商圈', width: 100, formatter: function (value, row) {
+                        return row.locationInfo.BusinessZone;
+                    }
+                },
+                { field: 'address', title: '地址', width: 220 },
+                { field: 'phone', title: '电话', width: 80 },
+                {
+                    field: 'review.Score', title: '好评率', width: 50,align:'right',  formatter: function (value, row) {
+                        return row.review.scoreField;
+                    }
+                }
+            ]],
+            toolbar: [{
+                text: '详情/预订',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    var row = Grid.datagrid('getSelected');
+                    if (row != null) {
+                        if (row.id != "") {
+                            var d = SearchForm.serializeObject();
+                            var url = "/PCCCHotel/elongHotelDetail?arrivalDate=" + d.arrivalDate + "&departureDate=" + d.departureDate + "&hotelId=" + row.id;
+                            console.log(url);
+                            $("#MainCenterTabs").tabs('add', {
+                                title: row.hotelName,
+                                href: url,
+                                closable: true
+                            });
+                        }
+                    }
+                    else {
+                        $.messager.alert('提示', '请先选择一行', 'warning');
+                    }
+                }
+            }]
+        });
+        loadgrid();
+
+        //网格翻页
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                request.Page = pPageIndex;
+                request.PageSize = pPageSize;
+                loadgrid();
+            }
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'78',border:false">
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#fafafa;" data-options="fit:true,border:false">
+            <form id="@(PageId)SearchForm">
+                <table>
+                    <tr>
+                        <td>入住时间：</td>
+                        <td><input type="text" name="arrivalDate" id="@(PageId)SearchHotelArrivalDate" class="easyui-datebox" data-options="editable:false,required:true" validType="checkthisdate[-1]" /></td>
+                        <td>离店时间：</td>
+                        <td><input type="text" name="departureDate" id="@(PageId)SearchHotelDepartureDate" class="easyui-datebox" validType="checkthisdate[0]" data-options="editable:false,required:true," /></td>
+                        <td>关键字：</td>
+                        <td><input type="text" name="queryText" /><input type="hidden" name="districtId" value="" /></td>
+                        <td>主题：</td>
+                        <td><select name="themeIds" style="width:120px;"></select></td>
+                    </tr>
+                    <tr>
+                        <td>价格：</td>
+                        <td><select name="hotelpricerate" style="width:153px;"></select></td>
+                        <td>星级：</td>
+                        <td>
+                            <select name="starRate" style="width:153px;">
+                                <option value="1">一星</option>
+                                <option value="2">二星</option>
+                                <option value="3">三星</option>
+                                <option value="4">四星</option>
+                                <option value="5">五星</option>
+                            </select>
+                        </td>
+                        <td>排序方式：</td>
+                        <td>
+                            <select name="Sort">
+                                <option value="0">默认</option>
+                                <option value="1">星级降序</option>
+                                <option value="2">价格升序</option>
+                                <option value="4">价格降序</option>
+                            </select>
+                        </td>
+                        <td></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'"><table id="@(PageId)Grid"></table></div>
+</div>

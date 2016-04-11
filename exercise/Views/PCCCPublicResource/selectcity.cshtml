@@ -1,0 +1,121 @@
+﻿@{
+    Layout = null;
+    SearchAreaInfoListRequestModel condtion = new UsungSysTem.Models.SearchAreaInfoListRequestModel();
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+    //省市区联动
+    string PageId = ViewBag.PageId;
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var ProvinceGrid = $("#@(PageId)Province");//网格对象省
+        var CityGrid = $("#@(PageId)City");//网格对象市
+        var AreaGrid = $("#@(PageId)Area");//网格对象区
+        var request = $.parseJSON('@Html.Raw(r)');//请求参数
+        function loaddata() {
+            //加载网格数据
+            ProvinceGrid.datagrid("loading");
+            $.getJSON("/api/ApiLocation/GetProvniceList", function (json) {
+                editrow = undefined;
+                ProvinceGrid.datagrid("loaded");
+                ProvinceGrid.datagrid("loadData", { total: json.length, rows: json });
+            });
+        }
+        ProvinceGrid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小 - 不使用
+            singleSelect: true,
+            idField: "id",
+            columns: [[
+                {
+                    field: 'text', title: '省', width: 150, align: 'center', formatter: function (value, row) {
+                        return value
+                    }
+                }
+            ]],
+            onClickRow: ClickProvince
+
+        });
+        CityGrid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小 - 不使用
+            singleSelect: true,
+            idField: "CityCode",
+            columns: [[
+                {
+                    field: 'CityName', title: '市', width: 150, align: 'center', formatter: function (value, row) {
+                        return value
+                    }
+                }
+            ]],
+            onClickRow: ClickCity
+
+        });
+        AreaGrid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小 - 不使用
+            singleSelect: true,
+            idField: "id",
+            columns: [[
+                {
+                    field: 'text', title: '区', width: 150, align: 'center', formatter: function (value, row) {
+                        return value
+                    }
+                }
+            ]]
+
+        });
+        //省点击事件,获取选择省的所有市列表
+        function ClickProvince() {
+            CityGrid.datagrid('unselectAll');
+            AreaGrid.datagrid('unselectAll');
+            AreaGrid.datagrid('loadData', { total: 0, rows: [] });
+            var row = ProvinceGrid.datagrid("getSelected");
+            if (row) {
+                $.getJSON("/api/ApiLocation/GetCityListByProvniceId?Id="+row.id, function (json) {
+                    editrow = undefined;
+                    CityGrid.datagrid("loaded");
+                    CityGrid.datagrid("loadData", { total: json.length, rows: json });
+                });
+            }
+        }
+
+        //市点击事件,获取选择市的所有行政区列表
+        function ClickCity() {
+            AreaGrid.datagrid('unselectAll');
+            var row = CityGrid.datagrid("getSelected");
+            if (row) {
+                request.CityCode = row.CityCode;
+                $.post("/api/ApiLocation/GetAreaInfoListByCityCode", request, function (json) {
+                    console.log(json);
+                    editrow = undefined;
+                    AreaGrid.datagrid("loaded");
+                    AreaGrid.datagrid("loadData", { total: json.length, rows: json.rows });                 });
+            }
+        }
+        loaddata();
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'center'">
+        <div class="easyui-layout" style="width:100%;height:100%;">
+            <!--省-->
+            <div data-options="region:'west'" style="width:33%;">
+                <table id="@(PageId)Province"></table>
+            </div>
+            <!--市-->
+            <div data-options="region:'center'" style="padding:5px;background:#eee;">
+                <table id="@(PageId)City"></table>
+            </div>
+            <!--区-->
+            <div data-options="region:'east'" style="width:33%;">
+                <table id="@(PageId)Area"></table>
+            </div>
+        </div>
+    </div>
+</div>

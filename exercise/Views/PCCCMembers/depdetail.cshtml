@@ -1,0 +1,647 @@
+﻿
+@{
+    Layout = null;
+    string PageId = ViewBag.PageId;
+    string Id = ViewBag.Id;
+    DepInfoModel depinfo = ViewBag.depInfo;
+    string j = Newtonsoft.Json.JsonConvert.SerializeObject(depinfo);
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+
+        var depinfo = $.parseJSON('@Html.Raw(j)');
+        depinfo.baseinfo.isdisabled = depinfo.baseinfo.isdisabled ? "true" : "false";
+
+        var SelectUserGrid = $("#@(PageId)SelectUserGrid");//可选用户网格
+        var SearchUserFrom = $("#@(PageId)SearchUserFrom");//查询栏表单
+        var GridSearchUserBtn = $("#@(PageId)GridSearchUserBtn");//用户查询按钮
+        var GridClearSearchUserBtn = $("#@(PageId)GridClearSearchUserBtn");//清空用户查询按钮
+        var searchuserrequest = {
+            "ordertype": 0,
+            "keyWords": "",
+            "userId": "",
+            "orgId": "",
+            "getOtherOrgDepartmentInfo": true,
+            "departmentIds": [
+            ],
+            "Page": 1,
+            "PageSize": 20
+        };
+        //加载可选用户列表数据
+        function loadsearchusergrid() {
+            //加载数据
+            SelectUserGrid.datagrid("loading");//显示网格正在加载
+            console.log(searchuserrequest);
+            $.post("/api/ApiMembers/SearchMembersList", searchuserrequest, function (json) {
+                console.log(json);
+                SelectUserGrid.datagrid("loaded");//加载结束
+                SelectUserGrid.datagrid("loadData", json);
+            });
+        }
+        //获取用户的标示显示值
+        function getTabTitle(row) {
+            var s = "";
+            if (row.FullName != null && row.FullName != "") {
+                s = row.FullName;
+            }
+            else if (row.NickName != null && row.NickName != "") {
+                s = row.NickName;
+            }
+            else {
+                s = row.LoginName;
+            }
+            return s;
+        }
+
+        //初始化可选用户网格
+        SelectUserGrid.datagrid({
+            pagination: true,
+            pageSize: parseInt(searchuserrequest.PageSize),
+            pageNumber: parseInt(searchuserrequest.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "UserId",
+            columns: [[
+                {
+                    field:'UserId',checkbox:true
+                },
+                { field: 'LoginName', title: '登录名', width: 100 },
+                {
+                    field: "numOfDep.numofcompany", title: "公司", align: "right", width: 40, formatter: function (value, row) {
+                        return row.numOfDep.numofcompany + "家";
+                    }
+                },
+                {
+                    field: "numOfDep.numofdepartments", title: "部门", align: "right", width: 40, formatter: function (value, row) {
+                        return row.numOfDep.numofdepartments + "个";
+                    }
+                },
+                { field: 'FullName', title: '真实姓名', width: 60 },
+                {
+                    field: 'Sex', title: '性别', width: 40, formatter: function (value, row) {
+                        return EnumSex(value);
+                    }
+                },
+                { field: 'MobilePhone', title: '手机', width: 80 },
+                {
+                    field: 'isDisabled', title: '禁用', align: "center", width: 40, formatter: function (value, row) {
+                        return value ? "是" : "否";
+                    }
+                },
+                { field: 'NickName', title: '昵称', width: 60 },
+                {
+                    field: 'createdon', title: '创建/注册时间', width: 120, formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                },
+                {
+                    field: 'IdType', title: '证件类型', width: 60, formatter: function (value, row) {
+                        return EnumUserIdType(value);
+                    }
+                },
+                { field: 'IdCard', title: '证件号码', width: 100 },
+                { field: 'Email', title: 'Email', width: 100 }
+            ]],
+            toolbar: [
+                {
+                    text: '选择',
+                    iconCls: 'icon-ok',
+                    handler: function () {
+                        var rows = SelectUserGrid.datagrid("getChecked");
+                        if (rows.length > 0) {
+                            console.log(rows);
+                            $.messager.confirm('请确认', '请确认为该部门添加'+ rows.length +'个用户？', function (r) {
+                                if (r) {
+                                    var adddepuserrequest = {
+                                        "departmentId": depinfo.baseinfo.depmentid,
+                                        "users": [
+                                        ]
+                                    };
+                                    $.each(rows, function (i, n) {
+                                        adddepuserrequest.users.push({ userId: n.UserId, isCaption: false });
+                                    });
+                                    console.log(adddepuserrequest);
+                                    $.post("/api/ApiDepartments/SetDepartmentMembers", adddepuserrequest, function (json) {
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', json.ReturnMessage, 'info');
+                                            loaddepusergrid();
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请勾选要添加到该部门下的用户', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '全部取消勾选',
+                    iconCls: 'icon-no',
+                    handler: function () {
+                        SelectUserGrid.datagrid("clearChecked");
+                    }
+                },
+                {
+                    text: '用户详情/编辑',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        //获取选中的行
+                        var row = SelectUserGrid.datagrid('getSelected');
+                        if (row != null) {
+                            $("#MainCenterTabs").tabs('add', {
+                                title: "用户[" + getTabTitle(row) + "]详情",
+                                href: "/PCCCMembers/userdetail?userId=" + row.UserId,
+                                closable: true
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '查看日志',
+                    iconCls: 'icon-search',
+                    handler: function () {
+                        //获取选中的行
+                        var row = SelectUserGrid.datagrid('getSelected');
+                        if (row != null) {
+                            $("#MainCenterTabs").tabs('add', {
+                                title: "用户[" + getTabTitle(row) + "]日志",
+                                href: "/PCCCSysManger/SysUserLog?SysUserId=" + row.UserId,
+                                closable: true
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                }
+            ]
+        });
+        loadsearchusergrid();
+
+        //可选用户翻页设置
+        SelectUserGrid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                searchuserrequest.Page = pPageIndex;
+                searchuserrequest.PageSize = pPageSize;
+                loadsearchusergrid();
+            }
+        });
+
+        //组织查询参数
+        var SelectOrgRequest = {
+            "departmentId": "",
+            "page": {
+                "Page": 1,
+                "PageSize": 10
+            },
+            "ordertype": 0,
+            "caption": "",
+            "showdisabled": true,
+            "showontheui": false
+        };
+
+        //初始化组织选择
+        var SelectOrg = $("#@(PageId)selectorg");
+        var SelectDep = $("#@(PageId)selectdep");
+        SelectDep.combotree({
+            multiple: true,
+            editable: false,
+            cascadeCheck: false
+        });
+
+        SelectOrg.combobox({
+            valueField: "depmentid",
+            textField: "caption",
+            onChange: function (newValue, oldValue) {
+                //判断该值是否是选择的值
+                var selectitem = SelectOrg.combobox("getData");
+                var isSelect = false;
+                $.each(selectitem, function (i, item) {
+                    if (item.depmentid == newValue) {
+                        isSelect = true;
+                        SelectOrgRequest.caption = item.caption;
+                    }
+                });
+                if (!isSelect) {
+                    SelectOrgRequest.departmentId = "";
+                    SelectOrgRequest.caption = newValue;
+                }
+                SelectOrg.combobox("reload");//当Change时重新加载
+            },
+            onSelect: function (record) {
+                $.post("/api/ApiDepartments/SearchDepartmentsTree", {
+                    departmentId: record.depmentid,
+                    getchild: true,
+                    ordertype: 4,
+                    caption: "",
+                    showdisabled: true,
+                    showontheui: false
+                }, function (json) {
+                    SelectDep.combotree('loadData', json);
+                });
+            },
+            loader: function (p, success, error) {
+                $.post("/api/ApiDepartments/SearchRootDepartments", SelectOrgRequest, function (json) {
+                    success(json.rows);
+                });
+                return true;
+            }
+        });
+
+        //检索按钮
+        GridSearchUserBtn.click(function () {
+            console.log("Search...");
+            //获取表单值
+            var d = SearchUserFrom.serializeObject();
+            searchuserrequest.Page = 1;
+            searchuserrequest.PageSize = 20;
+            searchuserrequest.keyWords = d.keyWords;
+            searchuserrequest.orgId = d.orgId;
+            searchuserrequest.departmentIds = d.departmentIds;
+            loadsearchusergrid();
+            var p = SelectUserGrid.datagrid("getPager");
+            p.pagination({
+                pageNumber: 1
+            });
+        });
+        //清除检索栏表单按钮
+        GridClearSearchUserBtn.click(function () {
+            SearchUserFrom.form('clear');//清空表单
+            //重新加载组织框
+            SelectOrgRequest.caption = "";
+            SelectOrgRequest.departmentId = "";
+            SelectOrg.combobox("reload");
+            //清空部门选择框
+            SelectDep.combotree("loadData", new Object());
+        });
+
+        //部门现有员工网格
+        var DepUserGrid = $("#@(PageId)DepUserGrid");
+        var searchdepusersrequest = {
+            "ordertype": 4,
+            "keyWords": "",
+            "userId": "",
+            "orgId": depinfo.orginfo.depmentid,
+            "getOtherOrgDepartmentInfo": false,
+            "departmentIds": [
+              depinfo.baseinfo.depmentid,
+            ],
+            "Page": 1,
+            "PageSize": 20
+        };
+        //加载部门用户网格
+        function loaddepusergrid() {
+            DepUserGrid.datagrid("loading");//显示网格正在加载
+            console.log(searchdepusersrequest);
+            $.post("/api/ApiMembers/SearchMembersList", searchdepusersrequest, function (json) {
+                console.log(json);
+                DepUserGrid.datagrid("loaded");//加载结束
+                DepUserGrid.datagrid("acceptChanges");//结束修改
+                editrow = undefined;
+                //数据转换
+                var depuserslist = {
+                    total: json.total,
+                    rows: []
+                };
+                if (json.total > 0) {
+                    $.each(json.rows, function (i, n) {
+                        var newrow = {
+                            UserId: n.UserId,
+                            LoginName: n.LoginName,
+                            FullName: n.FullName,
+                            isCaption: "false",
+                            Sex: n.Sex,
+                            MobilePhone: n.MobilePhone,
+                            isDisabled: n.isDisabled,
+                            depnum: n.numOfDep.numofdepartments
+                        };
+                        $.each(n.userDepartmentList, function (j, d) {
+                            if (d.departmentId == depinfo.baseinfo.depmentid && d.isCaption == true) {
+                                newrow.isCaption = "true";
+                            }
+                        });
+                        depuserslist.rows.push(newrow);
+                    });
+                }
+                DepUserGrid.datagrid("loadData", depuserslist);
+            });
+        }
+
+        var editrow = undefined;
+
+        DepUserGrid.datagrid({
+            pagination: true,
+            pageSize: searchdepusersrequest.PageSize,
+            pageNumber: searchdepusersrequest.Page,
+            rownumbers: false,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "UserId",
+            onClickRow: function (rowIndex, rowData) {
+                if (editrow != undefined) {
+                    DepUserGrid.datagrid("endEdit", editrow);
+                }
+                DepUserGrid.datagrid("beginEdit", rowIndex);
+                editrow = rowIndex;
+            },
+            columns: [[
+                {
+                    field: 'UserId', checkbox: true
+                },
+                { field: 'LoginName', title: '登录名', width: 100 },
+                { field: 'FullName', title: '真实姓名', width: 60 },
+                {
+                    field: 'isCaption', title: '主管', width: 40, align: 'right', editor: {
+                        type: 'checkbox',
+                        options: { on: true, off: false }
+                    }, formatter: function (value, row) {
+                        return value == "true" ? "是" : "否";
+                    }
+                },
+                {
+                    field: 'depnum', title: '部门[当前组织]', width: 100, align: 'right', formatter: function (value,row) {
+                        return value+" 个"
+                    }
+                },
+                {
+                    field: 'Sex', title: '性别', width: 40, align: 'center', formatter: function (value, row) {
+                        return EnumSex(value);
+                    }
+                },
+                { field: 'MobilePhone', title: '手机', width: 80 },
+                {
+                    field: 'isDisabled', title: '禁用', align: "center", width: 40, formatter: function (value, row) {
+                        return value ? "是" : "否";
+                    }
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '用户详情',
+                    iconCls: 'icon-search',
+                    handler: function () {
+                        //获取选中的行
+                        var row = DepUserGrid.datagrid('getSelected');
+                        if (row != null) {
+                            $("#MainCenterTabs").tabs('add', {
+                                title: "用户[" + getTabTitle(row) + "]详情",
+                                href: "/PCCCMembers/userdetail?userId=" + row.UserId,
+                                closable: true
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: "如何添加？",
+                    iconCls: 'icon-help',
+                    handler: function () {
+                        $.messager.alert('Help', "请从右边的用户列表中勾选用户<br />然后点击选择按钮", 'info');
+                    }
+                },
+                {
+                    text: "保存",
+                    iconCls: "icon-save",
+                    handler: function () {
+                        if (editrow != undefined) {
+                            DepUserGrid.datagrid("endEdit", editrow);
+                            editrow = undefined;
+                        }
+                        var rows = DepUserGrid.datagrid("getChanges");
+                        if (rows.length > 0) {
+                            var editdepuserrequest = {
+                                departmentId: depinfo.baseinfo.depmentid,
+                                users: []
+                            };
+                            $.each(rows, function (i, n) {
+                                editdepuserrequest.users.push({
+                                    userId: n.UserId,
+                                    isCaption: n.isCaption
+                                });
+                            });
+                            console.log(editdepuserrequest);
+                            $.post("/api/ApiDepartments/EditDepartmentMembers", editdepuserrequest, function (json) {
+                                if (json.ReturnCode == 0) {
+                                    $.messager.alert('Success', "保存成功", 'info');
+                                    DepUserGrid.datagrid("uncheckAll");
+                                    loaddepusergrid();
+                                }
+                                else {
+                                    $.messager.alert('错误', json.ReturnMessage, 'error');
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '没有数据被修改', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: "从部门中移除",
+                    iconCls: "icon-clear",
+                    handler: function () {
+                        var rows = DepUserGrid.datagrid("getChecked");
+                        if (rows.length > 0) {
+                            $.messager.confirm('请确认', '请确认从部门中移除' + rows.length + '个用户？', function (r) {
+                                if (r) {
+                                    var removedepuserrequest = {
+                                        "departmentId": depinfo.baseinfo.depmentid,
+                                        "users": [
+                                        ]
+                                    };
+                                    $.each(rows, function (i, n) {
+                                        removedepuserrequest.users.push({
+                                            userId: n.UserId
+                                        });
+                                    });
+                                    console.log(removedepuserrequest);
+                                    $.post("/api/ApiDepartments/DelDepartmentMembers", removedepuserrequest, function (json) {
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', json.ReturnMessage, 'info');
+                                            DepUserGrid.datagrid("uncheckAll");
+                                            loaddepusergrid();
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请勾选您要从部门中移除的用户', 'warning');
+                        }
+                    }
+                },
+            ]
+        });
+        loaddepusergrid();
+        //部门用户翻页设置
+        DepUserGrid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                searchdepusersrequest.Page = pPageIndex;
+                searchdepusersrequest.PageSize = pPageSize;
+                loaddepusergrid();
+            },
+            showPageList: false,
+            displayMsg: "总计{total}人"
+        });
+
+        //部门表单赋值
+        var DepInfoForm = $("#@(PageId)DepInfoForm");
+        var DepinfoFormSaveBtn = $("#@(PageId)DepinfoFormSaveBtn");
+        DepInfoForm.form("load", depinfo.baseinfo);
+
+        //保存部门信息按钮事件
+        DepinfoFormSaveBtn.click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                DepInfoForm.form("submit", {
+                    onSubmit: function () {
+                        var Reg = $(this).form('enableValidation').form('validate');
+                        if (Reg) {
+                            DepinfoFormSaveBtn.linkbutton('disable');
+                            DepinfoFormSaveBtn.parent().next().html("<span>请稍后...</span>");
+                            var d = DepInfoForm.serializeObject();
+                            console.log(d);
+                            $.post("/api/ApiDepartments/EditDepInfo", d, function (json) {
+                                DepinfoFormSaveBtn.linkbutton('enable');
+                                DepinfoFormSaveBtn.parent().next().html("");
+                                if (json.ReturnCode == 0) {
+                                    $.messager.alert('Success', "保存成功", 'info');
+                                }
+                                else {
+                                    $.messager.alert('错误', json.ReturnMessage, 'error');
+                                }
+                            });
+                        }
+                        return Reg;
+                    }
+                });
+            }
+        });
+        //检查是否是跟节点，如果是则不允许编辑
+        if (depinfo.baseinfo.depmentid == depinfo.orginfo.depmentid) {
+            DepinfoFormSaveBtn.linkbutton('disable');
+            DepinfoFormSaveBtn.parent().next().html("<span>该部门不允许在此处进行编辑</span>");
+        }
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+        <div data-options="region:'west',border:false" style="width:30%;padding:5px;">
+            <div class="easyui-panel" title="部门详情" data-options="fit:true" style="padding:10px;">
+                <div class="easyui-tabs">
+                    <div title="部门信息" style="padding:20px;">
+                        <form id="@(PageId)DepInfoForm">
+                            <input type="hidden" name="depmentid" value="@depinfo.baseinfo.depmentid" />
+                            <table class="formtable">
+                                <tr>
+                                    <td>部门ID：</td>
+                                    <td>@depinfo.baseinfo.depmentid</td>
+                                </tr>
+                                <tr>
+                                    <td>人数：</td>
+                                    <td>部门：@(depinfo.baseinfo.memberNum)人，总计：@(depinfo.baseinfo.memberNumCount)人</td>
+                                </tr>
+                                <tr>
+                                    <td>创建时间：</td>
+                                    <td>@depinfo.baseinfo.modifiedon.ToString("yyyy-MM-dd HH:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td>部门名称：</td>
+                                    <td><input type="text" class="easyui-textbox" name="caption" data-options="required:true,validType:'length[0,25]'" /></td>
+                                </tr>
+                                <tr>
+                                    <td>是否禁用：</td>
+                                    <td>
+                                        <select name="isdisabled" class="easyui-combobox" data-options="editable:false">
+                                            <option value="true">是</option>
+                                            <option value="false">否</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="btntable">
+                                <tr>
+                                    <td><a href="javascript:void(0)" id="@(PageId)DepinfoFormSaveBtn" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存部门基础信息</a></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div title="所属组织信息" style="padding:20px">
+                        <table class="formtable">
+                            <tr>
+                                <td>组织名称：</td>
+                                <td>@depinfo.orginfo.caption</td>
+                            </tr>
+                            <tr>
+                                <td>所有者：</td>
+                                <td>@depinfo.orginfo.linkUserinfo.FullName [@depinfo.orginfo.linkUserinfo.MobilePhone]</td>
+                            </tr>
+                            <tr>
+                                <td>总计用户：</td>
+                                <td>@depinfo.orginfo.memberNumCount 人</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-options="region:'east',border:false" style="width:70%;padding:5px 5px 5px 0;">
+            <div class="easyui-layout" data-options="fit:true,border:false">
+                <div data-options="region:'west',border:false" style="width:40%; padding-right:5px;">
+                    <div class="easyui-panel" title="该部门下现有用户" data-options="fit:true">
+                        <table id="@(PageId)DepUserGrid"></table>
+                    </div>
+                </div>
+                <div data-options="region:'east',border:false" style="width:60%;">
+                    <div class="easyui-panel" title="选择新增用户" data-options="fit:true">
+                        <div class="easyui-layout" data-options="fit:true">
+                            <div data-options="region:'north',height:'78',border:false">
+                                <div class="easyui-panel SearchBox" style="padding:10px;background:#F4F4F4;" data-options="fit:true,border:false">
+                                    <form id="@(PageId)SearchUserFrom">
+                                        <table>
+                                            <tr>
+                                                <td>组织：</td>
+                                                <td><input type="text" id="@(PageId)selectorg" name="orgId" /></td>
+                                                <td>部门：</td>
+                                                <td><input type="text" id="@(PageId)selectdep" name="departmentIds" /></td>
+                                            </tr>
+                                            <tr>
+                                                <td>关键字：</td>
+                                                <td><input type="text" class="easyui-textbox" name="keyWords" /></td>
+                                                <td></td>
+                                                <td>
+                                                    <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchUserBtn" data-options="iconCls:'icon-search'">查询</a>
+                                                    <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridClearSearchUserBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </form>
+                                </div>
+                            </div>
+                            <div data-options="region:'center',border:false"><table id="@(PageId)SelectUserGrid"></table></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>

@@ -1,0 +1,401 @@
+﻿@{
+    Layout = null;
+    RequestSysUserListModel condtion = ViewBag.condtion;
+}
+<script>
+    var RequestSysUserListModelcondtion = {
+        "KeyWords": "@condtion.KeyWords",
+        "RoleId": [
+          1001,
+          1002
+        ],
+        "Page": "@condtion.Page",
+        "PageSize": "@condtion.PageSize"
+    };
+    $.post("/api/ApiSysManager/SearchSysUserList",RequestSysUserListModelcondtion,function(json){
+        var Grid = $("#SysUserGrid");//获取网格对象
+        //重构数据方法（初始化和翻页时调用）--因为EASYUI网格对多层复杂对象支持不够友好，所以在前端重新定义需要在网格中展示的数据对象
+        function ResetRowsInfo(json) {
+            var rowlist = new Object();
+            rowlist.total = json.total;
+            rowlist.rows = new Array();
+            for (var i = 0; i < json.UserList.length; i++) {
+                var newrow = Object();
+                newrow.LoginName = json.UserList[i].LoginName;
+                newrow.RoleId = json.UserList[i].SysRole.RoleId;
+                newrow.RoleName = json.UserList[i].SysRole.RoleName;
+                newrow.FullName = json.UserList[i].FullName;
+                newrow.JobTitle = json.UserList[i].JobTitle;
+                newrow.MobilePhone = json.UserList[i].MobilePhone;
+                newrow.IsDisabled = json.UserList[i].IsDisabled ? "true" : "false";
+                newrow.UserId = json.UserList[i].UserId;
+                newrow.CreatedOn = json.UserList[i].CreatedOn;
+                rowlist.rows.push(newrow);
+            }
+            return rowlist;
+        }
+
+        //重构数据
+        var rowlist = ResetRowsInfo(json);
+        console.log(rowlist);
+
+        var SelectIndex = undefined //当前选中的行的ID
+
+        var editIndex = undefined; //定义当前编辑行
+
+        //行的验证
+        function endEditing() {
+            if (editIndex == undefined) { return true }
+            if (Grid.datagrid('validateRow', editIndex)) {
+                //格式化角色显示值
+                var ed = Grid.datagrid('getEditor', { index: editIndex, field: 'RoleId' });
+                var RoleName = $(ed.target).combobox('getText');
+                Grid.datagrid('getRows')[editIndex]['RoleName'] = RoleName;
+                //确认编辑
+                Grid.datagrid('endEdit', editIndex);
+                editIndex = undefined;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        
+
+        //初始化网格
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(RequestSysUserListModelcondtion.PageSize),
+            pageNumber: parseInt(RequestSysUserListModelcondtion.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect:true,
+            idField: "UserId",
+            data: rowlist,
+            onClickRow: function (rowIndex, rowData) {//行点击事件
+                if (rowIndex == SelectIndex) {
+                    Grid.datagrid('unselectRow', rowIndex);
+                    SelectIndex = undefined;
+                }
+                else {
+                    SelectIndex = rowIndex;
+                }
+
+            },
+            columns: [[
+                {
+                    field: 'LoginName', title: '登录名', width: 100, editor: {
+                        type: "textbox", options: {
+                            required: true,
+                            validType: [
+                                "length[6,50]"
+                            ]
+                        }
+                    }
+                },
+                {
+                    field: 'RoleId', title: '角色', width: 100, editor: {
+                        type: "combobox", options: {
+                            valueField: 'RoleId',
+                            textField: 'RoleName',
+                            method: 'GET',
+                            url: '/PCCCSysManger/GetRoles',
+                            multiple: false,
+                            editable: false,
+                            required: true
+                        }
+                    },
+                    formatter: function (value, row) {
+                        return row.RoleName;
+                    }
+                },
+                { field: 'FullName', title: '姓名', width: 100, editor: { type: "textbox", options: { required: true } } },
+                { field: 'JobTitle', title: '职位', width: 150, editor: { type: "textbox" } },
+                { field: 'MobilePhone', title: '联系方式', width: 150, editor: { type: "textbox" } },
+                {
+                    field: 'IsDisabled', title: '是否禁用', width: 60, editor: {
+                        type: 'checkbox',
+                        options: { on: true, off: false }
+                    }
+                },
+                {
+                    title: '创建时间', field: 'CreatedOn', width: 150, formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '新增',
+                    iconCls: 'icon-add',
+                    handler: function () {
+                        if (endEditing()) {
+                            Grid.datagrid('insertRow', { index: 0, row: { UserId: null, LoginName: "" } });
+                            editIndex = 0;
+                            SelectIndex = 0;
+                            Grid.datagrid('selectRow', editIndex).datagrid('beginEdit', editIndex);
+                        }
+                    }
+                },
+                {
+                    text: '编辑',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            if (editIndex == undefined) {
+                                Grid.datagrid('selectRow', SelectIndex).datagrid('beginEdit', SelectIndex);
+                                editIndex = SelectIndex;
+                            }
+                            else {
+                                Grid.datagrid('selectRow', editIndex);
+                                SelectIndex = editIndex;
+                            }
+                        } else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '取消编辑',
+                    iconCls: 'icon-undo',
+                    handler: function () {
+                        if (editIndex != undefined) {
+                            Grid.datagrid('selectRow', editIndex);
+                            var row = Grid.datagrid('getSelected');
+                            Grid.datagrid('cancelEdit', editIndex);
+                            if (row.UserId == undefined) {
+                                Grid.datagrid('deleteRow', editIndex);
+                            }
+                            Grid.datagrid("unselectAll");
+                            editIndex = undefined;
+                            SelectIndex = undefined;
+                        }
+                    }
+                },
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+
+                        if (editIndex != undefined) {
+                            var saveindex = editIndex;
+
+                            Grid.datagrid('selectRow', editIndex);
+                            if (endEditing()) {
+                                var row = Grid.datagrid('getSelected');
+                                var d = {
+                                    "UserId": row.UserId,
+                                    "LoginName": row.LoginName,
+                                    "FullName": row.FullName,
+                                    "JobTitle": row.JobTitle,
+                                    "MobilePhone": row.MobilePhone,
+                                    "SysRole": {
+                                        "RoleId": row.RoleId
+                                    },
+                                    "IsDisabled": row.IsDisabled
+                                };
+                                console.log(d);
+                                $.post("/api/ApiSysManager/EditSysUser", d, function (json) {
+                                    console.log(json);
+                                    if (json.ReturnCode != 0) {
+                                        $.messager.alert('错误', json.ReturnMessage, 'error');
+
+                                        //保存如果出错则刷新网格
+                                        $.post("/api/ApiSysManager/SearchSysUserList", RequestSysUserListModelcondtion, function (json) {
+                                            //重构数据
+                                            var rowlist = ResetRowsInfo(json);
+
+                                            Grid.datagrid("loadData", rowlist);//加载数据
+                                            //加载后重置单元格编辑
+                                            editIndex = undefined;
+                                            SelectIndex = undefined;
+                                            Grid.datagrid('acceptChanges');
+                                            Grid.datagrid('unselectAll');
+                                        });
+
+                                    }
+                                    else {
+                                        $.messager.alert('Success', "保存成功", 'info');
+                                        if (row.UserId == null) {
+                                            //如果是新增的行需要将新增的用户ID赋给该行
+                                            Grid.datagrid('getRows')[saveindex]['UserId'] = json.ReturnMessage;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            $.messager.alert('错误', '没有数据需要保存', 'error');
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            if (row.UserId != null) {//判断是否为新增的行
+                                $.messager.confirm('请确认', '确定要删除用户：' + row.FullName, function (r) {
+                                    if (r) {
+                                        $.getJSON("/api/ApiSysManager/DelSysUser/" + row.UserId, function (json) {
+                                            if (json.ReturnCode == 0) {
+                                                $.messager.alert('Success', '删除成功', 'info');
+                                                Grid.datagrid('cancelEdit', SelectIndex).datagrid('deleteRow', SelectIndex);
+                                                SelectIndex = undefined;
+                                                editIndex = undefined;
+                                            }
+                                            else {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            } else {
+                                console.log(SelectIndex);
+                                //新增的行直接删除
+                                Grid.datagrid('cancelEdit', SelectIndex);
+                                Grid.datagrid('deleteRow', SelectIndex);
+                                SelectIndex = undefined;
+                                editIndex = undefined;
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '重置用户登录密码',
+                    iconCls: 'icon-reload',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            if (row.UserId != null) {//判断是否为新增的行
+                                $.messager.confirm('请确认', '确定要重置用户：【' + row.FullName + "】的登陆密码？<br />重置后登陆密码为：【@ViewBag.DefaultPwd】", function (r) {
+                                    if (r) {
+                                        $.getJSON("/api/ApiSysManager/ReSetUserPwd/" + row.UserId, function (json) {
+                                            if (json.ReturnCode == 0) {
+                                                $.messager.alert('Success', '重置成功', 'info');
+                                            }
+                                            else {
+                                                $.messager.alert('错误', json.ReturnMessage, 'error');
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            else {
+                                $.messager.alert('提示', '该用户还未保存', 'warning');
+                            }
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '查看日志',
+                    iconCls: 'icon-search',
+                    handler: function () {
+                        var row = Grid.datagrid("getSelected");
+                        if (row != null) {
+                            $("#SysUserLogListWindow").dialog({
+                                href: "/PCCCSysManger/SysUserLog?SysUserId=" + row.UserId
+                            });
+                            $("#SysUserLogListWindow").dialog("open");
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                }
+            ]
+        });
+
+        //翻页设置
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                RequestSysUserListModelcondtion.Page = pPageIndex;
+                RequestSysUserListModelcondtion.PageSize = pPageSize;
+                $.post("/api/ApiSysManager/SearchSysUserList", RequestSysUserListModelcondtion, function (json) {
+                    //重构数据
+                    var rowlist = ResetRowsInfo(json);
+
+                    Grid.datagrid("loadData", rowlist);//加载数据
+                    //加载后重置单元格编辑（翻页后忽略前一页的编辑项与选择项）
+                    editIndex = undefined;
+                    SelectIndex = undefined;
+                    Grid.datagrid('acceptChanges');
+                    Grid.datagrid('unselectAll');
+                });
+            }
+        });
+
+        //查询栏
+        $("#SysUserGridSearchBtn").click(function () {
+            console.log("Search...");
+            var d = $("#SysUserGridSearchFrom").serializeObject();
+            RequestSysUserListModelcondtion.Page = "@condtion.Page";
+            RequestSysUserListModelcondtion.PageSize = "@condtion.PageSize";
+            RequestSysUserListModelcondtion.KeyWords = d.KeyWords;
+            RequestSysUserListModelcondtion.RoleId = d.RoleId;
+            console.log(RequestSysUserListModelcondtion);
+            $.post("/api/ApiSysManager/SearchSysUserList", RequestSysUserListModelcondtion, function (json) {
+                //重构数据
+                var rowlist = ResetRowsInfo(json);
+
+                Grid.datagrid("loadData", rowlist);//加载数据
+                //加载后重置单元格编辑（查询后忽略前一页的编辑项与选择项目）
+                editIndex = undefined;
+                SelectIndex = undefined;
+                Grid.datagrid('acceptChanges');
+                Grid.datagrid('unselectAll');
+            });
+        });
+        $("#SysUserGridClearSearchBtn").click(function () {
+            $("#SysUserGridSearchFrom").form('clear');
+        });
+        //初始化表格
+        $("#SysUserGridSearchFrom").form('load', {
+            "RoleId": [
+              1001,
+              1002
+            ]
+        })
+    });
+</script>
+<div id="SysUserLogListWindow" class="easyui-dialog" data-options="
+            modal: true,
+            inline: true,
+            closed: true,
+            fit: true,
+            title: '用户日志',
+            draggable:true,
+            top:30" ></div>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'54',border:false" >
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#fafafa;" data-options="fit:true,border:true">
+            <form id="SysUserGridSearchFrom">
+                <table>
+                    <tr>
+                        <td>关键字：</td>
+                        <td><input type="text" class="easyui-textbox" name="KeyWords" /></td>
+                        <td>角色：</td>
+                        <td><input type="text" class="easyui-combobox" data-options="valueField:'RoleId',textField:'RoleName',multiple:true,method:'get',url:'/api/ApiSysManager/GetSysRoleAllRowList'" name="RoleId" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="SysUserGridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="SysUserGridClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'"><table id="SysUserGrid"></table></div>
+</div>
+

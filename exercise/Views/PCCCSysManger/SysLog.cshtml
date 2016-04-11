@@ -1,0 +1,223 @@
+﻿@{
+    Layout = null;
+    GetSysLogRequestModel condtion = ViewBag.condtion;
+    string PageId = ViewBag.PageId;
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var Grid = $("#@(PageId)Grid");
+        var request = {
+            "BeginDate": "@condtion.BeginDate",
+            "EndDate": "@condtion.EndDate",
+            "LogType": null,
+            "Page": "@condtion.Page",
+            "PageSize": "@condtion.PageSize"
+        };
+        function loadgrid() {
+            Grid.datagrid("loading");
+            $.post("/api/ApiSysManager/SearchSysLog", request, function (json) {
+                console.log(json);
+                Grid.datagrid("loaded");
+                Grid.datagrid("loadData", json);
+            });
+        }
+        //初始化网格
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(request.PageSize),
+            pageNumber: parseInt(request.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect:false,
+            idField: "Id",
+            toolbar: [
+                {
+                    text: '查看详情',
+                    iconCls: 'icon-search',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            $("#@(PageId)WindowRequest").text(row.Condtion);
+                            $("#@(PageId)WindowMsg").text(row.Errormsg);
+                            $("#@(PageId)WindowLogType").text(row.LogTypeText);
+                            $("#@(PageId)WindowCreatedOn").text(new Date(row.CreatedOn).Format("yyyy-MM-dd hh:mm"));
+                            $("#@(PageId)Window").dialog("open");
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var rows = Grid.datagrid('getChecked');
+                        if (rows.length > 0) {
+                            $.messager.confirm('请确认', '确认要删除勾选的'+ rows.length +'行？', function (r) {
+                                if (r) {
+                                    console.log(rows);
+                                    var d = new Object();
+                                    d.rows = rows;
+                                    $.post("/api/ApiSysManager/DelSysLog", d, function (json) {
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', json.ReturnMessage, 'info');
+                                            Grid.datagrid("uncheckAll");
+                                            $.post("/api/ApiSysManager/SearchSysLog", request, function (json) {
+                                                Grid.datagrid("loadData", json);//加载数据
+                                            });
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先勾选需要删除的行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '导出Excel',
+                    iconCls: 'icon-print',
+                    handler: function () {
+                        $.messager.confirm('请确认', '将按当前查询方式导出最多1000条数据，是否继续？', function (r) {
+                            if (r) {
+                                $.post("/PCCCSysManger/ExcelSysLog", request, function (data) {
+                                    console.log(data);
+                                    window.location.href = "/WebHome/DownloadFile?Path=" + data;
+                                });
+                            }
+                        });
+                    }
+                }
+            ],
+            columns: [[
+                {field:"",checkbox:true},
+                {
+                    field: 'LogType', title: '', width: 30,
+                    styler: function (value, row, index) {
+                        if (value == 0) {
+                            return "background:url('/Content/themes/icons/no.png')  no-repeat; background-position:center center;";
+                        } else if (value == 1) {
+                            return "background:url('/Content/themes/icons/tip.png')  no-repeat; background-position:center center;";
+                        }
+                        else {
+                            return "background:url('/Content/themes/icons/ok.png')  no-repeat; background-position:center center;";
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        return "";
+                    }
+
+                },
+                { field: 'LogTypeText', title: '类型', width: 40,align:"center" },
+                { field: 'Id', title: '记录号', width: 120 },
+                {
+                    field: 'CreatedOn', title: '时间', width: 140,align:'right', formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm:ss");
+                        }
+                    }
+                },
+                { field: 'Errormsg', title: '日志内容', width: 400 },
+                { field: 'Condtion', title: '请求参数', width: 220 }
+            ]]
+        });
+        loadgrid();
+        //翻页设置
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                request.Page = pPageIndex;
+                request.PageSize = pPageSize;
+                console.log(request);
+                loadgrid();
+            }
+        });
+
+        //查询栏
+        $("#@(PageId)GridSearchBtn").click(function () {
+            var d = $("#@(PageId)SearchFrom").serializeObject();
+            request.LogType = d.LogType;
+            request.BeginDate = d.BeginDate;
+            request.EndDate = d.EndDate;
+            request.Page = "@condtion.Page";
+            request.PageSize = "@condtion.PageSize";
+            console.log(request);
+            loadgrid();
+        });
+        $("#@(PageId)GridClearSearchBtn").click(function () {
+            $("#@(PageId)SearchFrom").form('clear');
+        });
+    });
+</script>
+<div id="@(PageId)Window" class="easyui-dialog" data-options="
+            modal: true,
+            inline: true,
+            closed: true,
+            fit: true,
+            title: '信息详情',
+            draggable:true,
+            top:30" style="padding:10px;" >
+    <table class="formtable" style="width:100%;">
+        <tr>
+            <td style="width:40px;">类型：</td>
+            <td id="@(PageId)WindowLogType"></td>
+            <td style="width:40px;">时间：</td>
+            <td id="@(PageId)WindowCreatedOn"></td>
+        </tr>
+        <tr>
+            <td>参数：</td>
+            <td colspan="3" id="@(PageId)WindowRequest"></td>
+        </tr>
+        <tr>
+            <td>内容：</td>
+            <td colspan="3" id="@(PageId)WindowMsg"></td>
+        </tr>
+    </table>
+</div>
+
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'54',border:false">
+        <div class="easyui-panel SearchBox" style="padding: 10px; background: #fafafa;" data-options="fit:true,border:true">
+            <form id="@(PageId)SearchFrom">
+                <table>
+                    <tr>
+                        <td>日志类型：</td>
+                        <td>
+                            <input type="text" name="LogType" class="easyui-combobox" data-options="
+                                valueField:'value',textField:'label',editable:false,
+                                data: [{
+			                        label: '错误',
+			                        value: '0'
+		                        },{
+			                        label: '警告',
+			                        value: '1'
+		                        },{
+			                        label: '通知',
+			                        value: '2'
+		                        }]" /></td>
+                        <td>开始时间：</td>
+                        <td>
+                            <input type="text" class="easyui-datetimebox" data-options="showSeconds:false" name="BeginDate" /></td>
+                        <td>结束时间：</td>
+                        <td>
+                            <input type="text" class="easyui-datetimebox" data-options="showSeconds:false" name="EndDate" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'">
+        <table id="@(PageId)Grid"></table>
+    </div>
+</div>

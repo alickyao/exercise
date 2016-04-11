@@ -1,0 +1,292 @@
+﻿@{
+    string PageId = ViewBag.PageId;
+    SearchCatInfoRequest condtion = ViewBag.condtion;
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        var Grid = $("#@(PageId)Grid");
+        var request = {
+            "Dep": "@condtion.Dep",
+            "_parentId": "@condtion._parentId",
+            "KeyWords": "@condtion.KeyWords",
+            "id": "@condtion.id"
+        }
+        $.post("/api/ApiPublicResource/SearchCatInfoList", request, function (json) {
+            console.log(json);
+            var data = {
+                rows: json
+            };
+
+            var SelectRow = undefined;//当前选中的行
+            var EditRow = undefined;//当前编辑的行
+
+
+
+            Grid.treegrid({
+                rownumbers: false,
+                animate: true,
+                collapsible: true,
+                data: data,
+                fit: true,
+                idField: 'id',
+                treeField: 'caption',
+                lines: true,
+                onClickRow: function (row) {
+                    if (row == SelectRow) {
+                        Grid.treegrid('unselect', SelectRow.id);
+                        SelectRow = undefined;
+                    } else {
+                        SelectRow = row;
+                    }
+                },
+                columns: [[
+                    { title: 'Id', field: 'id', width: 115 },
+                    { title: '标题', field: 'caption', width: 220, editor: { type: "textbox", options: { required: true } } },
+                    { title: '排序', field: 'sort', width: 60, align: 'right', editor: { type: "numberbox" } },
+                    {
+                        title: '创建/编辑时间', field: 'ModifiedOn', width: 150, align: 'right', formatter: function (value) {
+                            if (value != null) {
+                                return new Date(value).Format("yyyy-MM-dd hh:mm");
+                            }
+                        }
+                    }
+                ]],
+                toolbar: [
+                    {
+                        text: '新增行',
+                        iconCls: 'icon-add',
+                        handler: function () {
+                            if (EditRow == undefined) {//当前没有编辑项
+                                var node = Grid.treegrid('getSelected');
+                                Grid.treegrid('append', {
+                                    parent: node == null ? null : node.id,  // the node has a 'id' value that defined through 'idField' property
+                                    data: [{
+                                        id: "",
+                                        _parentId: node == null ? null : node.id
+                                    }]
+                                });
+                                EditRow = { id: "" };
+                                Grid.treegrid('select', EditRow.id).treegrid('beginEdit', EditRow.id);
+                            }
+                            else {
+                                Grid.treegrid('select', EditRow.id)
+                            }
+                        }
+                    },
+                    {
+                        text: '编辑',
+                        iconCls: 'icon-edit',
+                        handler: function () {
+                            if (EditRow == undefined) {//当前没有编辑项
+                                var node = Grid.treegrid('getSelected');
+                                EditRow = node;
+                                Grid.treegrid('beginEdit', EditRow.id);
+                            }
+                            else {
+                                Grid.treegrid('select', EditRow.id)
+                            }
+                        }
+                    },
+                    {
+                        text: '取消编辑',
+                        iconCls: 'icon-undo',
+                        handler: function () {
+                            if (EditRow != undefined) {
+                                Grid.treegrid('cancelEdit', EditRow.id);
+                                var node = Grid.treegrid('find', EditRow.id);
+                                if (node.id == "") {
+                                    //新增还未保存的行需要删除
+                                    Grid.treegrid('deleteRow', EditRow.id);
+                                }
+                                EditRow = undefined;
+                                console.log(node);
+                            }
+                        }
+                    },
+                    {
+                        text: '保存',
+                        iconCls: 'icon-save',
+                        handler: function () {
+                            if (EditRow != undefined) {
+                                if (Grid.treegrid('validateRow', EditRow.id)) {
+                                    Grid.datagrid('endEdit', EditRow.id);
+                                    var node = Grid.treegrid('find', EditRow.id);
+                                    console.log(node);
+                                    $.post("/api/ApiPublicResource/SaveCatInfo", node, function (json) {
+                                        if (json.ReturnCode != 0) {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                        else {
+                                            //新增的行需要将ID赋值
+                                            if (node.id == "") {
+                                                console.log(json.ReturnMessage);
+                                                Grid.treegrid('update', {
+                                                    id: node.id,
+                                                    row: {
+                                                        id: json.ReturnMessage
+                                                    }
+                                                });
+                                            }
+                                            Grid.treegrid("acceptChanges");
+                                            EditRow = undefined;
+                                            $.messager.alert('Success', "保存成功", 'info');
+                                        }
+                                    });
+                                }
+                                else {
+                                    $.messager.alert('提示', '数据验证失败', 'info');
+                                }
+                            }
+                            else {
+                                $.messager.alert('提示', '没有数据需要保存', 'info');
+                            }
+                        }
+                    },
+                    {
+                        text: '标记删除',
+                        iconCls: 'icon-clear',
+                        handler: function () {
+                            if (EditRow == undefined) {
+                                var node = Grid.treegrid('getSelected');
+                                if (node != null) {
+                                    $.messager.confirm('请确认', '确定要删除节点：' + node.caption, function (r) {
+                                        if (r) {
+                                            $.post("/api/ApiPublicResource/DelCatInfo", node, function (json) {
+                                                if (json.ReturnCode != 0) {
+                                                    $.messager.alert('错误', json.ReturnMessage, 'error');
+                                                }
+                                                else {
+                                                    $.messager.alert('Success', json.ReturnMessage, 'info');
+                                                    Grid.treegrid('remove', node.id);
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                                else {
+                                    $.messager.alert('提示', '请选选择一个节点', 'info');
+                                }
+                            }
+                            else {
+                                Grid.treegrid('select', EditRow.id)
+                            }
+                        }
+                    },
+                    {
+                        text: '节点位置调整',
+                        iconCls:'icon-filter',
+                        handler: function () {
+                            $("#@(PageId)SortWindow").dialog("open");
+                            $.post("/api/ApiPublicResource/SearchCatTreeList", {
+                                "Dep": null,
+                                "_parentId": "",
+                                "KeyWords": "",
+                                "id": ""
+                            }, function (json) {
+                                $('#@(PageId)WindowTree').tree({
+                                    animate: true,
+                                    lines: true,
+                                    dnd: true,
+                                    data: json,
+                                    onDrop: function (target, source, point) {
+                                        //父节点确认
+                                        var ParentNode = null;
+                                        if (point == "append") {
+                                            //被放到某节点内部，获取该节点信息
+                                            ParentNode = $('#@(PageId)WindowTree').tree("getNode", target);
+                                        }
+                                        else {
+                                            //被放到某节点内部，获取该节点信息
+                                            ParentNode = $('#@(PageId)WindowTree').tree("getParent", target);
+                                        }
+                                        var Pid = null;
+                                        if (ParentNode != null) {
+                                            Pid = ParentNode.id;
+                                        }
+                                        console.log("新的父节点ID：" + Pid);
+                                        $.ajax({
+                                            async: false, //同步开关
+                                            type: "POST",
+                                            url: "/api/ApiPublicResource/SetCatInfoParent",
+                                            data: {id:source.id,_parentId:Pid},
+                                            success: function (json) {
+                                                if (json.ReturnCode != 0) {
+                                                    //错误
+                                                    $.messager.alert('错误', json.ReturnMessage, 'error');
+                                                    $("#@(PageId)SortWindow").dialog("close");
+                                                }
+                                                console.log(json);
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    },
+                    {
+                        text: '刷新',
+                        iconCls: 'icon-reload',
+                        handler: function () {
+                            $.post("/api/ApiPublicResource/SearchCatInfoList",request, function (json) {
+                                var data = new Object();//树网格特殊操作
+                                data.rows = json;//树形网格特殊操作
+                                Grid.treegrid('loadData', data);
+                            });
+                        }
+                    }
+                ]
+            });
+        });
+
+        //查询栏组合树
+        $.post("/api/ApiPublicResource/SearchCatTreeList", {
+            "Dep": null,
+            "_parentId": "",
+            "KeyWords": "",
+            "id": ""
+        }, function (json) {
+            console.log(json);
+            $('#@(PageId)SearchTreeCombotree').combotree('loadData', json);
+        });
+        //查询栏
+        $("#@(PageId)GridSearchBtn").click(function () {
+            var d = $("#@(PageId)SearchFrom").serializeObject();
+            request.id = d.id;
+            request.KeyWords = d.KeyWords
+            console.log(request);
+            $.post("/api/ApiPublicResource/SearchCatInfoList", request, function (json) {
+                //重构数据
+                console.log(json);
+                Grid.treegrid("loadData", { rows: json });//加载数据
+            });
+            });
+        $("#@(PageId)GridClearSearchBtn").click(function () {
+            $("#@(PageId)SearchFrom").form('clear');
+        });
+    });
+</script>
+<div id="@(PageId)SortWindow" class="easyui-dialog" title="节点位置调整" data-options="closed:true,modal:true,inline:true" style="width:300px;height:350px;padding:10px;">
+    <div class="tr"><a href="javascript:void(0)" title="拖拽节点调整位置" class="easyui-tooltip easyui-linkbutton" data-options="iconCls:'icon-tip'">提示</a></div>
+    <ul id="@(PageId)WindowTree"></ul>
+</div>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'54',border:false">
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#fafafa;" data-options="fit:true,border:true">
+            <form id="@(PageId)SearchFrom">
+                <table>
+                    <tr>
+                        <td>节点</td>
+                        <td><input id="@(PageId)SearchTreeCombotree" name="id" value="" class="easyui-combotree"></td>
+                        <td>关键字</td>
+                        <td><input type="text" class="easyui-textbox" name="KeyWords" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center'"><table id="@(PageId)Grid"></table></div>
+</div>

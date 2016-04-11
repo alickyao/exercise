@@ -1,0 +1,366 @@
+﻿
+@{
+    Layout = null;
+    string PageId = ViewBag.PageId;
+    string orgId = ViewBag.orgId;
+    OrgInfoModel orginfo = ViewBag.orginfo;
+    string j = Newtonsoft.Json.JsonConvert.SerializeObject(orginfo);
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        //var info = $.parseJSON('@Html.Raw(j)');
+        var info = @Html.Raw(j);
+        var baseinfo = info.baseInfo;
+        baseinfo.isdisabled = baseinfo.isdisabled ? "true" : "false";
+        baseinfo.isshow = baseinfo.isshow ? "true" : "false";
+        var BaseInfoFrom = $("#@(PageId)orgbaseinfoform");
+        BaseInfoFrom.form("load", baseinfo);
+        console.log(baseinfo);
+        //所有者下拉框
+        var SelectLinkMan = $("#@(PageId)SelectLinkMan");
+        var SearchUserRequest = {
+            q: "",
+            userid: baseinfo.linkUserinfo.UserId
+        };
+        SelectLinkMan.combobox({
+            valueField:'id',
+            textField: 'text',
+            onChange: function (newValue, oldValue) {
+                var selectitem = SelectLinkMan.combobox("getData");
+                var isSelect = false;
+                $.each(selectitem, function (i, item) {
+                    if (item.id == newValue) {
+                        isSelect = true;
+                        SearchUserRequest.q = "";
+                        SearchUserRequest.userid = newValue;
+                    }
+                });
+                if (!isSelect) {
+                    SearchUserRequest.userid = "";
+                    SearchUserRequest.q = newValue;
+                }
+                SelectLinkMan.combobox("reload");
+            },
+            loader:function(p,success,error){
+                $.getJSON("/api/ApiMembers/SearchMembersListForcombobox", SearchUserRequest, function (json) {
+                    success(json);
+                });
+                return true;
+            }
+        });
+        SelectLinkMan.combobox("setValue", baseinfo.linkUserinfo.UserId);
+        //组织基础数据表单保存
+        var OrgSaveBtn = $("#@(PageId)orginfoFormSaveBtn");
+        var OrgSaveForm = $("#@(PageId)orgbaseinfoform");
+        OrgSaveBtn.click(function () {
+            if ($(this).linkbutton('options').disabled == false) {
+                OrgSaveForm.form("submit", {
+                    onSubmit: function () {
+                        var Reg = $(this).form('enableValidation').form('validate');
+                        if (Reg) {
+                            OrgSaveBtn.linkbutton('disable');
+                            OrgSaveBtn.parent().next().html("<span>请稍后...</span>");
+                            var d = OrgSaveForm.serializeObject();
+                            console.log(d);
+                            $.post("/api/ApiDepartments/EditOrgInfo", d, function (json) {
+                                OrgSaveBtn.linkbutton('enable');
+                                OrgSaveBtn.parent().next().html("");
+                                if (json.ReturnCode == 0) {
+                                    $.messager.alert('Success', "保存成功", 'info');
+                                }
+                                else {
+                                    $.messager.alert('错误', json.ReturnMessage, 'error');
+                                }
+                            });
+                        }
+                        return Reg;
+                    }
+                });
+            }
+        });
+        //$.extend($.fn.validatebox.defaults.rules, {
+        //    orgcaption: {
+        //        validator: function (value, param) {
+        //            var r = false;
+        //            $.ajax({
+        //                url: "/api/ApiDepartments/GetDepartmentCapitonNum?caption=" + value + "&orgid=" + param[0],
+        //                async: false,
+        //                dataType: 'json',
+        //                type: 'get',
+        //                contentType: "application/json",
+        //                success: function (data) {
+        //                    r = (data == 0);
+        //                }
+        //            });
+        //            return r;
+        //        },
+        //        message: '该组织名称已经被使用'
+        //    }
+        //});
+
+
+        var ExGrid = $("#@(PageId)ExGrid");//组织扩展信息网格
+        var ExWin = $("#@(PageId)ExWin");//组织扩展信息表单窗口
+        var ExFrom = $("#@(PageId)ExFrom");//组织扩展信息表单
+        var ExCat = $("#@(PageId)ExCat");
+
+
+        $.post("/api/ApiPublicResource/SearchCatTreeList", {
+            "Dep": null,
+            "_parentId": "160201140222_8089",
+            "KeyWords": "",
+            "id": ""
+        }, function (json) {
+            console.log(json);
+            ExCat.combotree('loadData', json);
+        });
+
+        function loadExdata() {
+            //加载数据
+            ExGrid.datagrid("loading");
+            $.getJSON("/api/ApiDepartments/GetOrgInfoById/" + baseinfo.depmentid, function (json) {
+                console.log(json);
+                ExGrid.datagrid("loaded");
+                ExGrid.datagrid("loadData", { total: json.exList.length, rows: json.exList });
+            });
+        }
+
+        //-- 初始化组织扩展网格
+        ExGrid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小 - 不使用
+            singleSelect: true,
+            idField: "exInfoId",
+            data: { total: info.exList.length, rows: info.exList },
+            columns: [[
+                {
+                    field: 'caption', title: '类型', width: 60, formatter: function (value, row) {
+                        return row.cat.caption
+                    }
+                },
+                {
+                    field: "detail", title: '描述', width: 250
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '新增',
+                    iconCls: 'icon-add',
+                    handler: function () {
+                        ExWin.dialog("open");
+                    }
+                },
+                {
+                    text: '详情/编辑',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        var row = ExGrid.datagrid("getSelected");
+                        if (row != null) {
+                            console.log(row);
+                            ExWin.find("#@(PageId)ExmodifiedOn").text(new Date(row.modifiedOn).Format("yyyy-MM-dd hh:mm"));
+                            ExWin.find("#@(PageId)ExmodifiedBy").text(row.modifyedBy.FullName + "[" + row.modifyedBy.LoginName + "]");
+                            ExCat.combotree("setValue", row.cat.id);
+                            ExFrom.form("load", row);
+                            ExWin.dialog("open");
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var row = ExGrid.datagrid("getSelected");
+                        if (row != null) {
+                            var url = "/api/ApiPublicResource/DelMemberExInfo/" + row.exInfoId;
+                            $.messager.confirm('请确认', '确定要删除节点：' + row.cat.caption, function (r) {
+                                if (r) {
+                                    ExGrid.datagrid("loading");
+                                    $.getJSON(url, function (json) {
+                                        if (json.ReturnCode != 0) {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                        else {
+                                            $.messager.alert('Success', "删除成功", 'info');
+                                            loadExdata();
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                }
+            ]
+        });
+
+        //-- 初始化用户扩展表单窗口
+        ExWin.dialog({
+            buttons: [
+                {
+                    text: "保存",
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        var btn = $(this);
+                        ExFrom.form("submit", {
+                            onSubmit: function (param) {
+                                var Reg = $(this).form('validate');
+                                if (Reg) {
+                                    btn.linkbutton("disable");
+                                    var n = $(this).serializeObject();
+                                    console.log(n);
+                                    param = {
+                                        fkId: baseinfo.depmentid,
+                                        exInfoId: n.exInfoId,
+                                        cat: {
+                                            id: n.excatid
+                                        },
+                                        detail: n.detail,
+                                    };
+                                    console.log(param);
+
+                                    $.post("/api/ApiPublicResource/EditExInfo", param, function (json) {
+                                        btn.linkbutton("enable");
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', "保存成功", 'info');
+                                            ExWin.dialog("close");
+                                            loadExdata();
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    })
+                                }
+                                return Reg;
+                            }
+                        });
+                    }
+                },
+                {
+                    text: "取消",
+                    iconCls: 'icon-undo',
+                    handler: function () {
+                        ExWin.dialog("close");
+                    }
+                },
+            ],
+            onClose: function () {
+                ExWin.find("#@(PageId)ExmodifiedOn").text("");
+                ExWin.find("#@(PageId)ExmodifiedBy").text("");
+                ExFrom.form("clear");
+            }
+        });
+
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div class="easyui-dialog" id="@(PageId)ExWin" title="扩展信息" data-options="resizable:true,modal:true,inline:true,fit:false,closed:true" style="width:520px; height:330px; padding:10px;">
+        <form id="@(PageId)ExFrom" method="post">
+            <input type="hidden" name="exInfoId" value="" />
+            <table class="formtable">
+                <tr>
+                    <td>类型</td>
+                    <td><input id="@(PageId)ExCat" name="excatid" class="easyui-combotree" data-options="required:true"></td>
+                </tr>
+                <tr>
+                    <td>描述</td>
+                    <td>
+                        <input class="easyui-textbox" name="detail" data-options="multiline:true,required:true,validType:'length[0,150]'" style="width:300px; height:150px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="color:#3e3e3e">修改时间：<span id="@(PageId)ExmodifiedOn"></span>，修改者：<span id="@(PageId)ExmodifiedBy"></span></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div data-options="region:'west',border:false" style="padding:5px; width:30%">
+        <div class="easyui-panel" title="组织详情" data-options="fit:true" style="padding:10px;">
+            <div class="easyui-tabs">
+                <div title="组织基础信息" style="padding:20px;">
+                    <form id="@(PageId)orgbaseinfoform">
+                        <input type="hidden" name="depmentid" value="@orginfo.baseInfo.depmentid" />
+                        <table class="formtable">
+                            <tr>
+                                <td>组织ID</td>
+                                <td>@orginfo.baseInfo.depmentid</td>
+                            </tr>
+                            <tr>
+                                <td>创建时间</td>
+                                <td>@orginfo.baseInfo.modifiedon.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <td>名称</td>
+                                <td><input type="text" name="caption" value="" class="easyui-textbox" data-options="required:true" validType="orgcaption['@orginfo.baseInfo.depmentid']" /></td>
+                            </tr>
+                            <tr>
+                                <td>禁用</td>
+                                <td>
+                                    <select name="isdisabled" class="easyui-combobox" data-options="editable:false">
+                                        <option value="true">是</option>
+                                        <option value="false">否</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>前端网站显示</td>
+                                <td>
+                                    <select name="isshow" class="easyui-combobox" data-options="editable:false">
+                                        <option value="true">是</option>
+                                        <option value="false">否</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>所有者</td>
+                                <td><input type="text" id="@(PageId)SelectLinkMan" name="linkUserId" data-options="required:true" /></td>
+                            </tr>
+                            <tr>
+                                <td>用户数量</td>
+                                <td>@orginfo.baseInfo.memberNumCount 人</td>
+                            </tr>
+                        </table>
+                        <table class="btntable">
+                            <tr>
+                                <td><a href="javascript:void(0)" id="@(PageId)orginfoFormSaveBtn" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存组织基础信息</a></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+                <div title="所有者信息" style="padding:20px;">
+                    <table class="formtable">
+                        
+                        <tr>
+                            <td>姓名：</td>
+                            <td>@orginfo.baseInfo.linkUserinfo.FullName</td>
+                        </tr>
+                        <tr>
+                            <td>电话：</td>
+                            <td>@orginfo.baseInfo.linkUserinfo.MobilePhone</td>
+                        </tr>
+                        <tr>
+                            <td>登录名：</td>
+                            <td>@orginfo.baseInfo.linkUserinfo.LoginName</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <h4>组织扩展信息</h4>
+            <div class="easyui-panel" data-options="height:300,noheader:true">
+                <table id="@(PageId)ExGrid"></table>
+            </div>
+        </div>
+    </div>
+    <div data-options="region:'east',border:false" style="width:70%; padding:5px;">
+        <div class="easyui-panel" title="部门详情" data-options="fit:true,loadingMessage:'加载中...',href:'/PCCCMembers/deplist?departmentId=@orgId'">
+        </div>
+    </div>
+</div>

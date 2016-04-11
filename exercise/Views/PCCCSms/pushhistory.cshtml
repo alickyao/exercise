@@ -1,0 +1,200 @@
+﻿@{
+    Layout = null;
+    string PageId = ViewBag.PageId;//当页面控件需要定义ID属性时，请使用此Guid作为其ID名称的开头部分
+    SearchSentPushListRequestModel condtion = ViewBag.condtion;//这是传入或者初始化的请求参数
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+}
+<script type="text/javascript" src="~/Scripts/datagrid-detailview.js"></script>
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        //请将全部JS代码写在这里面
+        var request = $.parseJSON('@Html.Raw(r)');//设置异步查询的请求参数
+        var Grid = $("#@(PageId)Grid");
+        var GridDetail = $("#@(PageId)DetailGrid");
+
+
+        function loadgrid() {
+            console.log(request);
+            Grid.datagrid("loading");
+            $.post("/api/ApiPush/SearchPushHistoryList", request, function (json) {
+                console.log(json);
+                Grid.datagrid("loaded");
+                Grid.datagrid("loadData", json);
+            });
+        }
+
+        function getpushDeviceType(type) {
+            switch (type) {
+                case 0:
+                    return "安卓";
+                    break;
+                case 1:
+                    return "IOS正式";
+                    break;
+                case 1:
+                    return "IOS测试";
+                    break;
+            }
+        }
+
+        //主网格
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(request.PageSize),
+            pageNumber: parseInt(request.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "id",
+            view: detailview,
+            onClickRow: function (rowIndex, rowData) {
+                var data = { total: rowData.sentUserList.length, rows: rowData.sentUserList };
+                $.each(data.rows, function (i, n) {
+                    n.UserId = n.sentUserInfo.UserId;
+                    n.LoginName = n.sentUserInfo.LoginName;
+                    n.FullName = n.sentUserInfo.FullName;
+                    n.nickName = n.sentUserInfo.nickName;
+                    n.deviceType = getpushDeviceType(n.sentDeviceInfo.deviceType);
+                    n.clientId = n.sentDeviceInfo.clientId;
+                })
+                GridDetail.datagrid("loadData", data);
+            },
+            detailFormatter: function (rowIndex, row) {
+                var s = '<table class="griddetailtable"><tr><td style="width:80px;">自定义内容</td><td>' + row.customInfo + '</td></tr><tr><td>返回（安卓）</td><td>' + (row.sentResultAndroid == null ? "没有向安卓设备发送推送" : row.sentResultAndroid) + '</td></tr><tr><td>返回（IOS）</td><td>' + (row.sentResultIos == null ? "没有向IOS设备发送推送" : row.sentResultIos) + '</td></tr></table>';
+                return s;
+            },
+            columns: [[
+                {
+                    field: 'createdBy', title: '操作者', width: 60, align: 'center', formatter: function (value, row) {
+                        return value.FullName
+                    }
+                },
+                {
+                    field: 'messageType', title: '类型', width: 40, align: 'center', formatter: function (value, row) {
+                        return value == 0 ? "通知" : "传透";
+                    }
+                },
+                {
+                    field: 'sentUserNum', title: '接收者', width: 60, align: 'right', formatter: function (value, row) {
+                        return value + "人";
+                    }
+                },
+                {
+                    field: 'title', title: '标题', width: 100, align: 'left'
+                },
+                {
+                    field: 'msg', title: '内容', width: 150, align: 'left'
+                },
+                {
+                    field: 'customInfo', title: '自定义的内容', width: 120, align: 'left'
+                },
+                {
+                    field: 'sentStats', title: '状态', width: 40, align: 'center', formatter: function (value, row) {
+                        return value ? "成功" : "失败";
+                    },
+                    styler: function (value, row, index) {
+                        return (!value) ? "background-color:#ffee00;color:red;" : "";
+                    }
+                },
+                {
+                    field: 'createdOn', title: '发送时间', width: 120, align: 'right', formatter: function (value, row) {
+                        return new Date(value).Format("yyyy-MM-dd hh:mm");
+                    }
+                }
+            ]]
+        });
+        loadgrid();
+
+        Grid.datagrid('getPager').pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                request.Page = pPageIndex;
+                request.PageSize = pPageSize;
+                loadgrid();
+            }
+        });
+
+        //从网格
+        GridDetail.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "UserId",
+            columns: [[
+                {
+                    field: 'LoginName', title: '登录名', width: 100, align: 'left'
+                },
+                {
+                    field: 'FullName', title: '姓名', width: 60, align: 'center'
+                },
+                {
+                    field: 'nickName', title: '昵称', width: 60, align: 'center'
+                },
+                {
+                    field: 'deviceType', title: '设备类型', width: 60, align: 'center'
+                },
+                {
+                    field: 'clientId', title: 'clientId', width: 200, align: 'left'
+                }
+            ]]
+        });
+
+        var SearchFrom = $("#@(PageId)searchform");
+        var SearchBtn = $("#@(PageId)SearchBtn");
+        var ClearSearchBtn = $("#@(PageId)ClearSearchBtn");
+        ClearSearchBtn.click(function () {
+            SearchFrom.form("clear");
+        });
+        SearchBtn.click(function () {
+            var d = SearchFrom.serializeObject();
+            request = d;
+            loadgrid();
+            var p = Grid.datagrid("getPager");
+            p.pagination({
+                pageNumber: 1
+            });
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',height:'54',border:false">
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#F4F4F4;" data-options="fit:true,border:false">
+            <form id="@(PageId)searchform">
+                <input type="hidden" name="Page" value="@condtion.Page" />
+                <input type="hidden" name="PageSize" value="@condtion.PageSize" />
+                <table>
+                    <tr>
+                        <td>开始时间：</td>
+                        <td><input type="text" class="easyui-datetimebox" data-options="showSeconds:false" name="beginDate" /></td>
+                        <td>结束时间：</td>
+                        <td><input type="text" class="easyui-datetimebox" data-options="showSeconds:false" name="endDate" /></td>
+                        <td>关键字：</td>
+                        <td><input type="text" class="easyui-textbox" name="keyWords" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)SearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)ClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center',border:false">
+        <div class="easyui-layout" data-options="fit:true">
+            <div data-options="region:'east',border:false" style="width:40%;">
+                <div class="easyui-panel" title="接收者详情" data-options="fit:true">
+                    <table id="@(PageId)DetailGrid"></table>
+                </div>
+            </div>
+            <div data-options="region:'center',border:false">
+                <table id="@(PageId)Grid"></table>
+            </div>
+        </div>
+    </div>
+</div>

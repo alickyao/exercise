@@ -1,0 +1,144 @@
+﻿@{
+    Layout = null;
+    SearchSmsInfoListRequestModel condtion = ViewBag.condtion;//这是传入或者初始化的请求参数
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+    string PageId = ViewBag.PageId;//当页面控件需要定义ID属性时，请使用此Guid作为其ID名称的开头部分
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        //请将全部JS代码写在这里面
+        var Grid = $("#@(PageId)Grid");
+        var SearchFrom = $("#@(PageId)SearchFrom");//查询栏表单
+        var SearchFromBtn = $("#@(PageId)GridSearchBtn");//查询按钮
+        var dialogwin = $("#@(PageId)dialogwin");//详情弹出框
+        var request = $.parseJSON('@Html.Raw(r)');//设置异步查询的请求参数
+        SearchFrom.form("load", request);
+        //加载数据
+        function loadgrid() {
+            //加载数据
+            Grid.datagrid("loading");//显示网格正在加载
+            console.log(request);
+            $.post("/api/ApiSms/SearchHistorySmsList", request, function (json) {
+                console.log(json);
+                Grid.datagrid("loaded");//加载结束
+                Grid.datagrid("loadData", json);
+            });
+        }
+        //初始化网格
+        Grid.datagrid({
+            pagination: true,
+            pageSize: parseInt(request.PageSize),
+            pageNumber: parseInt(request.Page),
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小
+            singleSelect: true,
+            selectOnCheck: false,
+            checkOnSelect: false,
+            idField: "id",
+            onDblClickRow: function (rowIndex, rowData) {
+                //模态框赋值
+                dialogwin.find(".createdOn").text(new Date(rowData.createdOn).Format("yyyy-MM-dd hh:mm"));
+                dialogwin.find(".createdBy").text(rowData.createdBy.FullName);
+                dialogwin.find(".mobilePhones").text(rowData.mobilePhones);
+                dialogwin.find(".contentMsg").text(rowData.contentMsg);
+                dialogwin.find(".sendState").text(rowData.sendState?"成功":"失败");
+                dialogwin.dialog("open");
+            },
+            columns: [[
+                {
+                    field: 'createdBy', title: '操作员', align: "center", width: 100, formatter: function (value, row) {
+                        return value.FullName
+                    }
+                },
+                { field: 'mobilePhones', title: '接收手机号', align: "left", width: 100 },
+                { field: 'contentMsg', title: '内容', width: 350},
+                {
+                    field: 'sendState', title: '状态', align: "center", width: 60, formatter: function (value, row) {
+                        return value ? "成功" : "失败";
+                    }
+                },
+                { field: 'returnMsg', title: '接口返回', width: 200 },
+                {
+                    field: 'createdOn', title: '发送时间', align: "right", width: 120, formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                }
+            ]]
+        });
+        //加载数据
+        loadgrid();
+        //翻页设置
+        Grid.datagrid("getPager").pagination({
+            onSelectPage: function (pPageIndex, pPageSize) {
+                request.Page = pPageIndex;
+                request.PageSize = pPageSize;
+                loadgrid();
+            }
+        });
+        //检索按钮
+        SearchFromBtn.click(function () {
+            console.log("Search...");
+            //获取表单值
+            var d = SearchFrom.serializeObject();
+            request.Page = "@condtion.Page";
+            request.PageSize = "@condtion.PageSize";
+            request.mobilePhones = d.mobilePhones;
+            request.contentMsg = d.contentMsg;
+            loadgrid();
+            var p = Grid.datagrid("getPager");
+            p.pagination({
+                pageNumber: 1
+            });
+        });
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div id="@(PageId)dialogwin" class="easyui-dialog" title="短信详情" style="width:80%;height:80%; padding:5px;" data-options="iconCls:'icon-save',resizable:true,modal:true,inline:true,closed:true">
+        <table class="formtable" id="">
+            <tr>
+                <td>发送时间</td>
+                <td class="createdOn"></td>
+            </tr>
+            <tr>
+                <td>操作员</td>
+                <td class="createdBy"></td>
+            </tr>
+            <tr>
+                <td>接收手机号码</td>
+                <td class="mobilePhones"></td>
+            </tr>
+            <tr>
+                <td>短信内容</td>
+                <td class="contentMsg"></td>
+            </tr>
+            <tr>
+                <td>状态</td>
+                <td class="sendState"></td>
+            </tr>
+        </table>
+    </div>
+    <div data-options="region:'north',height:'54',border:false">
+        <div class="easyui-panel SearchBox" style="padding:10px;background:#F4F4F4;" data-options="fit:true,border:false">
+            <form id="@(PageId)SearchFrom">
+                <table>
+                    <tr>
+                        <td>接收手机号</td>
+                        <td><input type="text" class="easyui-textbox" name="mobilePhones" /></td>
+                        <td>内容文本</td>
+                        <td><input type="text" class="easyui-textbox" name="contentMsg" /></td>
+                        <td>
+                            <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div data-options="region:'center',border:false">
+        <!-- 这是网格的容器 -->
+        <table id="@(PageId)Grid"></table>
+    </div>
+    </div>

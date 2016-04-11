@@ -1,0 +1,318 @@
+﻿@{
+    Layout = null;
+    string PageId = ViewBag.PageId;
+    GetUserExInfoListRequest condtion = ViewBag.condtion;
+    string r = Newtonsoft.Json.JsonConvert.SerializeObject(condtion);
+    string callback = ViewBag.callback;
+}
+<script>
+    $.get("/PCCCMain/HelloWord", function (Mut) {
+        //常地址网格定义
+        var Grid = $("#@(PageId)Grid");//网格对象
+        var request = $.parseJSON('@Html.Raw(r)');//请求参数
+        var locationInfo = new Object();
+        function loaddata() {
+            Grid.datagrid('unselectAll');
+            //加载网格数据
+            Grid.datagrid("loading");
+            $.post("/api/ApiAddress/GetAddressListByFkId", request, function (json) {
+                editrow = undefined;
+                Grid.datagrid("loaded");
+                Grid.datagrid("loadData", { total: json.length, rows: json });
+            });
+        }
+        //选择省市区模态网格
+        ProvincialcityWin = $("#@(PageId)ProvincialcityWin");
+        $("#@(PageId)btnCitySearch").click(function () {
+            ProvincialcityWin.dialog("open");
+        });
+        ProvincialcityWin.dialog({
+            buttons: [
+              {
+                  text: '保存',
+                  iconCls: 'icon-save',
+                  handler: function () {
+                      var row = $("#@(PageId)City").datagrid("getSelected");
+                      if (row) {
+                          var provincerow = $("#@(PageId)Province").datagrid("getSelected");
+                          var cityrow = $("#@(PageId)City").datagrid("getSelected");
+                          var arearow = $("#@(PageId)Area").datagrid("getSelected");
+                          var cityinfo = provincerow.text + "-" + cityrow.CityName;
+                          if (arearow) {
+                              cityinfo = cityinfo + "-" + arearow.text
+                          }
+                          $("#@(PageId)btnCitySearch").html(cityinfo);
+                          //赋值城市编号，区域编号，fkid
+                          $("input[name='fkId']").val(request.fkId);
+                          if (arearow) {
+                              locationInfo.DistrictId = arearow.id;
+                          } else {
+                              locationInfo.DistrictId = null;
+                          }
+                          locationInfo.cityInfo = {
+                              CityCode: cityrow.CityCode
+                          };
+                          $("#@(PageId)City").datagrid('loadData', { total: 0, rows: [] });
+                          $("#@(PageId)Area").datagrid('loadData', { total: 0, rows: [] });
+                          ProvincialcityWin.dialog("close");
+                      } else {
+                          $.messager.alert('提示', "请选择地址信息!", 'error');
+                      }
+                  }
+              },
+              {
+                  text: '关闭',
+                  iconCls: 'icon-clear',
+                  handler: function () {
+                      $("#@(PageId)City").datagrid('loadData', { total: 0, rows: [] });
+                      $("#@(PageId)Area").datagrid('loadData', { total: 0, rows: [] });
+                      ProvincialcityWin.dialog("close");
+                  }
+              }
+            ]
+        });
+
+
+        //添加/修改常地址网格
+        EditAddressrWin = $("#@(PageId)EditAddressWin");
+        EditAddressrWinform = $("#@(PageId)EditAddressWin form");
+        EditAddressrWin.dialog({
+            buttons: [
+                {
+                    text: '保存',
+                    iconCls: 'icon-save',
+                    handler: function () {
+                        var btn = $(this);
+                        if (btn.linkbutton('options').disabled == false) {
+                            var Reg = EditAddressrWinform.form('enableValidation').form('validate');
+                            if (Reg) {
+                                var cityseach = $("#@(PageId)btnCitySearch").html();
+                                if (cityseach == "请选择省市区") {
+                                    $.messager.alert('提示', "请选择省市区!", 'error');
+                                    return;
+                                }
+                                btn.linkbutton('disable');
+                                var d = EditAddressrWinform.serializeObject();
+                                d.locationInfo = locationInfo;
+                                $.post("/api/ApiAddress/EditAddress", d, function (json) {
+                                    if (json.ReturnCode == 0) {
+                                        $.messager.alert('Success', "保存成功", 'info');
+                                        EditAddressrWin.dialog("close");
+                                        loaddata();
+                                    }
+                                    else {
+                                        $.messager.alert('错误', json.ReturnMessage, 'error');
+                                    }
+                                    btn.linkbutton('enable');
+                                });
+                            }
+                        }
+                    }
+                },
+                {
+                    text: '关闭',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        EditAddressrWin.dialog("close");
+                    }
+                }
+            ],
+            onClose: function () {
+                EditAddressrWinform.form("clear");
+            }
+        });
+
+        var editrow = undefined;
+        Grid.datagrid({
+            pagination: false,
+            rownumbers: true,
+            border: false,
+            fit: true,  //自动大小 - 不使用
+            singleSelect: true,
+            idField: "id",
+            columns: [[
+                {
+                    field: 'locationInfo', title: '省市区', width: 150, align: 'left', formatter: function (value, row) {
+                        var val = value.cityInfo.ProvniceInfo.text + "-" + row.locationInfo.cityInfo.CityName;
+                        if (value.District) {
+                            val = val + "-" + value.District;
+                        }
+                        return val;
+                    }
+                },
+                {
+                    field: 'address', title: '地址', width: 120, align: 'left'
+                },
+                {
+                    field: 'postCode', title: '邮编', width: 60, align: 'left'
+
+                },
+                {
+                    field: 'linkMan', title: '联系人', width: 60, align: 'left'
+
+                }, {
+                    field: 'linkPhone', title: '联系电话', width: 80, align: 'left'
+
+                },
+                {
+                    field: 'isDefault', title: '默认', width: 40, align: 'center', formatter: function (value, row) {
+                        return value ? "是" : "否";
+                    }
+                },
+                {
+                    field: 'modifiedOn', title: '创建/注册时间', width: 120, align: 'right', formatter: function (value, row) {
+                        if (value != null) {
+                            return new Date(value).Format("yyyy-MM-dd hh:mm");
+                        }
+                    }
+                }
+            ]],
+            toolbar: [
+                {
+                    text: '新增',
+                    iconCls: 'icon-add',
+                    handler: function () {
+                        EditAddressrWin.dialog("open");
+                        $("#@(PageId)btnCitySearch").html("请选择省市区");
+                    }
+                },
+                {
+                    text: '编辑',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        //获取选中的行
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+
+                            var Adress = row.locationInfo.cityInfo.ProvniceInfo.text + "-" + row.locationInfo.cityInfo.CityName;
+                            if (row.locationInfo.District) {
+                                Adress = Adress + "-" + row.locationInfo.District;
+                            }
+                            $("#@(PageId)btnCitySearch").html(Adress);
+                            EditAddressrWinform.form("load", row);
+                            locationInfo.DistrictId = row.locationInfo.DistrictId;
+                            locationInfo.cityInfo = {
+                                CityCode: row.locationInfo.cityInfo.CityCode
+                            };
+                            EditAddressrWin.dialog("open");
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '删除',
+                    iconCls: 'icon-clear',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            $.messager.confirm('请确认', '确认删除' + row.linkMan + '[' + row.address + ']的地址吗？', function (r) {
+                                if (r) {
+                                    var id = row.id;
+                                    console.log(row);
+                                    $.getJSON("/Api/ApiAddress/DelAddress?Id=" + id, function (json) {
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('错误', "删除成功", 'info');
+                                            loaddata();
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '设置为默认',
+                    iconCls: 'icon-edit',
+                    handler: function () {
+                        var row = Grid.datagrid('getSelected');
+                        if (row != null) {
+                            if (row.isDefault == true) {
+                                $.messager.alert('提示', '该地址已经是该用户的默认地址了!', 'warning');
+                                return;
+                            }
+                            $.messager.confirm('请确认', '确认要将' + row.linkMan + '[' + row.address + ']设置为默认吗？', function (r) {
+                                if (r) {
+                                    row.isDefault = true;
+                                    $.post("/Api/ApiAddress/EditAddress", row, function (json) {
+                                        if (json.ReturnCode == 0) {
+                                            $.messager.alert('Success', "设置成功", 'info');
+                                            loaddata();
+                                        }
+                                        else {
+                                            $.messager.alert('错误', json.ReturnMessage, 'error');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.messager.alert('提示', '请先选择一行', 'warning');
+                        }
+                    }
+                },
+                {
+                    text: '刷新',
+                    iconCls: 'icon-reload',
+                    handler: function () {
+                        loaddata();
+                    }
+                }
+            ]
+        });
+        loaddata();
+    });
+
+</script>
+
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'center'">
+        <!-- 添加/编辑常用地址模态窗-->
+        <div class="easyui-dialog" id="@(PageId)EditAddressWin" title="地址信息" data-options="resizable:true,modal:true,inline:true,fit:false,closed:true" style="width:80%; height:80%;">
+            <form>
+                <input type="hidden" name="id" value="" />
+                <input type="hidden" name="fkId" value="" />
+                <table class="formtable">
+                    <tr>
+                        <td>省市区</td>
+                        <td>
+                            <a href="#" class="easyui-linkbutton" id="@(PageId)btnCitySearch" plain="true" title="点击选择省市区" iconCls="icon-search">请选择省市区</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>地址</td>
+                        <td><input type="text" name="address" class="easyui-textbox" data-options="required:true,validType:'length[1,50]'" /></td>
+                    </tr>
+                    <tr>
+                        <td>邮编</td>
+                        <td>
+                            <input type="text" name="postCode" class="easyui-textbox" data-options="validType:'length[1,10]'" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>联系人</td>
+                        <td><input type="text" name="linkMan" class="easyui-textbox" data-options="required:true,validType:'length[1,15]'" /></td>
+                    </tr>
+                    <tr>
+                        <td>联系电话</td>
+                        <td>
+                            <input type="text" name="linkPhone" class="easyui-textbox" data-options="required:true,validType:'length[1,11]'" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+
+        <!--选择省市区模态窗-->
+        <div class="easyui-dialog" id="@(PageId)ProvincialcityWin" title="省市区选择" data-options="resizable:true,modal:true,inline:true,fit:false,closed:true,href:'/PCCCPublicResource/selectcity?PageId=@(PageId)'" style="width:60%; height:60%;">
+        </div>
+        <table id="@(PageId)Grid"></table>
+    </div>
+</div>

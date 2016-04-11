@@ -1,0 +1,41 @@
+{
+	"index.html": {
+		"resources": [
+			"js/mui.min.js",
+			"css/mui.min.css",
+			"fonts/mui.ttf",
+			"exercis/list.html",
+			"js/global.js",
+			"js/easemob/easemob.im-1.0.7.js",
+			"js/easemob/strophe.js",
+			"js/jquery-1.11.1.js",
+			"js/easemob/json2.js"
+		],
+		"refer": [
+			"chat/main.html",
+			"exercis/list.html",
+			"user/home.html"
+		]
+	},
+	"exercis/list.html": {
+		"resources": [
+			"js/mui.min.js",
+			"css/mui.min.css",
+			"fonts/mui.ttf"
+		]
+	},
+	"chat/main.html": {
+		"resources": [
+			"js/mui.min.js",
+			"fonts/mui.ttf",
+			"css/mui.min.css",
+			"js/mui.imageViewer.js",
+			"js/arttmpl.js",
+			"images/logo.png",
+			"js/easemob/easemob.im-1.0.7.js",
+			"js/easemob/strophe.js",
+			"js/easemob/json2.js",
+			"js/jquery-1.11.1.js"
+		]
+	}
+}
