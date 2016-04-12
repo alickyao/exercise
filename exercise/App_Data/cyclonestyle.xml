@@ -1634,6 +1634,12 @@
             <param name="condtion"></param>
             <returns></returns>
         </member>
+        <member name="M:cyclonestyle.Controllers.ApiEasemobController.QueryToken">
+            <summary>
+            获取环信令牌
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:cyclonestyle.Controllers.ApiLocationController">
             <summary>
             地理位置接口

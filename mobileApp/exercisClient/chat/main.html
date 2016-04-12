@@ -6,6 +6,13 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<title></title>
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		
+		<!-- 环信集成 -->
+		<script src="../js/jquery-1.11.1.js"></script>
+		<script src="../js/easemob/strophe.js"></script>
+		<script src="../js/easemob/json2.js"></script>
+		<script src="../js/easemob/easemob.im-1.0.7.js"></script>
+		
 		<style>
 			html,
 			body {
@@ -325,7 +332,7 @@
 			}
 		</style>
 	</head>
-
+	
 	<body contextmenu="return false;">
 		<pre id='h'></pre>
 		<script id='msg-template' type="text/template">
@@ -382,7 +389,8 @@
 		
 		<script type="text/javascript" charset="UTF-8">
 			(function($, doc) {
-				//环信
+
+				
 				
 				
 				//聊天界面与事件
@@ -400,6 +408,46 @@
 				});
 				template.config('escape', false);
 				$.plusReady(function() {
+					//参数
+					var easemobKefuId = plus.storage.getItem("easemobKefuId");
+					var easemobAppName = plus.storage.getItem("easemobAppName");
+					var easemobOrgName = plus.storage.getItem("easemobOrgName");
+					
+					var host = plus.storage.getItem("host");
+					
+					
+					//环信初始化
+					var conn = null;
+					conn = new Easemob.im.Connection();
+					window.setTimeout(function() {
+						console.log("开始登录环信...");
+						var username = "test001";
+						var pass = "123456";
+						conn.open({
+							user: username,
+							pwd: pass,
+							appKey: easemobOrgName+'#'+easemobAppName
+						});
+					}, 1000);
+					conn.init({
+						onOpened: function() {
+							console.log("环信登录成功");
+							conn.setPresence();//设置为在线
+						},
+						//收到消息
+						onTextMessage : function(message){
+							console.log(message);
+							console.log("您收到一条文本消息");
+							var msg ={
+									sender: message.from,
+									type: 'text',
+									content: message.data
+							};
+							onrecevie(msg);
+						}
+					});
+					
+					
 					plus.webview.currentWebview().setStyle({
 						softinputMode: "adjustResize"
 					});
@@ -477,10 +525,59 @@
 						type: 'text',
 						content: 'Hi，我是 MUI 小管家！'
 					}];
+					
+					var onrecevie = function(msg){
+						record.push(msg);
+						bindMsgList();
+					};
 					//发送动作
 					var send = function(msg) {
 						record.push(msg);
 						bindMsgList();
+						//给环信发送消息
+						var options = {
+							to : easemobKefuId,
+							msg : "",
+							type : "chat"
+						};
+						switch(msg.type){
+							case "text"://文本
+							options.msg = msg.content
+							conn.sendTextMessage(options);
+							break;
+							case "image"://图像
+							console.log(msg);
+							mui.get(host+"api/ApiEasemob/QueryToken",function(token){
+								console.log(token);
+								var uploadrquest={
+								    appName : easemobAppName,
+								    orgName : easemobOrgName,
+								    accessToken : token,
+								    fileInfo :{
+								    	url : msg.content,
+								        filename : 'abc',
+								        filetype : 'jpg'
+								    },
+								    onFileUploadComplete:function(data){
+								    	//upload file success 
+								    	console.log("ok");
+								    },
+								    onFileUploadError:function(e){
+								    	//upload file error 
+								    	console.log("error");
+								    	console.log(e);
+								    },
+								    width:100,//only for pic
+								    heght:100//only for pic
+								};
+								Easemob.im.Helper.upload(uploadrquest);
+							});
+							break;
+							case "sound"://语音
+							
+							break;
+						}
+						
 					};
 					
 					

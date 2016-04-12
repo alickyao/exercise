@@ -48,7 +48,7 @@ namespace cyclonestyle.BLL
         /// 获取令牌
         /// </summary>
         /// <returns></returns>
-        private static string queryToken() {
+        internal static string queryToken() {
             string cacheKey = client_id + client_secret;
             if (HttpRuntime.Cache.Get(cacheKey) != null && HttpRuntime.Cache.Get(cacheKey).ToString().Length > 0)
             {

@@ -19,6 +19,7 @@ namespace cyclonestyle.Controllers
         /// </summary>
         /// <param name="condtion"></param>
         /// <returns></returns>
+        [HttpPost]
         public ReplayBase RegisterUser(RegisterUserEasemobRequestModel condtion) {
             return easemobInterFaceService.RegisterUser(condtion);
         }
@@ -28,8 +29,19 @@ namespace cyclonestyle.Controllers
         /// </summary>
         /// <param name="condtion"></param>
         /// <returns></returns>
+        [HttpPost]
         public ReplayBase SendMsg(SendMessageRequestModel condtion) {
             ReplayBase result = easemobInterFaceService.SendMsg(condtion);
+            return result;
+        }
+
+        /// <summary>
+        /// 获取环信令牌
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public string QueryToken() {
+            string result = easemobInterFaceService.queryToken();
             return result;
         }
     }

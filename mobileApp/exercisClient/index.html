@@ -8,12 +8,6 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/global.js"></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
-
-		<!-- 环信集成 -->
-		<script src="js/jquery-1.11.1.js"></script>
-		<script src="js/easemob/strophe.js"></script>
-		<script src="js/easemob/json2.js"></script>
-		<script src="js/easemob/easemob.im-1.0.7.js"></script>
 	</head>
 
 	<body>
@@ -35,39 +29,7 @@
 			</a>
 		</nav>
 		<script>
-			$(function() {
-				//环信初始化
-				var conn = null;
-				conn = new Easemob.im.Connection();
-				window.setTimeout(function() {
-					console.log("开始登录环信...");
-					var username = "test001";
-					var pass = "123456";
-					conn.open({
-						user: username,
-						pwd: pass,
-						appKey: 'xindong#xindongexercis'
-					});
-				}, 1000);
-				conn.init({
-					onOpened: function() {
-						console.log("环信登录成功");
-						var options = {
-							to : "kefu001",
-							msg : "hello...my love",
-							type : "chat"
-						};
-						conn.sendTextMessage(options);
-						conn.setPresence();
-						
-					},
-					//收到消息
-					onTextMessage : function(message){
-						console.log(message);
-						console.log("您收到一条消息");
-					}
-				});
-			});
+			
 			mui.init({
 				swipeBack: false,
 			});
