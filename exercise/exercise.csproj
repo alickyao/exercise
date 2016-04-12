@@ -157,7 +157,7 @@
     <Content Include="Content\Css\MStyle.css" />
     <Content Include="Content\Css\PCWebFront.css" />
     <Content Include="Content\Css\PCWebStyle.css" />
-    <Content Include="Content\images\PCLogo.jpg" />
+    <Content Include="Content\images\PCLogo1.jpg" />
     <Content Include="Content\themes\black\accordion.css" />
     <Content Include="Content\themes\black\calendar.css" />
     <Content Include="Content\themes\black\combo.css" />

@@ -71,12 +71,12 @@
                 },
                 { field: 'LoginName', title: '登录名', width: 100 },
                 {
-                    field: "numOfDep.numofcompany", title: "公司", align: "right", width: 40, formatter: function (value, row) {
-                        return row.numOfDep.numofcompany + "家";
+                    field: "numOfDep.numofcompany", title: "大类", align: "right", width: 40, formatter: function (value, row) {
+                        return row.numOfDep.numofcompany + "个";
                     }
                 },
                 {
-                    field: "numOfDep.numofdepartments", title: "部门", align: "right", width: 40, formatter: function (value, row) {
+                    field: "numOfDep.numofdepartments", title: "小类", align: "right", width: 40, formatter: function (value, row) {
                         return row.numOfDep.numofdepartments + "个";
                     }
                 },
@@ -116,7 +116,7 @@
                         var rows = SelectUserGrid.datagrid("getChecked");
                         if (rows.length > 0) {
                             console.log(rows);
-                            $.messager.confirm('请确认', '请确认为该部门添加'+ rows.length +'个用户？', function (r) {
+                            $.messager.confirm('请确认', '请确认为该小类添加'+ rows.length +'个用户？', function (r) {
                                 if (r) {
                                     var adddepuserrequest = {
                                         "departmentId": depinfo.baseinfo.depmentid,
@@ -140,7 +140,7 @@
                             });
                         }
                         else {
-                            $.messager.alert('提示', '请勾选要添加到该部门下的用户', 'warning');
+                            $.messager.alert('提示', '请勾选要添加到该小类下的用户', 'warning');
                         }
                     }
                 },
@@ -366,16 +366,9 @@
                 },
                 { field: 'LoginName', title: '登录名', width: 100 },
                 { field: 'FullName', title: '真实姓名', width: 60 },
+                { field: 'MobilePhone', title: '手机', width: 80 },
                 {
-                    field: 'isCaption', title: '主管', width: 40, align: 'right', editor: {
-                        type: 'checkbox',
-                        options: { on: true, off: false }
-                    }, formatter: function (value, row) {
-                        return value == "true" ? "是" : "否";
-                    }
-                },
-                {
-                    field: 'depnum', title: '部门[当前组织]', width: 100, align: 'right', formatter: function (value,row) {
+                    field: 'depnum', title: '所属小类[当前大类]', width: 120, align: 'right', formatter: function (value,row) {
                         return value+" 个"
                     }
                 },
@@ -384,7 +377,6 @@
                         return EnumSex(value);
                     }
                 },
-                { field: 'MobilePhone', title: '手机', width: 80 },
                 {
                     field: 'isDisabled', title: '禁用', align: "center", width: 40, formatter: function (value, row) {
                         return value ? "是" : "否";
@@ -418,49 +410,12 @@
                     }
                 },
                 {
-                    text: "保存",
-                    iconCls: "icon-save",
-                    handler: function () {
-                        if (editrow != undefined) {
-                            DepUserGrid.datagrid("endEdit", editrow);
-                            editrow = undefined;
-                        }
-                        var rows = DepUserGrid.datagrid("getChanges");
-                        if (rows.length > 0) {
-                            var editdepuserrequest = {
-                                departmentId: depinfo.baseinfo.depmentid,
-                                users: []
-                            };
-                            $.each(rows, function (i, n) {
-                                editdepuserrequest.users.push({
-                                    userId: n.UserId,
-                                    isCaption: n.isCaption
-                                });
-                            });
-                            console.log(editdepuserrequest);
-                            $.post("/api/ApiDepartments/EditDepartmentMembers", editdepuserrequest, function (json) {
-                                if (json.ReturnCode == 0) {
-                                    $.messager.alert('Success', "保存成功", 'info');
-                                    DepUserGrid.datagrid("uncheckAll");
-                                    loaddepusergrid();
-                                }
-                                else {
-                                    $.messager.alert('错误', json.ReturnMessage, 'error');
-                                }
-                            });
-                        }
-                        else {
-                            $.messager.alert('提示', '没有数据被修改', 'warning');
-                        }
-                    }
-                },
-                {
-                    text: "从部门中移除",
+                    text: "从小类中移除",
                     iconCls: "icon-clear",
                     handler: function () {
                         var rows = DepUserGrid.datagrid("getChecked");
                         if (rows.length > 0) {
-                            $.messager.confirm('请确认', '请确认从部门中移除' + rows.length + '个用户？', function (r) {
+                            $.messager.confirm('请确认', '请确认从小类中移除' + rows.length + '个用户？', function (r) {
                                 if (r) {
                                     var removedepuserrequest = {
                                         "departmentId": depinfo.baseinfo.depmentid,
@@ -487,7 +442,7 @@
                             });
                         }
                         else {
-                            $.messager.alert('提示', '请勾选您要从部门中移除的用户', 'warning');
+                            $.messager.alert('提示', '请勾选您要从小类中移除的用户', 'warning');
                         }
                     }
                 },
@@ -540,15 +495,15 @@
         //检查是否是跟节点，如果是则不允许编辑
         if (depinfo.baseinfo.depmentid == depinfo.orginfo.depmentid) {
             DepinfoFormSaveBtn.linkbutton('disable');
-            DepinfoFormSaveBtn.parent().next().html("<span>该部门不允许在此处进行编辑</span>");
+            DepinfoFormSaveBtn.parent().next().html("<span>该小类不允许在此处进行编辑</span>");
         }
     });
 </script>
 <div class="easyui-layout" data-options="fit:true,border:false">
         <div data-options="region:'west',border:false" style="width:30%;padding:5px;">
-            <div class="easyui-panel" title="部门详情" data-options="fit:true" style="padding:10px;">
+            <div class="easyui-panel" title="小类详情" data-options="fit:true" style="padding:10px;">
                 <div class="easyui-tabs">
-                    <div title="部门信息" style="padding:20px;">
+                    <div title="小类信息" style="padding:20px;">
                         <form id="@(PageId)DepInfoForm">
                             <input type="hidden" name="depmentid" value="@depinfo.baseinfo.depmentid" />
                             <table class="formtable">
@@ -558,14 +513,14 @@
                                 </tr>
                                 <tr>
                                     <td>人数：</td>
-                                    <td>部门：@(depinfo.baseinfo.memberNum)人，总计：@(depinfo.baseinfo.memberNumCount)人</td>
+                                    <td>小类：@(depinfo.baseinfo.memberNum)人，总计：@(depinfo.baseinfo.memberNumCount)人（包含子小类）</td>
                                 </tr>
                                 <tr>
                                     <td>创建时间：</td>
                                     <td>@depinfo.baseinfo.modifiedon.ToString("yyyy-MM-dd HH:mm")</td>
                                 </tr>
                                 <tr>
-                                    <td>部门名称：</td>
+                                    <td>小类名称：</td>
                                     <td><input type="text" class="easyui-textbox" name="caption" data-options="required:true,validType:'length[0,25]'" /></td>
                                 </tr>
                                 <tr>
@@ -586,13 +541,13 @@
                             </table>
                         </form>
                     </div>
-                    <div title="所属组织信息" style="padding:20px">
+                    <div title="所属大类信息" style="padding:20px">
                         <table class="formtable">
                             <tr>
-                                <td>组织名称：</td>
+                                <td>大类名称：</td>
                                 <td>@depinfo.orginfo.caption</td>
                             </tr>
-                            <tr>
+                            <tr style="display:none;">
                                 <td>所有者：</td>
                                 <td>@depinfo.orginfo.linkUserinfo.FullName [@depinfo.orginfo.linkUserinfo.MobilePhone]</td>
                             </tr>
@@ -608,7 +563,7 @@
         <div data-options="region:'east',border:false" style="width:70%;padding:5px 5px 5px 0;">
             <div class="easyui-layout" data-options="fit:true,border:false">
                 <div data-options="region:'west',border:false" style="width:40%; padding-right:5px;">
-                    <div class="easyui-panel" title="该部门下现有用户" data-options="fit:true">
+                    <div class="easyui-panel" title="该小类下现有用户" data-options="fit:true">
                         <table id="@(PageId)DepUserGrid"></table>
                     </div>
                 </div>
@@ -620,9 +575,9 @@
                                     <form id="@(PageId)SearchUserFrom">
                                         <table>
                                             <tr>
-                                                <td>组织：</td>
+                                                <td>大类：</td>
                                                 <td><input type="text" id="@(PageId)selectorg" name="orgId" /></td>
-                                                <td>部门：</td>
+                                                <td>小类：</td>
                                                 <td><input type="text" id="@(PageId)selectdep" name="departmentIds" /></td>
                                             </tr>
                                             <tr>

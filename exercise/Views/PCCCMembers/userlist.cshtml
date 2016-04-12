@@ -282,7 +282,7 @@
             detailFormatter: function (rowIndex, rowData) {
                 var d = "";
                 $.each(rowData.userDepartmentList, function (i, n) {
-                    d += ("<tr><td>" + n.pathText + "</td><td style='text-align:right'>" + (n.isCaption ? "是" : "否") + "</td></tr>");
+                    d += ("<tr><td>" + n.pathText + "</td></tr>");
                 });
                 var s = '<table class="griddetailtable">' +
                 '<tr>' +
@@ -290,8 +290,7 @@
                 '<td style="vertical-align:top">' +
                 '<table>' +
                 '<tr>' +
-                '<th>所在部门</th>' +
-                '<th>是否主管</th>' +
+                '<th>所属类别</th>' +
                 '</tr>' + d +
                 '</table>' +
                 '</td>' +
