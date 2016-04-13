@@ -80,6 +80,76 @@ namespace cyclonestyle.BLL
             return string.Empty;
         }
 
+
+        
+
+
+        /// <summary>
+        /// 在环信注册新的用户
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <returns></returns>
+        public static ReplayBase RegisterUser(RegisterUserEasemobRequestModel condtion) {
+            string postDate = JsonConvert.SerializeObject(condtion);
+            return RequestUrl(easemobUrl + "users", "POST", postDate, queryToken());
+        }
+
+
+        /// <summary>
+        /// 发送文本消息
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <returns></returns>
+        internal static ReplayBase SendMsg(EasemobSendTextMessageRequestModel condtion)
+        {
+            string postDate = JsonConvert.SerializeObject(condtion);
+            ReplayBase result = RequestUrl(easemobUrl + "messages", "POST", postDate, queryToken());
+            return result;
+        }
+
+
+        /// <summary>
+        /// 发送图片消息
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <returns></returns>
+        internal static ReplayBase SendImgMsg(EasemobSendIMgMessageRequestModel condtion)
+        {
+            string url = easemobUrl + "chatfiles";
+            ReplayBase result = new ReplayBase();
+            EasemobUploadFileRequestModel fileinfo = HttpUploadFile(url, condtion.msg.url);//上传图片
+            condtion.msg = new EasemobPicMesModel()
+            {
+                filename = fileinfo.filename,
+                secret = fileinfo.secret,
+                url = easemobUrl + "chatfiles/" + fileinfo.uuid,
+            };
+            string postDate = JsonConvert.SerializeObject(condtion);//发送消息
+            result = RequestUrl(easemobUrl + "messages", "POST", postDate, queryToken());
+            return result;
+        }
+
+        /// <summary>
+        /// 发送语音消息
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <returns></returns>
+        internal static ReplayBase SendAudioMsg(EasemobSendAudioMessageRequestModel condtion)
+        {
+            string url = easemobUrl + "chatfiles";
+            ReplayBase result = new ReplayBase();
+            EasemobUploadFileRequestModel fileinfo = HttpUploadFile(url, condtion.msg.url);//上传语音文件
+            condtion.msg = new EasemobSoundMesModel() {
+                filename = fileinfo.filename,
+                length = fileinfo.length,
+                secret = fileinfo.secret,
+                url = easemobUrl + "chatfiles/" + fileinfo.uuid
+            };
+            string postDate = JsonConvert.SerializeObject(condtion);//发送消息
+            result = RequestUrl(easemobUrl + "messages", "POST", postDate, queryToken());
+            return result;
+        }
+
         /// <summary>
         /// 环信接口调用
         /// </summary>
@@ -144,25 +214,68 @@ namespace cyclonestyle.BLL
             return result;
         }
 
-
         /// <summary>
-        /// 在环信注册新的用户
+        /// Http上传文件
         /// </summary>
-        /// <param name="condtion"></param>
+        /// <param name="url">目标服务器地址</param>
+        /// <param name="path">文件的地址</param>
         /// <returns></returns>
-        public static ReplayBase RegisterUser(RegisterUserEasemobRequestModel condtion) {
-            string postDate = JsonConvert.SerializeObject(condtion);
-            return RequestUrl(easemobUrl + "users", "POST", postDate, queryToken());
-        }
-        /// <summary>
-        /// 发送消息
-        /// </summary>
-        /// <param name="condtion"></param>
-        /// <returns></returns>
-        internal static ReplayBase SendMsg(SendMessageRequestModel condtion)
+        public static EasemobUploadFileRequestModel HttpUploadFile(string url, string path)
         {
-            string postDate = JsonConvert.SerializeObject(condtion);
-            ReplayBase result = RequestUrl(easemobUrl + "messages", "POST", postDate, queryToken());
+            // 设置参数
+            HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            CookieContainer cookieContainer = new CookieContainer();
+            request.CookieContainer = cookieContainer;
+            request.AllowAutoRedirect = true;
+            request.Method = "POST";
+
+            request.Headers.Add("Authorization", "Bearer " + queryToken());//环信特有
+            request.Headers.Add("restrict-access", "true");//环信特有
+
+
+
+            string boundary = DateTime.Now.Ticks.ToString("X"); // 随机分隔线
+            request.ContentType = "multipart/form-data;charset=utf-8;boundary=" + boundary;
+            byte[] itemBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "\r\n");
+            byte[] endBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+
+            int pos = path.LastIndexOf("\\");
+            string fileName = path.Substring(pos + 1);
+            long filelenght = 0;
+
+            //请求头部信息 
+            StringBuilder sbHeader = new StringBuilder(string.Format("Content-Disposition:form-data;name=\"file\";filename=\"{0}\"\r\nContent-Type:application/octet-stream\r\n\r\n", fileName));
+            byte[] postHeaderBytes = Encoding.UTF8.GetBytes(sbHeader.ToString());
+
+            FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            byte[] bArr = new byte[fs.Length];
+            fs.Read(bArr, 0, bArr.Length);
+            filelenght = fs.Length;
+            fs.Close();
+
+            Stream postStream = request.GetRequestStream();
+            postStream.Write(itemBoundaryBytes, 0, itemBoundaryBytes.Length);
+            postStream.Write(postHeaderBytes, 0, postHeaderBytes.Length);
+            postStream.Write(bArr, 0, bArr.Length);
+            postStream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);
+            postStream.Close();
+
+            //发送请求并获取相应回应数据
+            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
+            //直到request.GetResponse()程序才开始向目标网页发送Post请求
+            Stream instream = response.GetResponseStream();
+            StreamReader sr = new StreamReader(instream, Encoding.UTF8);
+            //返回结果网页（html）代码
+            string content = sr.ReadToEnd();
+            content = content.Replace("share-", "");
+            dynamic jo = JsonConvert.DeserializeObject(content);
+            EasemobUploadFileRequestModel result = new EasemobUploadFileRequestModel()
+            {
+                secret = jo.entities[0].secret,
+                uuid = jo.entities[0].uuid,
+                filename = fileName,
+                length = filelenght
+            };
             return result;
         }
     }

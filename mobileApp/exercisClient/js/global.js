@@ -8,3 +8,4 @@ mui.plusReady(function(){
 	plus.storage.setItem("easemobAppName","xindongexercis");
 	plus.storage.setItem("easemobOrgName","xindong");
 });
+

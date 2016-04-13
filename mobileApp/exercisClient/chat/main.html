@@ -13,6 +13,8 @@
 		<script src="../js/easemob/json2.js"></script>
 		<script src="../js/easemob/easemob.im-1.0.7.js"></script>
 		
+		<script src="../js/pfun.js"></script>
+		
 		<style>
 			html,
 			body {
@@ -345,6 +347,13 @@
 							<% } %>
 								<div class="msg-content">
 									<div class="msg-content-inner">
+										
+										<% if(item.id!=null && item.id!=undefined){
+											%>
+											<span id="<%=item.id %>"><%=item.sendtype?"[sending]":"[false]" %></span>
+											<%
+										} %>
+										
 										<% if(item.type=='text' ) { %>
 											<%=( item.content|| '&nbsp;&nbsp;') %>
 												<% } else if(item.type=='image' ) { %>
@@ -434,7 +443,7 @@
 							console.log("环信登录成功");
 							conn.setPresence();//设置为在线
 						},
-						//收到消息
+						//收到文本消息
 						onTextMessage : function(message){
 							console.log(message);
 							console.log("您收到一条文本消息");
@@ -442,6 +451,39 @@
 									sender: message.from,
 									type: 'text',
 									content: message.data
+							};
+							onrecevie(msg);
+						},
+						//收到图片消息
+						onPictureMessage :function(message){
+							console.log(message);
+							console.log("您收到一条图片消息");
+							var msg = {
+								sender:message.from,
+								type:'image',
+								content:message.url
+							}
+							onrecevie(msg);
+						},
+						//收到表情消息
+						onEmotionMessage :function(message){
+							console.log(message);
+							console.log("您收到一条表情消息");
+							//表情消息中 message.data是一个数组，需要格式化
+							var txt = "";
+							$.each(message.data, function(i,n) {
+								if (n.type == "emotion"){
+									txt += '<img src="'+ n.data +'" />';
+								}
+								else{
+									txt += n.data;
+								}
+							});
+							
+							var msg ={
+									sender: message.from,
+									type: 'text',
+									content: txt
 							};
 							onrecevie(msg);
 						}
@@ -525,13 +567,19 @@
 						type: 'text',
 						content: 'Hi，我是 MUI 小管家！'
 					}];
-					
+					//接收动作
 					var onrecevie = function(msg){
 						record.push(msg);
 						bindMsgList();
 					};
+
 					//发送动作
 					var send = function(msg) {
+						if(msg.type != "text"){
+							msg.id = getUid();//当前发送的消息的ID
+							msg.sendtype = true; //发送中或者正在发送中
+						}
+						
 						record.push(msg);
 						bindMsgList();
 						//给环信发送消息
@@ -546,35 +594,68 @@
 							conn.sendTextMessage(options);
 							break;
 							case "image"://图像
-							console.log(msg);
-							mui.get(host+"api/ApiEasemob/QueryToken",function(token){
-								console.log(token);
-								var uploadrquest={
-								    appName : easemobAppName,
-								    orgName : easemobOrgName,
-								    accessToken : token,
-								    fileInfo :{
-								    	url : msg.content,
-								        filename : 'abc',
-								        filetype : 'jpg'
-								    },
-								    onFileUploadComplete:function(data){
-								    	//upload file success 
-								    	console.log("ok");
-								    },
-								    onFileUploadError:function(e){
-								    	//upload file error 
-								    	console.log("error");
-								    	console.log(e);
-								    },
-								    width:100,//only for pic
-								    heght:100//only for pic
-								};
-								Easemob.im.Helper.upload(uploadrquest);
-							});
-							break;
 							case "sound"://语音
-							
+							console.log(msg);
+							//发送图像和语音分两步走，第一步将文件上传到本地服务器，第二部通知本地服务器上传这些文件到远程服务器，并通过本地服务器发送图片或者语音信息
+							var uploadurl = host+"WebHome/UploadFile?dir=chatfiles";
+							var task = plus.uploader.createUpload(uploadurl,{},function(t,status){
+								if(status==200){
+									if (t.responseText != null && t.responseText != ""){
+										//上传成功提交到本地服务器
+										options.from="test001";
+										options.msg = {};
+										options.msg.url = t.responseText;
+										var posturl = host+"api/ApiEasemob/"+(msg.type=="image"?"SendImg":"SendAudio");
+										mui.ajax(posturl,{
+											data:options,
+											dataType:'json',//服务器返回json格式数据
+											type:'post',//HTTP请求类型
+											success:function(json){
+												$.each(record, function(i,n) {
+													if (n.id==msg.id){
+														if (json.ReturnCode == 0){
+															n.id=null;
+														}
+														else{
+															n.sendtype = false;
+														}
+													}
+												});
+												bindMsgList();
+											},
+											error:function(xhr,type,errorThrown){
+												mui.toast("发送失败-500");
+												$.each(record, function(i,n) {
+													if (n.id==msg.id){
+														n.sendtype = false
+													}
+												});
+												bindMsgList();
+											}
+										});
+									}
+									else{
+										mui.toast("上传文件失败-未能读取到该文件");
+										$.each(record, function(i,n) {
+											if (n.id==msg.id){
+												n.sendtype = false
+											}
+										});
+										bindMsgList();
+									}
+								}
+								else{
+									mui.toast("上传文件失败-500");
+									$.each(record, function(i,n) {
+										if (n.id==msg.id){
+											n.sendtype = false
+										}
+									});
+									bindMsgList();
+								}
+							});
+							task.addFile(msg.content,{key:"a"});//添加文件
+							task.start();//开始上传
 							break;
 						}
 						

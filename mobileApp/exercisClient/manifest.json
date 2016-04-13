@@ -230,7 +230,9 @@
 					"js/easemob/easemob.im-1.0.7.js",
 					"js/easemob/strophe.js",
 					"js/easemob/json2.js",
-					"js/jquery-1.11.1.js"
+					"js/jquery-1.11.1.js",
+					"js/global.js",
+					"js/pfun.js"
 				],
 				"refer": [],
 				"priority": 0

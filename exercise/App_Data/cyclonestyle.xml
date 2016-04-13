@@ -555,6 +555,34 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:cyclonestyle.BLL.easemobInterFaceService.RegisterUser(cyclonestyle.Models.RegisterUserEasemobRequestModel)">
+            <summary>
+            在环信注册新的用户
+            </summary>
+            <param name="condtion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:cyclonestyle.BLL.easemobInterFaceService.SendMsg(cyclonestyle.Models.EasemobSendTextMessageRequestModel)">
+            <summary>
+            发送文本消息
+            </summary>
+            <param name="condtion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:cyclonestyle.BLL.easemobInterFaceService.SendImgMsg(cyclonestyle.Models.EasemobSendIMgMessageRequestModel)">
+            <summary>
+            发送图片消息
+            </summary>
+            <param name="condtion"></param>
+            <returns></returns>
+        </member>
+        <member name="M:cyclonestyle.BLL.easemobInterFaceService.SendAudioMsg(cyclonestyle.Models.EasemobSendAudioMessageRequestModel)">
+            <summary>
+            发送语音消息
+            </summary>
+            <param name="condtion"></param>
+            <returns></returns>
+        </member>
         <member name="M:cyclonestyle.BLL.easemobInterFaceService.RequestUrl(System.String,System.String,System.String,System.String)">
             <summary>
             环信接口调用
@@ -565,18 +593,12 @@
             <param name="token">接口调用令牌，只有获取令牌时为空，其他操作必须有值</param>
             <returns></returns>
         </member>
-        <member name="M:cyclonestyle.BLL.easemobInterFaceService.RegisterUser(cyclonestyle.Models.RegisterUserEasemobRequestModel)">
+        <member name="M:cyclonestyle.BLL.easemobInterFaceService.HttpUploadFile(System.String,System.String)">
             <summary>
-            在环信注册新的用户
+            Http上传文件
             </summary>
-            <param name="condtion"></param>
-            <returns></returns>
-        </member>
-        <member name="M:cyclonestyle.BLL.easemobInterFaceService.SendMsg(cyclonestyle.Models.SendMessageRequestModel)">
-            <summary>
-            发送消息
-            </summary>
-            <param name="condtion"></param>
+            <param name="url">目标服务器地址</param>
+            <param name="path">文件的地址</param>
             <returns></returns>
         </member>
         <member name="T:cyclonestyle.BLL.GTuiPushInterFaceService">
@@ -1620,6 +1642,12 @@
             环信即时通信
             </summary>
         </member>
+        <member name="M:cyclonestyle.Controllers.ApiEasemobController.QueryToken">
+            <summary>
+            获取环信令牌
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:cyclonestyle.Controllers.ApiEasemobController.RegisterUser(cyclonestyle.Models.RegisterUserEasemobRequestModel)">
             <summary>
             注册为环信的新用户
@@ -1627,17 +1655,25 @@
             <param name="condtion"></param>
             <returns></returns>
         </member>
-        <member name="M:cyclonestyle.Controllers.ApiEasemobController.SendMsg(cyclonestyle.Models.SendMessageRequestModel)">
+        <member name="M:cyclonestyle.Controllers.ApiEasemobController.SendMsg(cyclonestyle.Models.EasemobSendTextMessageRequestModel)">
             <summary>
-            发送消息
+            发送文本消息
             </summary>
             <param name="condtion"></param>
             <returns></returns>
         </member>
-        <member name="M:cyclonestyle.Controllers.ApiEasemobController.QueryToken">
+        <member name="M:cyclonestyle.Controllers.ApiEasemobController.SendImg(cyclonestyle.Models.EasemobSendIMgMessageRequestModel)">
             <summary>
-            获取环信令牌
+            发送图片消息
             </summary>
+            <param name="condtion">请求参数中的 condtion.msg.url 为图片文件在服务器上的保存路径，请先调用WebHome/UploadFile将图片上传到服务器</param>
+            <returns></returns>
+        </member>
+        <member name="M:cyclonestyle.Controllers.ApiEasemobController.SendAudio(cyclonestyle.Models.EasemobSendAudioMessageRequestModel)">
+            <summary>
+            发送语音消息
+            </summary>
+            <param name="condtion">请求参数中的 condtion.msg.url 为语音文件在服务器上的保存路径，请先调用WebHome/UploadFile将语音上传到服务器</param>
             <returns></returns>
         </member>
         <member name="T:cyclonestyle.Controllers.ApiLocationController">
@@ -2274,7 +2310,14 @@
             <summary>
             通用下载文件
             </summary>
-            <param name="Path">文件URL路径</param>
+            <param name="Path">完整的文件存放路径（url）</param>
+        </member>
+        <member name="M:cyclonestyle.Controllers.WebHomeController.UploadFile(System.String)">
+            <summary>
+            通用上传文件
+            </summary>
+            <param name="dir">存放于upload目录下的文件夹名 可为空 为空则为user</param>
+            <returns>成功返回上传文件的的存放路径(url)，失败返回空字符串</returns>
         </member>
         <member name="T:cyclonestyle.DataBase.MembersExDataBaseManager">
             <summary>
@@ -3364,12 +3407,12 @@
         </member>
         <member name="T:cyclonestyle.Models.EasemobTextMesModel">
             <summary>
-            文本消息
+            文本消息类型
             </summary>
         </member>
         <member name="P:cyclonestyle.Models.EasemobTextMesModel.type">
             <summary>
-            消息类型
+            消息类型 默认为 文本  txt
             </summary>
         </member>
         <member name="P:cyclonestyle.Models.EasemobTextMesModel.msg">
@@ -3379,7 +3422,32 @@
         </member>
         <member name="T:cyclonestyle.Models.EasemobPicMesModel">
             <summary>
-            图片消息
+            图片消息类型
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobPicMesModel.type">
+            <summary>
+            消息类型 默认为图片 img
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobPicMesModel.url">
+            <summary>
+            文件上传后返回的URL
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobPicMesModel.filename">
+            <summary>
+            文件名
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobPicMesModel.secret">
+            <summary>
+            上传后返回的secret
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobPicMesModel.size">
+            <summary>
+            图片大小
             </summary>
         </member>
         <member name="T:cyclonestyle.Models.EasemobSoundMesModel">
@@ -3387,30 +3455,125 @@
             声音消息
             </summary>
         </member>
-        <member name="T:cyclonestyle.Models.SendMessageRequestModel">
+        <member name="P:cyclonestyle.Models.EasemobSoundMesModel.type">
             <summary>
-            发送环信消息请求
+            消息类型 默认为 audio
             </summary>
         </member>
-        <member name="P:cyclonestyle.Models.SendMessageRequestModel.target_type">
+        <member name="P:cyclonestyle.Models.EasemobSoundMesModel.url">
+            <summary>
+            文件上传后返回的URL
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSoundMesModel.filename">
+            <summary>
+            文件名
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSoundMesModel.length">
+            <summary>
+            文件大小
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSoundMesModel.secret">
+            <summary>
+            上传后返回的secret
+            </summary>
+        </member>
+        <member name="T:cyclonestyle.Models.EasemobSendTextMessageRequestModel">
+            <summary>
+            发送文本信息请求
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSendTextMessageRequestModel.msg">
+            <summary>
+            文本消息内容
+            </summary>
+        </member>
+        <member name="T:cyclonestyle.Models.EasemobSendIMgMessageRequestModel">
+            <summary>
+            发送图片消息请求
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSendIMgMessageRequestModel.msg">
+            <summary>
+            图片消息内容
+            </summary>
+        </member>
+        <member name="T:cyclonestyle.Models.EasemobSendAudioMessageRequestModel">
+            <summary>
+            发送语音消息请求
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSendAudioMessageRequestModel.msg">
+            <summary>
+            语音消息内容
+            </summary>
+        </member>
+        <member name="T:cyclonestyle.Models.EasemobSendMessageRequestModel">
+            <summary>
+            发送环信消息基础请求
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobSendMessageRequestModel.target_type">
             <summary>
             users 给用户发消息, chatgroups 给群发消息, chatrooms 给聊天室发消息
             默认 users
             </summary>
         </member>
-        <member name="P:cyclonestyle.Models.SendMessageRequestModel.target">
+        <member name="P:cyclonestyle.Models.EasemobSendMessageRequestModel.target">
             <summary>
             接收的用户，默认为客服
             </summary>
         </member>
-        <member name="P:cyclonestyle.Models.SendMessageRequestModel.msg">
-            <summary>
-            文本消息内容
-            </summary>
-        </member>
-        <member name="P:cyclonestyle.Models.SendMessageRequestModel.from">
+        <member name="P:cyclonestyle.Models.EasemobSendMessageRequestModel.from">
             <summary>
             发送者
+            </summary>
+        </member>
+        <member name="T:cyclonestyle.Models.EasemobUploadFileRequestModel">
+            <summary>
+            环信服务端上传文件返回对象
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobUploadFileRequestModel.uuid">
+            <summary>
+            文件唯一id，发送消息时需要用到指定是哪个文件
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobUploadFileRequestModel.secret">
+            <summary>
+            上传成功后返回，发送消息时需要用到。
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobUploadFileRequestModel.filename">
+            <summary>
+            文件名
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobUploadFileRequestModel.length">
+            <summary>
+            文件的长度
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobUploadFileRequestModel.imgsize">
+            <summary>
+            图片文件的大小
+            </summary>
+        </member>
+        <member name="T:cyclonestyle.Models.EasemobImgSizeModel">
+            <summary>
+            图片文件大小
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobImgSizeModel.width">
+            <summary>
+            宽
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.EasemobImgSizeModel.height">
+            <summary>
+            高
             </summary>
         </member>
         <member name="T:cyclonestyle.Models.MapPoint">

@@ -35,7 +35,7 @@ namespace cyclonestyle.Controllers
         /// <summary>
         /// 通用下载文件
         /// </summary>
-        /// <param name="Path">文件URL路径</param>
+        /// <param name="Path">完整的文件存放路径（url）</param>
         public void DownloadFile(string Path) {
             string serverpath = Server.MapPath(Path);
             Response.ClearHeaders();
@@ -61,6 +61,41 @@ namespace cyclonestyle.Controllers
             Response.ContentType = "application/octet-stream;charset=gbk";
             Response.BinaryWrite(byteFile);
             Response.End();
+        }
+
+        /// <summary>
+        /// 通用上传文件
+        /// </summary>
+        /// <param name="dir">存放于upload目录下的文件夹名 可为空 为空则为user</param>
+        /// <returns>成功返回上传文件的的存放路径(url)，失败返回空字符串</returns>
+        [HttpPost]
+        public string UploadFile(string dir = null) {
+            if (string.IsNullOrEmpty(dir)) {
+                dir = "user";
+            }
+            string filepath = string.Empty;
+
+            //参数
+            string savepath = "/upload/"+ dir +"/" + DateTime.Now.ToString("yyMMdd") + "/";
+            string serverpath = Server.MapPath(savepath);
+            if (!Directory.Exists(serverpath)) {
+                Directory.CreateDirectory(serverpath);
+            }
+            HttpFileCollectionBase files = Request.Files;
+            if (files.Count > 0) {
+                HttpPostedFileBase file = files[0];
+                string fileName, fileExtension;
+                //取得上传得文件名
+                fileName = Path.GetFileName(file.FileName);
+                //取得文件的扩展名
+                fileExtension = Path.GetExtension(fileName);
+
+                string newfilename = Guid.NewGuid().ToString();
+
+                file.SaveAs(serverpath + newfilename + fileExtension);
+                filepath = savepath + newfilename + fileExtension;
+            }
+            return filepath;
         }
     }
 }
