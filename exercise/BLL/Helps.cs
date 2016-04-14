@@ -17,12 +17,30 @@ namespace cyclonestyle.BLL
     /// </summary>
     public class Helps
     {
+
+        private static Random rnd = new Random();
         /// <summary>
-        /// 获取时间ID（用于创造可读性比较强的编号，格式yyMMddHHmmss_ffff）
+        /// 获取一组随机字符串
+        /// </summary>
+        /// <param name="c">获取的个数</param>
+        /// <returns></returns>
+        internal static string GetRandKey(int c = 6)
+        {
+            char[] constant = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+            StringBuilder s = new StringBuilder(c);
+            for (int i = 0; i < c; i++)
+            {
+                s.Append(constant[rnd.Next(25)]);
+            }
+            return s.ToString();
+        }
+
+        /// <summary>
+        /// 获取时间ID（用于创造可读性比较强的编号，格式yyMMddHHmmss_ffffff）
         /// </summary>
         /// <returns></returns>
         internal static string GetTimeId(){
-            return DateTime.Now.ToString("yyMMddHHmmss_ffff", System.Globalization.DateTimeFormatInfo.InvariantInfo);
+            return DateTime.Now.ToString("yyMMddHHmmss_") + GetRandKey(6);
         }
 
         /// <summary>
@@ -105,6 +123,9 @@ namespace cyclonestyle.BLL
             string encoded = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(str))).Replace("-", "");
             return encoded.ToLower();
         }
+
+
+        
     }
 
     /// <summary>

@@ -22,7 +22,7 @@ namespace cyclonestyle.DataBase
 	using System;
 	
 	
-	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="cyclone")]
+	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="exercise")]
 	public partial class SysTemDataBaseDataContext : System.Data.Linq.DataContext
 	{
 		
@@ -75,15 +75,15 @@ namespace cyclonestyle.DataBase
     partial void InsertUs_RsAddress(Us_RsAddress instance);
     partial void UpdateUs_RsAddress(Us_RsAddress instance);
     partial void DeleteUs_RsAddress(Us_RsAddress instance);
-    partial void InsertUs_SysUser(Us_SysUser instance);
-    partial void UpdateUs_SysUser(Us_SysUser instance);
-    partial void DeleteUs_SysUser(Us_SysUser instance);
     partial void InsertUs_RunSentPush(Us_RunSentPush instance);
     partial void UpdateUs_RunSentPush(Us_RunSentPush instance);
     partial void DeleteUs_RunSentPush(Us_RunSentPush instance);
     partial void InsertUs_RunSentPushDetail(Us_RunSentPushDetail instance);
     partial void UpdateUs_RunSentPushDetail(Us_RunSentPushDetail instance);
     partial void DeleteUs_RunSentPushDetail(Us_RunSentPushDetail instance);
+    partial void InsertUs_SysUser(Us_SysUser instance);
+    partial void UpdateUs_SysUser(Us_SysUser instance);
+    partial void DeleteUs_SysUser(Us_SysUser instance);
     #endregion
 		
 		public SysTemDataBaseDataContext() : 
@@ -252,14 +252,6 @@ namespace cyclonestyle.DataBase
 			}
 		}
 		
-		public System.Data.Linq.Table<Us_SysUser> Us_SysUser
-		{
-			get
-			{
-				return this.GetTable<Us_SysUser>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Us_RunSentPush> Us_RunSentPush
 		{
 			get
@@ -273,6 +265,14 @@ namespace cyclonestyle.DataBase
 			get
 			{
 				return this.GetTable<Us_RunSentPushDetail>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Us_SysUser> Us_SysUser
+		{
+			get
+			{
+				return this.GetTable<Us_SysUser>();
 			}
 		}
 		
@@ -3536,628 +3536,6 @@ namespace cyclonestyle.DataBase
 		}
 	}
 	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Us_SysUser")]
-	public partial class Us_SysUser : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private string _Us_SysUserId;
-		
-		private bool _IsDeleted;
-		
-		private bool _IsDisabled;
-		
-		private long _Us_SysRoleId;
-		
-		private System.DateTime _CreatedOn;
-		
-		private string _LoginName;
-		
-		private string _PassWords;
-		
-		private string _FullName;
-		
-		private string _JobTitle;
-		
-		private string _MobilePhone;
-		
-		private string _MobilePhones;
-		
-		private string _Email;
-		
-		private System.Nullable<int> _Sex;
-		
-		private System.Nullable<int> _IdType;
-		
-		private string _IdCard;
-		
-		private string _NickName;
-		
-		private string _UserFace;
-		
-		private string _baiduPushUserId;
-		
-		private string _baiduPushchannelId;
-		
-		private System.Nullable<byte> _baiduPushdeviceType;
-		
-		private string _getuiPushClientId;
-		
-		private System.Nullable<byte> _getuiPushDeviceType;
-		
-		private EntitySet<Us_SysRole> _Us_SysRole;
-		
-		private EntitySet<Us_MemberDepartment> _Us_MemberDepartment;
-		
-    #region 可扩展性方法定义
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnUs_SysUserIdChanging(string value);
-    partial void OnUs_SysUserIdChanged();
-    partial void OnIsDeletedChanging(bool value);
-    partial void OnIsDeletedChanged();
-    partial void OnIsDisabledChanging(bool value);
-    partial void OnIsDisabledChanged();
-    partial void OnUs_SysRoleIdChanging(long value);
-    partial void OnUs_SysRoleIdChanged();
-    partial void OnCreatedOnChanging(System.DateTime value);
-    partial void OnCreatedOnChanged();
-    partial void OnLoginNameChanging(string value);
-    partial void OnLoginNameChanged();
-    partial void OnPassWordsChanging(string value);
-    partial void OnPassWordsChanged();
-    partial void OnFullNameChanging(string value);
-    partial void OnFullNameChanged();
-    partial void OnJobTitleChanging(string value);
-    partial void OnJobTitleChanged();
-    partial void OnMobilePhoneChanging(string value);
-    partial void OnMobilePhoneChanged();
-    partial void OnMobilePhonesChanging(string value);
-    partial void OnMobilePhonesChanged();
-    partial void OnEmailChanging(string value);
-    partial void OnEmailChanged();
-    partial void OnSexChanging(System.Nullable<int> value);
-    partial void OnSexChanged();
-    partial void OnIdTypeChanging(System.Nullable<int> value);
-    partial void OnIdTypeChanged();
-    partial void OnIdCardChanging(string value);
-    partial void OnIdCardChanged();
-    partial void OnNickNameChanging(string value);
-    partial void OnNickNameChanged();
-    partial void OnUserFaceChanging(string value);
-    partial void OnUserFaceChanged();
-    partial void OnbaiduPushUserIdChanging(string value);
-    partial void OnbaiduPushUserIdChanged();
-    partial void OnbaiduPushchannelIdChanging(string value);
-    partial void OnbaiduPushchannelIdChanged();
-    partial void OnbaiduPushdeviceTypeChanging(System.Nullable<byte> value);
-    partial void OnbaiduPushdeviceTypeChanged();
-    partial void OngetuiPushClientIdChanging(string value);
-    partial void OngetuiPushClientIdChanged();
-    partial void OngetuiPushDeviceTypeChanging(System.Nullable<byte> value);
-    partial void OngetuiPushDeviceTypeChanged();
-    #endregion
-		
-		public Us_SysUser()
-		{
-			this._Us_SysRole = new EntitySet<Us_SysRole>(new Action<Us_SysRole>(this.attach_Us_SysRole), new Action<Us_SysRole>(this.detach_Us_SysRole));
-			this._Us_MemberDepartment = new EntitySet<Us_MemberDepartment>(new Action<Us_MemberDepartment>(this.attach_Us_MemberDepartment), new Action<Us_MemberDepartment>(this.detach_Us_MemberDepartment));
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Us_SysUserId", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
-		public string Us_SysUserId
-		{
-			get
-			{
-				return this._Us_SysUserId;
-			}
-			set
-			{
-				if ((this._Us_SysUserId != value))
-				{
-					this.OnUs_SysUserIdChanging(value);
-					this.SendPropertyChanging();
-					this._Us_SysUserId = value;
-					this.SendPropertyChanged("Us_SysUserId");
-					this.OnUs_SysUserIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsDeleted", DbType="Bit NOT NULL")]
-		public bool IsDeleted
-		{
-			get
-			{
-				return this._IsDeleted;
-			}
-			set
-			{
-				if ((this._IsDeleted != value))
-				{
-					this.OnIsDeletedChanging(value);
-					this.SendPropertyChanging();
-					this._IsDeleted = value;
-					this.SendPropertyChanged("IsDeleted");
-					this.OnIsDeletedChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsDisabled", DbType="Bit NOT NULL")]
-		public bool IsDisabled
-		{
-			get
-			{
-				return this._IsDisabled;
-			}
-			set
-			{
-				if ((this._IsDisabled != value))
-				{
-					this.OnIsDisabledChanging(value);
-					this.SendPropertyChanging();
-					this._IsDisabled = value;
-					this.SendPropertyChanged("IsDisabled");
-					this.OnIsDisabledChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Us_SysRoleId", DbType="BigInt NOT NULL")]
-		public long Us_SysRoleId
-		{
-			get
-			{
-				return this._Us_SysRoleId;
-			}
-			set
-			{
-				if ((this._Us_SysRoleId != value))
-				{
-					this.OnUs_SysRoleIdChanging(value);
-					this.SendPropertyChanging();
-					this._Us_SysRoleId = value;
-					this.SendPropertyChanged("Us_SysRoleId");
-					this.OnUs_SysRoleIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedOn", DbType="DateTime NOT NULL")]
-		public System.DateTime CreatedOn
-		{
-			get
-			{
-				return this._CreatedOn;
-			}
-			set
-			{
-				if ((this._CreatedOn != value))
-				{
-					this.OnCreatedOnChanging(value);
-					this.SendPropertyChanging();
-					this._CreatedOn = value;
-					this.SendPropertyChanged("CreatedOn");
-					this.OnCreatedOnChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LoginName", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		public string LoginName
-		{
-			get
-			{
-				return this._LoginName;
-			}
-			set
-			{
-				if ((this._LoginName != value))
-				{
-					this.OnLoginNameChanging(value);
-					this.SendPropertyChanging();
-					this._LoginName = value;
-					this.SendPropertyChanged("LoginName");
-					this.OnLoginNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PassWords", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
-		public string PassWords
-		{
-			get
-			{
-				return this._PassWords;
-			}
-			set
-			{
-				if ((this._PassWords != value))
-				{
-					this.OnPassWordsChanging(value);
-					this.SendPropertyChanging();
-					this._PassWords = value;
-					this.SendPropertyChanged("PassWords");
-					this.OnPassWordsChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FullName", DbType="VarChar(50)")]
-		public string FullName
-		{
-			get
-			{
-				return this._FullName;
-			}
-			set
-			{
-				if ((this._FullName != value))
-				{
-					this.OnFullNameChanging(value);
-					this.SendPropertyChanging();
-					this._FullName = value;
-					this.SendPropertyChanged("FullName");
-					this.OnFullNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JobTitle", DbType="VarChar(50)")]
-		public string JobTitle
-		{
-			get
-			{
-				return this._JobTitle;
-			}
-			set
-			{
-				if ((this._JobTitle != value))
-				{
-					this.OnJobTitleChanging(value);
-					this.SendPropertyChanging();
-					this._JobTitle = value;
-					this.SendPropertyChanged("JobTitle");
-					this.OnJobTitleChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MobilePhone", DbType="VarChar(50)")]
-		public string MobilePhone
-		{
-			get
-			{
-				return this._MobilePhone;
-			}
-			set
-			{
-				if ((this._MobilePhone != value))
-				{
-					this.OnMobilePhoneChanging(value);
-					this.SendPropertyChanging();
-					this._MobilePhone = value;
-					this.SendPropertyChanged("MobilePhone");
-					this.OnMobilePhoneChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MobilePhones", DbType="VarChar(245)")]
-		public string MobilePhones
-		{
-			get
-			{
-				return this._MobilePhones;
-			}
-			set
-			{
-				if ((this._MobilePhones != value))
-				{
-					this.OnMobilePhonesChanging(value);
-					this.SendPropertyChanging();
-					this._MobilePhones = value;
-					this.SendPropertyChanged("MobilePhones");
-					this.OnMobilePhonesChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Email", DbType="VarChar(100)")]
-		public string Email
-		{
-			get
-			{
-				return this._Email;
-			}
-			set
-			{
-				if ((this._Email != value))
-				{
-					this.OnEmailChanging(value);
-					this.SendPropertyChanging();
-					this._Email = value;
-					this.SendPropertyChanged("Email");
-					this.OnEmailChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Sex", DbType="Int")]
-		public System.Nullable<int> Sex
-		{
-			get
-			{
-				return this._Sex;
-			}
-			set
-			{
-				if ((this._Sex != value))
-				{
-					this.OnSexChanging(value);
-					this.SendPropertyChanging();
-					this._Sex = value;
-					this.SendPropertyChanged("Sex");
-					this.OnSexChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IdType", DbType="Int")]
-		public System.Nullable<int> IdType
-		{
-			get
-			{
-				return this._IdType;
-			}
-			set
-			{
-				if ((this._IdType != value))
-				{
-					this.OnIdTypeChanging(value);
-					this.SendPropertyChanging();
-					this._IdType = value;
-					this.SendPropertyChanged("IdType");
-					this.OnIdTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IdCard", DbType="VarChar(50)")]
-		public string IdCard
-		{
-			get
-			{
-				return this._IdCard;
-			}
-			set
-			{
-				if ((this._IdCard != value))
-				{
-					this.OnIdCardChanging(value);
-					this.SendPropertyChanging();
-					this._IdCard = value;
-					this.SendPropertyChanged("IdCard");
-					this.OnIdCardChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NickName", DbType="VarChar(50)")]
-		public string NickName
-		{
-			get
-			{
-				return this._NickName;
-			}
-			set
-			{
-				if ((this._NickName != value))
-				{
-					this.OnNickNameChanging(value);
-					this.SendPropertyChanging();
-					this._NickName = value;
-					this.SendPropertyChanged("NickName");
-					this.OnNickNameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserFace", DbType="VarChar(50)")]
-		public string UserFace
-		{
-			get
-			{
-				return this._UserFace;
-			}
-			set
-			{
-				if ((this._UserFace != value))
-				{
-					this.OnUserFaceChanging(value);
-					this.SendPropertyChanging();
-					this._UserFace = value;
-					this.SendPropertyChanged("UserFace");
-					this.OnUserFaceChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_baiduPushUserId", DbType="VarChar(50)")]
-		public string baiduPushUserId
-		{
-			get
-			{
-				return this._baiduPushUserId;
-			}
-			set
-			{
-				if ((this._baiduPushUserId != value))
-				{
-					this.OnbaiduPushUserIdChanging(value);
-					this.SendPropertyChanging();
-					this._baiduPushUserId = value;
-					this.SendPropertyChanged("baiduPushUserId");
-					this.OnbaiduPushUserIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_baiduPushchannelId", DbType="VarChar(50)")]
-		public string baiduPushchannelId
-		{
-			get
-			{
-				return this._baiduPushchannelId;
-			}
-			set
-			{
-				if ((this._baiduPushchannelId != value))
-				{
-					this.OnbaiduPushchannelIdChanging(value);
-					this.SendPropertyChanging();
-					this._baiduPushchannelId = value;
-					this.SendPropertyChanged("baiduPushchannelId");
-					this.OnbaiduPushchannelIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_baiduPushdeviceType", DbType="TinyInt")]
-		public System.Nullable<byte> baiduPushdeviceType
-		{
-			get
-			{
-				return this._baiduPushdeviceType;
-			}
-			set
-			{
-				if ((this._baiduPushdeviceType != value))
-				{
-					this.OnbaiduPushdeviceTypeChanging(value);
-					this.SendPropertyChanging();
-					this._baiduPushdeviceType = value;
-					this.SendPropertyChanged("baiduPushdeviceType");
-					this.OnbaiduPushdeviceTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_getuiPushClientId", DbType="VarChar(100)")]
-		public string getuiPushClientId
-		{
-			get
-			{
-				return this._getuiPushClientId;
-			}
-			set
-			{
-				if ((this._getuiPushClientId != value))
-				{
-					this.OngetuiPushClientIdChanging(value);
-					this.SendPropertyChanging();
-					this._getuiPushClientId = value;
-					this.SendPropertyChanged("getuiPushClientId");
-					this.OngetuiPushClientIdChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_getuiPushDeviceType", DbType="TinyInt")]
-		public System.Nullable<byte> getuiPushDeviceType
-		{
-			get
-			{
-				return this._getuiPushDeviceType;
-			}
-			set
-			{
-				if ((this._getuiPushDeviceType != value))
-				{
-					this.OngetuiPushDeviceTypeChanging(value);
-					this.SendPropertyChanging();
-					this._getuiPushDeviceType = value;
-					this.SendPropertyChanged("getuiPushDeviceType");
-					this.OngetuiPushDeviceTypeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Us_SysUser_Us_SysRole", Storage="_Us_SysRole", ThisKey="Us_SysRoleId", OtherKey="Us_SysRoleId")]
-		public EntitySet<Us_SysRole> Us_SysRole
-		{
-			get
-			{
-				return this._Us_SysRole;
-			}
-			set
-			{
-				this._Us_SysRole.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Us_SysUser_Us_MemberDepartment", Storage="_Us_MemberDepartment", ThisKey="Us_SysUserId", OtherKey="Us_SysUserId")]
-		public EntitySet<Us_MemberDepartment> Us_MemberDepartment
-		{
-			get
-			{
-				return this._Us_MemberDepartment;
-			}
-			set
-			{
-				this._Us_MemberDepartment.Assign(value);
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_Us_SysRole(Us_SysRole entity)
-		{
-			this.SendPropertyChanging();
-			entity.Us_SysUser = this;
-		}
-		
-		private void detach_Us_SysRole(Us_SysRole entity)
-		{
-			this.SendPropertyChanging();
-			entity.Us_SysUser = null;
-		}
-		
-		private void attach_Us_MemberDepartment(Us_MemberDepartment entity)
-		{
-			this.SendPropertyChanging();
-			entity.Us_SysUser = this;
-		}
-		
-		private void detach_Us_MemberDepartment(Us_MemberDepartment entity)
-		{
-			this.SendPropertyChanging();
-			entity.Us_SysUser = null;
-		}
-	}
-	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Us_RunSentPush")]
 	public partial class Us_RunSentPush : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -4660,6 +4038,652 @@ namespace cyclonestyle.DataBase
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Us_SysUser")]
+	public partial class Us_SysUser : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private string _Us_SysUserId;
+		
+		private bool _IsDeleted;
+		
+		private bool _IsDisabled;
+		
+		private long _Us_SysRoleId;
+		
+		private System.DateTime _CreatedOn;
+		
+		private string _LoginName;
+		
+		private string _PassWords;
+		
+		private string _FullName;
+		
+		private string _JobTitle;
+		
+		private string _MobilePhone;
+		
+		private string _uuId;
+		
+		private string _MobilePhones;
+		
+		private string _Email;
+		
+		private System.Nullable<int> _Sex;
+		
+		private System.Nullable<int> _IdType;
+		
+		private string _IdCard;
+		
+		private string _NickName;
+		
+		private string _UserFace;
+		
+		private string _baiduPushUserId;
+		
+		private string _baiduPushchannelId;
+		
+		private System.Nullable<byte> _baiduPushdeviceType;
+		
+		private string _getuiPushClientId;
+		
+		private System.Nullable<byte> _getuiPushDeviceType;
+		
+		private EntitySet<Us_SysRole> _Us_SysRole;
+		
+		private EntitySet<Us_MemberDepartment> _Us_MemberDepartment;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnUs_SysUserIdChanging(string value);
+    partial void OnUs_SysUserIdChanged();
+    partial void OnIsDeletedChanging(bool value);
+    partial void OnIsDeletedChanged();
+    partial void OnIsDisabledChanging(bool value);
+    partial void OnIsDisabledChanged();
+    partial void OnUs_SysRoleIdChanging(long value);
+    partial void OnUs_SysRoleIdChanged();
+    partial void OnCreatedOnChanging(System.DateTime value);
+    partial void OnCreatedOnChanged();
+    partial void OnLoginNameChanging(string value);
+    partial void OnLoginNameChanged();
+    partial void OnPassWordsChanging(string value);
+    partial void OnPassWordsChanged();
+    partial void OnFullNameChanging(string value);
+    partial void OnFullNameChanged();
+    partial void OnJobTitleChanging(string value);
+    partial void OnJobTitleChanged();
+    partial void OnMobilePhoneChanging(string value);
+    partial void OnMobilePhoneChanged();
+    partial void OnuuIdChanging(string value);
+    partial void OnuuIdChanged();
+    partial void OnMobilePhonesChanging(string value);
+    partial void OnMobilePhonesChanged();
+    partial void OnEmailChanging(string value);
+    partial void OnEmailChanged();
+    partial void OnSexChanging(System.Nullable<int> value);
+    partial void OnSexChanged();
+    partial void OnIdTypeChanging(System.Nullable<int> value);
+    partial void OnIdTypeChanged();
+    partial void OnIdCardChanging(string value);
+    partial void OnIdCardChanged();
+    partial void OnNickNameChanging(string value);
+    partial void OnNickNameChanged();
+    partial void OnUserFaceChanging(string value);
+    partial void OnUserFaceChanged();
+    partial void OnbaiduPushUserIdChanging(string value);
+    partial void OnbaiduPushUserIdChanged();
+    partial void OnbaiduPushchannelIdChanging(string value);
+    partial void OnbaiduPushchannelIdChanged();
+    partial void OnbaiduPushdeviceTypeChanging(System.Nullable<byte> value);
+    partial void OnbaiduPushdeviceTypeChanged();
+    partial void OngetuiPushClientIdChanging(string value);
+    partial void OngetuiPushClientIdChanged();
+    partial void OngetuiPushDeviceTypeChanging(System.Nullable<byte> value);
+    partial void OngetuiPushDeviceTypeChanged();
+    #endregion
+		
+		public Us_SysUser()
+		{
+			this._Us_SysRole = new EntitySet<Us_SysRole>(new Action<Us_SysRole>(this.attach_Us_SysRole), new Action<Us_SysRole>(this.detach_Us_SysRole));
+			this._Us_MemberDepartment = new EntitySet<Us_MemberDepartment>(new Action<Us_MemberDepartment>(this.attach_Us_MemberDepartment), new Action<Us_MemberDepartment>(this.detach_Us_MemberDepartment));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Us_SysUserId", DbType="VarChar(50) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		public string Us_SysUserId
+		{
+			get
+			{
+				return this._Us_SysUserId;
+			}
+			set
+			{
+				if ((this._Us_SysUserId != value))
+				{
+					this.OnUs_SysUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._Us_SysUserId = value;
+					this.SendPropertyChanged("Us_SysUserId");
+					this.OnUs_SysUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsDeleted", DbType="Bit NOT NULL")]
+		public bool IsDeleted
+		{
+			get
+			{
+				return this._IsDeleted;
+			}
+			set
+			{
+				if ((this._IsDeleted != value))
+				{
+					this.OnIsDeletedChanging(value);
+					this.SendPropertyChanging();
+					this._IsDeleted = value;
+					this.SendPropertyChanged("IsDeleted");
+					this.OnIsDeletedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IsDisabled", DbType="Bit NOT NULL")]
+		public bool IsDisabled
+		{
+			get
+			{
+				return this._IsDisabled;
+			}
+			set
+			{
+				if ((this._IsDisabled != value))
+				{
+					this.OnIsDisabledChanging(value);
+					this.SendPropertyChanging();
+					this._IsDisabled = value;
+					this.SendPropertyChanged("IsDisabled");
+					this.OnIsDisabledChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Us_SysRoleId", DbType="BigInt NOT NULL")]
+		public long Us_SysRoleId
+		{
+			get
+			{
+				return this._Us_SysRoleId;
+			}
+			set
+			{
+				if ((this._Us_SysRoleId != value))
+				{
+					this.OnUs_SysRoleIdChanging(value);
+					this.SendPropertyChanging();
+					this._Us_SysRoleId = value;
+					this.SendPropertyChanged("Us_SysRoleId");
+					this.OnUs_SysRoleIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CreatedOn", DbType="DateTime NOT NULL")]
+		public System.DateTime CreatedOn
+		{
+			get
+			{
+				return this._CreatedOn;
+			}
+			set
+			{
+				if ((this._CreatedOn != value))
+				{
+					this.OnCreatedOnChanging(value);
+					this.SendPropertyChanging();
+					this._CreatedOn = value;
+					this.SendPropertyChanged("CreatedOn");
+					this.OnCreatedOnChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LoginName", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		public string LoginName
+		{
+			get
+			{
+				return this._LoginName;
+			}
+			set
+			{
+				if ((this._LoginName != value))
+				{
+					this.OnLoginNameChanging(value);
+					this.SendPropertyChanging();
+					this._LoginName = value;
+					this.SendPropertyChanged("LoginName");
+					this.OnLoginNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_PassWords", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		public string PassWords
+		{
+			get
+			{
+				return this._PassWords;
+			}
+			set
+			{
+				if ((this._PassWords != value))
+				{
+					this.OnPassWordsChanging(value);
+					this.SendPropertyChanging();
+					this._PassWords = value;
+					this.SendPropertyChanged("PassWords");
+					this.OnPassWordsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FullName", DbType="VarChar(50)")]
+		public string FullName
+		{
+			get
+			{
+				return this._FullName;
+			}
+			set
+			{
+				if ((this._FullName != value))
+				{
+					this.OnFullNameChanging(value);
+					this.SendPropertyChanging();
+					this._FullName = value;
+					this.SendPropertyChanged("FullName");
+					this.OnFullNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_JobTitle", DbType="VarChar(50)")]
+		public string JobTitle
+		{
+			get
+			{
+				return this._JobTitle;
+			}
+			set
+			{
+				if ((this._JobTitle != value))
+				{
+					this.OnJobTitleChanging(value);
+					this.SendPropertyChanging();
+					this._JobTitle = value;
+					this.SendPropertyChanged("JobTitle");
+					this.OnJobTitleChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MobilePhone", DbType="VarChar(50)")]
+		public string MobilePhone
+		{
+			get
+			{
+				return this._MobilePhone;
+			}
+			set
+			{
+				if ((this._MobilePhone != value))
+				{
+					this.OnMobilePhoneChanging(value);
+					this.SendPropertyChanging();
+					this._MobilePhone = value;
+					this.SendPropertyChanged("MobilePhone");
+					this.OnMobilePhoneChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_uuId", DbType="VarChar(200)")]
+		public string uuId
+		{
+			get
+			{
+				return this._uuId;
+			}
+			set
+			{
+				if ((this._uuId != value))
+				{
+					this.OnuuIdChanging(value);
+					this.SendPropertyChanging();
+					this._uuId = value;
+					this.SendPropertyChanged("uuId");
+					this.OnuuIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_MobilePhones", DbType="VarChar(245)")]
+		public string MobilePhones
+		{
+			get
+			{
+				return this._MobilePhones;
+			}
+			set
+			{
+				if ((this._MobilePhones != value))
+				{
+					this.OnMobilePhonesChanging(value);
+					this.SendPropertyChanging();
+					this._MobilePhones = value;
+					this.SendPropertyChanged("MobilePhones");
+					this.OnMobilePhonesChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Email", DbType="VarChar(100)")]
+		public string Email
+		{
+			get
+			{
+				return this._Email;
+			}
+			set
+			{
+				if ((this._Email != value))
+				{
+					this.OnEmailChanging(value);
+					this.SendPropertyChanging();
+					this._Email = value;
+					this.SendPropertyChanged("Email");
+					this.OnEmailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Sex", DbType="Int")]
+		public System.Nullable<int> Sex
+		{
+			get
+			{
+				return this._Sex;
+			}
+			set
+			{
+				if ((this._Sex != value))
+				{
+					this.OnSexChanging(value);
+					this.SendPropertyChanging();
+					this._Sex = value;
+					this.SendPropertyChanged("Sex");
+					this.OnSexChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IdType", DbType="Int")]
+		public System.Nullable<int> IdType
+		{
+			get
+			{
+				return this._IdType;
+			}
+			set
+			{
+				if ((this._IdType != value))
+				{
+					this.OnIdTypeChanging(value);
+					this.SendPropertyChanging();
+					this._IdType = value;
+					this.SendPropertyChanged("IdType");
+					this.OnIdTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_IdCard", DbType="VarChar(50)")]
+		public string IdCard
+		{
+			get
+			{
+				return this._IdCard;
+			}
+			set
+			{
+				if ((this._IdCard != value))
+				{
+					this.OnIdCardChanging(value);
+					this.SendPropertyChanging();
+					this._IdCard = value;
+					this.SendPropertyChanged("IdCard");
+					this.OnIdCardChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_NickName", DbType="VarChar(50)")]
+		public string NickName
+		{
+			get
+			{
+				return this._NickName;
+			}
+			set
+			{
+				if ((this._NickName != value))
+				{
+					this.OnNickNameChanging(value);
+					this.SendPropertyChanging();
+					this._NickName = value;
+					this.SendPropertyChanged("NickName");
+					this.OnNickNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_UserFace", DbType="VarChar(50)")]
+		public string UserFace
+		{
+			get
+			{
+				return this._UserFace;
+			}
+			set
+			{
+				if ((this._UserFace != value))
+				{
+					this.OnUserFaceChanging(value);
+					this.SendPropertyChanging();
+					this._UserFace = value;
+					this.SendPropertyChanged("UserFace");
+					this.OnUserFaceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_baiduPushUserId", DbType="VarChar(50)")]
+		public string baiduPushUserId
+		{
+			get
+			{
+				return this._baiduPushUserId;
+			}
+			set
+			{
+				if ((this._baiduPushUserId != value))
+				{
+					this.OnbaiduPushUserIdChanging(value);
+					this.SendPropertyChanging();
+					this._baiduPushUserId = value;
+					this.SendPropertyChanged("baiduPushUserId");
+					this.OnbaiduPushUserIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_baiduPushchannelId", DbType="VarChar(50)")]
+		public string baiduPushchannelId
+		{
+			get
+			{
+				return this._baiduPushchannelId;
+			}
+			set
+			{
+				if ((this._baiduPushchannelId != value))
+				{
+					this.OnbaiduPushchannelIdChanging(value);
+					this.SendPropertyChanging();
+					this._baiduPushchannelId = value;
+					this.SendPropertyChanged("baiduPushchannelId");
+					this.OnbaiduPushchannelIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_baiduPushdeviceType", DbType="TinyInt")]
+		public System.Nullable<byte> baiduPushdeviceType
+		{
+			get
+			{
+				return this._baiduPushdeviceType;
+			}
+			set
+			{
+				if ((this._baiduPushdeviceType != value))
+				{
+					this.OnbaiduPushdeviceTypeChanging(value);
+					this.SendPropertyChanging();
+					this._baiduPushdeviceType = value;
+					this.SendPropertyChanged("baiduPushdeviceType");
+					this.OnbaiduPushdeviceTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_getuiPushClientId", DbType="VarChar(100)")]
+		public string getuiPushClientId
+		{
+			get
+			{
+				return this._getuiPushClientId;
+			}
+			set
+			{
+				if ((this._getuiPushClientId != value))
+				{
+					this.OngetuiPushClientIdChanging(value);
+					this.SendPropertyChanging();
+					this._getuiPushClientId = value;
+					this.SendPropertyChanged("getuiPushClientId");
+					this.OngetuiPushClientIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_getuiPushDeviceType", DbType="TinyInt")]
+		public System.Nullable<byte> getuiPushDeviceType
+		{
+			get
+			{
+				return this._getuiPushDeviceType;
+			}
+			set
+			{
+				if ((this._getuiPushDeviceType != value))
+				{
+					this.OngetuiPushDeviceTypeChanging(value);
+					this.SendPropertyChanging();
+					this._getuiPushDeviceType = value;
+					this.SendPropertyChanged("getuiPushDeviceType");
+					this.OngetuiPushDeviceTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Us_SysUser_Us_SysRole", Storage="_Us_SysRole", ThisKey="Us_SysRoleId", OtherKey="Us_SysRoleId")]
+		public EntitySet<Us_SysRole> Us_SysRole
+		{
+			get
+			{
+				return this._Us_SysRole;
+			}
+			set
+			{
+				this._Us_SysRole.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Us_SysUser_Us_MemberDepartment", Storage="_Us_MemberDepartment", ThisKey="Us_SysUserId", OtherKey="Us_SysUserId")]
+		public EntitySet<Us_MemberDepartment> Us_MemberDepartment
+		{
+			get
+			{
+				return this._Us_MemberDepartment;
+			}
+			set
+			{
+				this._Us_MemberDepartment.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Us_SysRole(Us_SysRole entity)
+		{
+			this.SendPropertyChanging();
+			entity.Us_SysUser = this;
+		}
+		
+		private void detach_Us_SysRole(Us_SysRole entity)
+		{
+			this.SendPropertyChanging();
+			entity.Us_SysUser = null;
+		}
+		
+		private void attach_Us_MemberDepartment(Us_MemberDepartment entity)
+		{
+			this.SendPropertyChanging();
+			entity.Us_SysUser = this;
+		}
+		
+		private void detach_Us_MemberDepartment(Us_MemberDepartment entity)
+		{
+			this.SendPropertyChanging();
+			entity.Us_SysUser = null;
 		}
 	}
 	

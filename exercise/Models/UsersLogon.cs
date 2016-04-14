@@ -13,10 +13,13 @@ namespace cyclonestyle.Models
         /// 登录名（用户名）
         /// </summary>
         public string UserName { get; set; }
+
         /// <summary>
         /// 密码
         /// </summary>
-        public string UserPassWord { get; set; }
+        public string UserPassWord {
+            get; set;
+        }
     }
 
     /// <summary>

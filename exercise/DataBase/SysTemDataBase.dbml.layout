@@ -1,153 +1,153 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 29.875, 8.5" name="UsungSysTemDataBase">
-  <DataContextMoniker Name="/UsungSysTemDataBaseDataContext" />
+  <DataContextMoniker Name="/SysTemDataBaseDataContext" />
   <nestedChildShapes>
     <classShape Id="4e7833f5-369a-4d94-abab-8d7104e2da2c" absoluteBounds="2.875, 0.5, 2, 1.3525109863281251">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysRole" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_SysRole" />
       <nestedChildShapes>
         <elementListCompartment Id="bd4c5968-afd3-49c6-b06e-295cb612ef8b" absoluteBounds="2.8899999999999997, 0.96, 1.9700000000000002, 0.792510986328125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="cb9f5320-8cd2-445d-9290-e6cfe2fe74ba" absoluteBounds="5.25, 0.5, 2, 2.2764815266927085">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysMenu" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_SysMenu" />
       <nestedChildShapes>
         <elementListCompartment Id="6828e2bf-6ed4-4083-9c80-64514a3b6ac5" absoluteBounds="5.265, 0.96, 1.9700000000000002, 1.7164815266927085" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="f7697e89-40e9-4a33-a264-a2c173056092" absoluteBounds="2.875, 2.125, 2, 1.7220992024739581">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysUserLog" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_SysUserLog" />
       <nestedChildShapes>
         <elementListCompartment Id="90936a93-8044-456a-8582-9397a19f2a7f" absoluteBounds="2.8899999999999997, 2.585, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="676dd05a-cecd-4d0e-b94f-c19ddb103f7a" absoluteBounds="5.25, 3, 2, 1.7220992024739581">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysUpdateLog" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_SysUpdateLog" />
       <nestedChildShapes>
         <elementListCompartment Id="ed24afe8-f304-4d04-b411-05f4df63001d" absoluteBounds="5.2650000000000006, 3.46, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="47d8a489-0339-4f48-9dca-a7f8f277a04b" absoluteBounds="17.25, 0.5, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsDocumentResource" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RsDocumentResource" />
       <nestedChildShapes>
         <elementListCompartment Id="a0afce3f-ff26-4db6-8059-c77258ea33fc" absoluteBounds="17.265, 0.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="7ce8abe3-6f60-45d9-806f-42680bf799c2" absoluteBounds="5.25, 5, 2, 1.7220992024739581">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysLog" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_SysLog" />
       <nestedChildShapes>
         <elementListCompartment Id="c63a7ee4-8e85-4721-a999-8fe6f2f88e38" absoluteBounds="5.265, 5.46, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="a7eeb215-2479-4769-9f84-c528e2f8dcf6" absoluteBounds="12.375, 0.5, 2, 1.9068933105468751">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsCatInfo" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RsCatInfo" />
       <nestedChildShapes>
         <elementListCompartment Id="76a713d6-1b4f-4b51-9612-cd15fc43370d" absoluteBounds="12.39, 0.96, 1.9700000000000002, 1.346893310546875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="722857ab-ad93-4c46-b140-960c4ab30184" absoluteBounds="14.875, 0.5, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsUserInputRule" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RsUserInputRule" />
       <nestedChildShapes>
         <elementListCompartment Id="a871a3f1-91f6-4f65-b1de-ec031e014fa9" absoluteBounds="14.89, 0.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="4ee53602-4dc6-4760-bd72-fabce14921a2" absoluteBounds="2.875, 4.875, 2, 2.4612756347656251">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_DepDepartMent" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_DepDepartMent" />
       <nestedChildShapes>
         <elementListCompartment Id="26ef30bd-c631-4261-9eec-d8fafd206e7b" absoluteBounds="2.8899999999999997, 5.335, 1.9700000000000002, 1.901275634765625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="0030d8e7-7101-4d3d-ae9e-be7ed250886c" absoluteBounds="12.375, 3, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsExinfo" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RsExinfo" />
       <nestedChildShapes>
         <elementListCompartment Id="28f9ac8c-f604-4654-89c8-918ed1df681a" absoluteBounds="12.39, 3.46, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="6b845b38-605c-4fd2-ba0c-3b69b1c31f94" absoluteBounds="0.5, 5.75, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_MemberDepartment" />
+    <classShape Id="6b845b38-605c-4fd2-ba0c-3b69b1c31f94" absoluteBounds="0.5, 6.125, 2, 2.0916874186197916">
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_MemberDepartment" />
       <nestedChildShapes>
-        <elementListCompartment Id="d1ff4059-5799-4f63-a644-6ca8ab064e8c" absoluteBounds="0.51499999999999968, 6.21, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="d1ff4059-5799-4f63-a644-6ca8ab064e8c" absoluteBounds="0.51499999999999968, 6.585, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="14697483-9dcd-4222-bec2-fd6c7322f140" absoluteBounds="7.625, 0.5, 2, 1.7220992024739581">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_Geos" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/ElongHotel_Geos" />
       <nestedChildShapes>
         <elementListCompartment Id="8c28932c-9e5c-497e-9006-c1f476204500" absoluteBounds="7.6400000000000006, 0.96, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="6eef6b45-16fd-4314-a876-a69224ccae6d" absoluteBounds="10, 0.5, 2, 1.5373050944010416">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_GeoLocations" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/ElongHotel_GeoLocations" />
       <nestedChildShapes>
         <elementListCompartment Id="a70d8330-e6e3-42d8-a398-6d24c4798d55" absoluteBounds="10.015, 0.96, 1.9700000000000002, 0.97730509440104174" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <associationConnector edgePoints="[(9.625 : 1.26865254720052); (10 : 1.26865254720052)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/ElongHotel_Geos/ElongHotel_Geos_ElongHotel_GeoLocations" />
+      <AssociationMoniker Name="/SysTemDataBaseDataContext/ElongHotel_Geos/ElongHotel_Geos_ElongHotel_GeoLocations" />
       <nodes>
         <classShapeMoniker Id="14697483-9dcd-4222-bec2-fd6c7322f140" />
         <classShapeMoniker Id="6eef6b45-16fd-4314-a876-a69224ccae6d" />
       </nodes>
     </associationConnector>
     <classShape Id="c380160a-fa33-41d0-abc6-9d78f03f505a" absoluteBounds="7.625, 2.5, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/View_ElongHotelGeos" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/View_ElongHotelGeos" />
       <nestedChildShapes>
         <elementListCompartment Id="e7fab485-bd75-4b4a-b118-f88d2f3f307b" absoluteBounds="7.6400000000000006, 2.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="754bcdfa-2eaf-4354-9515-f34e9230a938" absoluteBounds="10, 2.5, 2, 1.9068933105468751">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/View_ElongHotelGeosLocations" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/View_ElongHotelGeosLocations" />
       <nestedChildShapes>
         <elementListCompartment Id="d65b286c-bfe0-47aa-95c9-39b4cfbf1333" absoluteBounds="10.015, 2.96, 1.9700000000000002, 1.346893310546875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="464adf98-e5ca-4e78-9a39-4ba1c6ae809f" absoluteBounds="23, 0.5, 2, 2.0916874186197916">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsTraveller" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RsTraveller" />
       <nestedChildShapes>
         <elementListCompartment Id="64194a92-c620-4f22-b6d9-564e271d69d1" absoluteBounds="23.015, 0.96, 1.9700000000000002, 1.5316874186197915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="f4e741b0-0cff-48e6-96d0-c0c9f7a6cb98" absoluteBounds="23, 2.875, 2, 2.6460697428385416">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RsAddress" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RsAddress" />
       <nestedChildShapes>
         <elementListCompartment Id="159e0350-2d88-4333-9a80-2cda7e37d9d7" absoluteBounds="23.015, 3.335, 1.9700000000000002, 2.0860697428385415" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <classShape Id="9e93c8b1-de20-486d-85ce-05d9686297c4" absoluteBounds="0.5, 0.5, 2, 4.8635990397135407">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysUser" />
-      <nestedChildShapes>
-        <elementListCompartment Id="73f477de-680b-42cc-81aa-ab2686e803a7" absoluteBounds="0.51499999999999968, 0.96, 1.9700000000000002, 4.3035990397135411" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <associationConnector edgePoints="[(2.5 : 1.17625549316406); (2.875 : 1.17625549316406)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysUser/Us_SysUser_Us_SysRole" />
-      <nodes>
-        <classShapeMoniker Id="9e93c8b1-de20-486d-85ce-05d9686297c4" />
-        <classShapeMoniker Id="4e7833f5-369a-4d94-abab-8d7104e2da2c" />
-      </nodes>
-    </associationConnector>
-    <associationConnector edgePoints="[(1.5 : 5.36359903971354); (1.5 : 5.75)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/Us_SysUser/Us_SysUser_Us_MemberDepartment" />
-      <nodes>
-        <classShapeMoniker Id="9e93c8b1-de20-486d-85ce-05d9686297c4" />
-        <classShapeMoniker Id="6b845b38-605c-4fd2-ba0c-3b69b1c31f94" />
-      </nodes>
-    </associationConnector>
     <classShape Id="a34dad59-1ad3-44b6-8e57-515cad2813f8" absoluteBounds="27.625, 0.5, 2, 2.6460697428385416">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentPush" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RunSentPush" />
       <nestedChildShapes>
         <elementListCompartment Id="df5e6d01-8651-4483-ac2f-96c2e692b991" absoluteBounds="27.64, 0.96, 1.9700000000000002, 2.0860697428385415" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="f935029d-8916-49e0-89b7-94f78bdb7a86" absoluteBounds="27.625, 4.125, 2, 1.7220992024739581">
-      <DataClassMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentPushDetail" />
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_RunSentPushDetail" />
       <nestedChildShapes>
         <elementListCompartment Id="4ae42a9b-d186-4a96-88fd-0f6f07543bc3" absoluteBounds="27.64, 4.585, 1.9700000000000002, 1.1620992024739583" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(28.625 : 3.14606974283854); (28.625 : 4.125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
-      <AssociationMoniker Name="/UsungSysTemDataBaseDataContext/Us_RunSentPush/Us_RunSentPush_Us_RunSentPushDetail" />
+    <associationConnector edgePoints="[(28.625 : 3.14606974283854); (28.625 : 4.125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/SysTemDataBaseDataContext/Us_RunSentPush/Us_RunSentPush_Us_RunSentPushDetail" />
       <nodes>
         <classShapeMoniker Id="a34dad59-1ad3-44b6-8e57-515cad2813f8" />
         <classShapeMoniker Id="f935029d-8916-49e0-89b7-94f78bdb7a86" />
+      </nodes>
+    </associationConnector>
+    <classShape Id="ccf8a64f-49d1-488a-8bf1-8454f8368492" absoluteBounds="0.5, 0.5, 2, 5.0483931477864576">
+      <DataClassMoniker Name="/SysTemDataBaseDataContext/Us_SysUser" />
+      <nestedChildShapes>
+        <elementListCompartment Id="26ea4ca1-57f7-4b67-8be4-06ba23e15f28" absoluteBounds="0.51500000000000057, 0.96, 1.9700000000000002, 4.488393147786458" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.5 : 1.17625549316406); (2.875 : 1.17625549316406)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/SysTemDataBaseDataContext/Us_SysUser/Us_SysUser_Us_SysRole" />
+      <nodes>
+        <classShapeMoniker Id="ccf8a64f-49d1-488a-8bf1-8454f8368492" />
+        <classShapeMoniker Id="4e7833f5-369a-4d94-abab-8d7104e2da2c" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.5 : 5.54839314778646); (1.5 : 6.125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/SysTemDataBaseDataContext/Us_SysUser/Us_SysUser_Us_MemberDepartment" />
+      <nodes>
+        <classShapeMoniker Id="ccf8a64f-49d1-488a-8bf1-8454f8368492" />
+        <classShapeMoniker Id="6b845b38-605c-4fd2-ba0c-3b69b1c31f94" />
       </nodes>
     </associationConnector>
   </nestedChildShapes>

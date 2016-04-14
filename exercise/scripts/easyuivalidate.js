@@ -48,11 +48,11 @@ $(document).ready(function () {
             },
             message: "该组织名称已经被使用,或字符太少或者太多"
         },
-        checkloginname: {//检查登录名是否有重复
+        checkusermobilephone: {
             validator: function (value, param) {
                 var r = false;
                 $.ajax({
-                    url: "/api/ApiMembers/CheckLoginName?LoginName="+value,
+                    url: "/api/ApiMembers/CheckMobilePhoneisInUse?mobilePhone=" + value,
                     async: false,
                     dataType: 'json',
                     type: 'get',
@@ -63,7 +63,7 @@ $(document).ready(function () {
                 });
                 return r;
             },
-            message:"该登录名已被使用"
+            message: "该手机号码已被使用"
         },
         checkdateforend: {//比较两个时间
             validator: function (value, param) {

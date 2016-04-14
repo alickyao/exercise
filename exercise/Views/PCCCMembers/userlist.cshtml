@@ -57,7 +57,8 @@
             idField: "UserId",
             columns: [[
                 { field: 'UserId', checkbox: true },
-                { field: 'LoginName', title: '登录名', width: 100, editor: { type: "textbox", options: { required: true, validType: ["checkloginname", "length[6, 20]"] } } },
+                { field: 'LoginName', title: '登录名', width: 100 },
+                { field: 'role',title:'角色',width:60,align:'center' },
                 {
                     field: 'isDisabled', title: '禁用', align: "center", width: 40, formatter: function (value, row) {
                         return value ? "是" : "否";
@@ -90,7 +91,14 @@
                         return EnumSex(value);
                     }
                 },
-                { field: 'MobilePhone', title: '手机', width: 80 },
+                {
+                    field: 'MobilePhone', title: '手机', width: 100, editor: {
+                        type: "textbox", options: {
+                            required: true,
+                            validType: ["checkusermobilephone", "length[11,11]"]
+                        }
+                    }
+                },
                 {
                     field: 'getuiPushSet', title: '推送', width: 50, align: 'center', formatter: function (value, row) {
                         return value == null ? "未设置" : "已设置";
@@ -105,7 +113,8 @@
                     }
                 },
                 { field: 'IdCard', title: '证件号码', width: 100 },
-                { field: 'Email', title: 'Email', width: 100 }
+                { field: 'Email', title: 'Email', width: 100 },
+                { field: 'uuId', title: 'uuid', width: 150 }
             ]],
             toolbar: [
                 {
@@ -149,8 +158,7 @@
                             if (v) {
                                 var row = Grid.datagrid("endEdit", editrow).datagrid("selectRow", editrow).datagrid("getSelected");
                                 var registerrequest = {
-                                    LoginName: row.LoginName,
-                                    PassWord: md5(randomString(6)),//随机生成一个密码
+                                    mobilePhone: row.MobilePhone,
                                     RegisterWay: "在后台由管理人员直接添加"
                                 };
                                 console.log(registerrequest);
@@ -402,6 +410,7 @@
             request.keyWords = d.keyWords;
             request.orgId = d.orgId;
             request.departmentIds = d.departmentIds;
+            request.roleids = d.roleids;
             loadgrid();
             var p = Grid.datagrid("getPager");
             p.pagination({
@@ -416,7 +425,11 @@
             SelectOrgRequest.departmentId = "";
             SelectOrg.combobox("reload");
             //清空部门选择框
-            SelectDep.combotree("loadData",new Object());
+            SelectDep.combotree("loadData", new Object());
+
+            SearchFrom.form("load", {
+                roleids: request.roleids
+            });
         });
 
         //查询请求中关键字不为空则需要赋值给查询栏
@@ -426,7 +439,9 @@
                 keyWords:request.keyWords
             });
         }
-
+        SearchFrom.form("load", {
+            roleids: request.roleids
+        });
     });
 </script>
 
@@ -442,10 +457,17 @@
                     <tr>
                         <td>姓名/昵称/手机号：</td>
                         <td><input type="text" class="easyui-textbox" name="keyWords" /></td>
+                        <td>角色：</td>
+                        <td>
+                            <select name="roleids" class="easyui-combobox" data-options="multiple:true">
+                                <option value="1009">会员</option>
+                                <option value="1008">访客</option>
+                            </select>
+                        </td>
                         <td>组织：</td>
-                        <td><input type="text" id="@(PageId)selectorg" name="orgId" style="width:200px;" /></td>
+                        <td><input type="text" id="@(PageId)selectorg" name="orgId" style="width:150px;" /></td>
                         <td>部门：</td>
-                        <td><input type="text" id="@(PageId)selectdep" name="departmentIds" style="width:230px;" /></td>
+                        <td><input type="text" id="@(PageId)selectdep" name="departmentIds" style="width:150px;" /></td>
                         <td>
                             <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridSearchBtn" data-options="iconCls:'icon-search'">查询</a>
                             <a href="javascript:void(0)" class="easyui-linkbutton" id="@(PageId)GridClearSearchBtn" data-options="iconCls:'icon-clear'">清空查询栏</a>

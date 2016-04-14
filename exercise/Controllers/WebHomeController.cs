@@ -8,7 +8,7 @@ using System.Web.Mvc;
 namespace cyclonestyle.Controllers
 {
     /// <summary>
-    /// 基础页
+    /// 基础页，通用页面
     /// </summary>
     public class WebHomeController : Controller
     {

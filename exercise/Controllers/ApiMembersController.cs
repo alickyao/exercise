@@ -18,6 +18,29 @@ namespace cyclonestyle.Controllers
     {
 
         /// <summary>
+        /// 会员用户注册
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public RegisterMembersReplayModel RegisterMembers(RegisterMembersRequestModel condtion)
+        {
+            condtion.IpAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
+            MembersService ms = new MembersService();
+            RegisterMembersReplayModel result = ms.RegisterMembers(condtion);
+            if (result.ReturnCode == EnumErrorCode.Success)
+            {
+                //记录到日志
+                SysManagerService.CreateSysUserLog(new SysUserLogModel()
+                {
+                    SysUserId = result.UserInfo.UserId,
+                    Describe = "用户注册，渠道" + condtion.RegisterWay + "，注册时客户端IP地址" + condtion.IpAddress
+                });
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 会员用户登录
         /// </summary>
         /// <param name="condtion"></param>
@@ -69,34 +92,18 @@ namespace cyclonestyle.Controllers
         }
 
         /// <summary>
-        /// 检查登录名出现的次数
+        /// 检查手机号出现的次数
         /// </summary>
-        /// <param name="LoginName">登录名</param>
-        /// <returns>返回出现的次数，如果大于0则表示该登录名已使用</returns>
+        /// <param name="mobilePhone">手机号码</param>
+        /// <param name="userid">可选，排除的用户ID</param>
+        /// <returns>返回出现的次数，如果大于0则表示该手机号码已使用</returns>
         [HttpGet]
-        public int CheckLoginName(string LoginName) {
-            return SysManagerService.CheckLoginNameisExist(LoginName);
-        }
-
-        /// <summary>
-        /// 会员用户注册
-        /// </summary>
-        /// <param name="condtion">此注册方法中登录名请限制为用户手机号码</param>
-        /// <returns></returns>
-        [HttpPost]
-        public RegisterMembersReplayModel RegisterMembers(RegisterMembersRequestModel condtion) {
-            condtion.IpAddress = System.Web.HttpContext.Current.Request.UserHostAddress;
+        public int CheckMobilePhoneisInUse(string mobilePhone ,string userid=null) {
             MembersService ms = new MembersService();
-            RegisterMembersReplayModel result = ms.RegisterMembers(condtion);
-            if (result.ReturnCode == EnumErrorCode.Success) { 
-                //记录到日志
-                SysManagerService.CreateSysUserLog(new SysUserLogModel()
-                {
-                    SysUserId = result.UserInfo.UserId,
-                    Describe = "用户注册，渠道" + condtion.RegisterWay + "，注册时客户端IP地址" + condtion.IpAddress
-                });
-            }
-            return result;
+            return ms.CheckMobilePhoneOrUUIdIsExist(new RegisterMembersRequestModel
+            {
+                mobilePhone = mobilePhone
+            }, userid);
         }
 
         /// <summary>
@@ -111,6 +118,7 @@ namespace cyclonestyle.Controllers
             ms.GetMemberInfo(condtion);
             return ms.memberInfo;
         }
+
 
         /// <summary>
         /// 编辑用户基础信息
@@ -136,8 +144,6 @@ namespace cyclonestyle.Controllers
             SearchMembersreplayModel result = MembersService.SearchMembersList(condtion);
             return result;
         }
-        
-
 
         /// <summary>
         /// 会员检索（下拉搜索数据）
@@ -145,7 +151,7 @@ namespace cyclonestyle.Controllers
         /// <param name="q">关键字,登录名,姓名，手机，昵称</param>
         /// <param name="orgid">用户所在组织的ID，选填，前台如要检索某一个组织下的用户则必填该项</param>
         /// <param name="userid">用户的ID</param>
-        /// <returns>返回用户Id+姓名/昵称[登录名]格式数据</returns>
+        /// <returns>返回用户Id+姓名/昵称[手机号]格式数据</returns>
         [HttpGet]
         [Authorize]
         public List<Combobox> SearchMembersListForcombobox(string q = null, string orgid = null, string userid = null)
@@ -168,7 +174,7 @@ namespace cyclonestyle.Controllers
                     result.Add(new Combobox()
                     {
                         id = u.UserId,
-                        text = (string.IsNullOrEmpty(u.FullName) ? u.NickName : u.FullName) + "[" + u.LoginName + "]"
+                        text = (string.IsNullOrEmpty(u.FullName) ? u.NickName : u.FullName) + "[" + u.MobilePhone + "]"
                     });
                 }
             }

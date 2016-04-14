@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <script src="js/global.js"></script>
+    <script src="js/pfun.js"></script>
+</head>
+<body>
+	<h1>LogOn Wait...</h1>
+	<script type="text/javascript" charset="UTF-8">
+		(function($){
+			
+			$.init({
+				swipeBack: false
+			});
+			var network = true; //网络
+			if(mui.os.plus){
+				mui.plusReady(function () {
+					if(plus.networkinfo.getCurrentType()==plus.networkinfo.CONNECTION_NONE){
+						network = false;
+					}
+					if (network){
+						var host = plus.storage.getItem("host");
+			      		mui.ajax(host + "api/ApiMembers/CheckisLogOn",{
+							dataType:'json',//服务器返回json格式数据
+							type:'get',//HTTP请求类型
+							data:null,//请求的数据
+							success:function(json){
+								//远程请求成功
+								if (json == "true"){
+									//当前已经登录
+									console.log("当前用户已登录");
+									//跳转到主界面
+								}
+								else{
+									//当前未登录
+									console.log("当前用户未登录");
+									var uuid = plus.device.uuid;//获取该设备的uuid
+									var mobilePhone = plus.storage.getItem("mobilePhone");//获取登录名
+									var UserPassWord = plus.storage.getItem("UserPassWord");//获取密码
+									var loginrequest= {
+										deviceUUid : null,
+										mobilePhone : null,
+										UserPassWord :null
+									};
+									if (userloginname==null){
+										//使用设备号登录
+										loginrequest.deviceUUid = uuid;
+									}
+									else{
+										//使用保存在本地的用户名和密码登录
+										loginrequest.mobilePhone = mobilePhone;
+										loginrequest.UserPassWord = UserPassWord;
+									}
+									//尝试登录
+									//成功后跳转到主界面
+									//失败跳转到登录界面
+								}
+							},
+							error:function(xhr,type,errorThrown){
+								//远程请求失败
+								mui.toast(type+" "+errorThrown);
+							}
+			      		});
+					}
+					else{
+						mui.toast("当前网络不给力");
+					}
+				});
+			}
+		})(mui);
+    </script>
+</body>
+</html>

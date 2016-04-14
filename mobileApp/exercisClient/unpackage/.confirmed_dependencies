@@ -39,5 +39,13 @@
 			"js/global.js",
 			"js/pfun.js"
 		]
+	},
+	"logon.html": {
+		"resources": [
+			"js/mui.min.js",
+			"css/mui.min.css",
+			"js/global.js",
+			"js/pfun.js"
+		]
 	}
 }

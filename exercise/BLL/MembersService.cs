@@ -111,6 +111,18 @@ namespace cyclonestyle.BLL
 
 
         /// <summary>
+        /// 检查手机号码或者uuId是否已存在
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <param name="userId">需要排除的用户ID</param>
+        /// <returns></returns>
+        public int CheckMobilePhoneOrUUIdIsExist(RegisterMembersRequestModel condtion,string userId = null)
+        {
+            int count = BaseSysTemDataBaseManager.MemberCheckMobilePhoneOrUUIdIsExist(condtion,userId);
+            return count;
+        }
+
+        /// <summary>
         /// 会员自助注册
         /// </summary>
         /// <param name="condtion"></param>
@@ -121,26 +133,39 @@ namespace cyclonestyle.BLL
             try
             {
                 //请求参数验证
-                if (string.IsNullOrEmpty(condtion.LoginName) || string.IsNullOrEmpty(condtion.PassWord)) {
+                if (string.IsNullOrEmpty(condtion.deviceUUid) && string.IsNullOrEmpty(condtion.mobilePhone)) {
                     result.ReturnCode = EnumErrorCode.EmptyDate;
-                    result.ReturnMessage = "登录名和密码不能为空";
+                    result.ReturnMessage = "设备ID或者手机号码不能同时为空";
                     return result;
                 }
-                if (condtion.LoginName.Length < 6) {
-                    result.ReturnCode = EnumErrorCode.EmptyDate;
-                    result.ReturnMessage = "登录名必须大于6位";
-                    return result;
+                if (!string.IsNullOrEmpty(condtion.mobilePhone)) {
+                    if (condtion.mobilePhone.Length < 11)
+                    {
+                        result.ReturnCode = EnumErrorCode.EmptyDate;
+                        result.ReturnMessage = "手机号码必须是11位";
+                        return result;
+                    }
+                    Regex r = new Regex("^[0-9_]+$");
+                    if (!r.IsMatch(condtion.mobilePhone))
+                    {
+                        result.ReturnCode = EnumErrorCode.EmptyDate;
+                        result.ReturnMessage = "手机号码必须全部为数字";
+                        return result;
+                    }
                 }
-                Regex r = new Regex("^[a-zA-Z0-9_]+$");
-                if (!r.IsMatch(condtion.LoginName)) {
-                    result.ReturnCode = EnumErrorCode.EmptyDate;
-                    result.ReturnMessage = "登录名只能由字母数字与下划线组成";
-                    return result;
-                }
-
-                int count = SysManagerService.CheckLoginNameisExist(condtion.LoginName);
+                int count = CheckMobilePhoneOrUUIdIsExist(condtion);
                 if (count == 0)
                 {
+                    //判断用户的角色
+                    if (string.IsNullOrEmpty(condtion.mobilePhone))
+                    {
+                        condtion.roleId = 1008;//注册为访客
+                    }
+                    else {
+                        condtion.roleId = 1009;//注册为会员
+                    }
+                    //随机获取一个登录名
+                    condtion.loginName = Helps.GetTimeId();
                     result = BaseSysTemDataBaseManager.MemberRegisterMembers(condtion);
                     if (result.ReturnCode == EnumErrorCode.Success)
                     {
@@ -153,7 +178,7 @@ namespace cyclonestyle.BLL
                 }
                 else {
                     result.ReturnCode = EnumErrorCode.EmptyDate;
-                    result.ReturnMessage = "该登录名已被使用";
+                    result.ReturnMessage = "该手机号码已使用";
                 }
             }
             catch (Exception e) {
@@ -164,18 +189,25 @@ namespace cyclonestyle.BLL
             return result;
         }
 
-
-
         /// <summary>
         /// 用户登录验证
         /// </summary>
         /// <param name="condtion"></param>
         /// <returns></returns>
-        internal RegisterMembersReplayModel CheckMemberLoginNameandPwd(RequestUserLogoModel condtion)
+        internal RegisterMembersReplayModel CheckMemberLoginNameandPwd(RequestLogOnMembersModel condtion)
         {
             RegisterMembersReplayModel result = new RegisterMembersReplayModel();
             try
             {
+
+                //请求参数验证
+                if (string.IsNullOrEmpty(condtion.deviceUUid) && string.IsNullOrEmpty(condtion.mobilePhone))
+                {
+                    result.ReturnCode = EnumErrorCode.EmptyDate;
+                    result.ReturnMessage = "设备ID或者手机号码不能同时为空";
+                    return result;
+                }
+
                 result = BaseSysTemDataBaseManager.MemberCheckMemberLoginNameandPwd(condtion);
                 if (result.ReturnCode == EnumErrorCode.Success) {
                     //登陆成功后获取用户基础信息

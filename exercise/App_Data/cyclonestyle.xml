@@ -666,9 +666,16 @@
             一些公共的方法组
             </summary>
         </member>
+        <member name="M:cyclonestyle.BLL.Helps.GetRandKey(System.Int32)">
+            <summary>
+            获取一组随机字符串
+            </summary>
+            <param name="c">获取的个数</param>
+            <returns></returns>
+        </member>
         <member name="M:cyclonestyle.BLL.Helps.GetTimeId">
             <summary>
-            获取时间ID（用于创造可读性比较强的编号，格式yyMMddHHmmss_ffff）
+            获取时间ID（用于创造可读性比较强的编号，格式yyMMddHHmmss_ffffff）
             </summary>
             <returns></returns>
         </member>
@@ -932,6 +939,14 @@
             <param name="user">用户信息，其中的userDepartmentList属性不能为空</param>
             <returns></returns>
         </member>
+        <member name="M:cyclonestyle.BLL.MembersService.CheckMobilePhoneOrUUIdIsExist(cyclonestyle.Models.RegisterMembersRequestModel,System.String)">
+            <summary>
+            检查手机号码或者uuId是否已存在
+            </summary>
+            <param name="condtion"></param>
+            <param name="userId">需要排除的用户ID</param>
+            <returns></returns>
+        </member>
         <member name="M:cyclonestyle.BLL.MembersService.RegisterMembers(cyclonestyle.Models.RegisterMembersRequestModel)">
             <summary>
             会员自助注册
@@ -939,7 +954,7 @@
             <param name="condtion"></param>
             <returns></returns>
         </member>
-        <member name="M:cyclonestyle.BLL.MembersService.CheckMemberLoginNameandPwd(cyclonestyle.Models.RequestUserLogoModel)">
+        <member name="M:cyclonestyle.BLL.MembersService.CheckMemberLoginNameandPwd(cyclonestyle.Models.RequestLogOnMembersModel)">
             <summary>
             用户登录验证
             </summary>
@@ -1727,6 +1742,13 @@
             会员接口-注册、登陆、详情、找回密码等功能
             </summary>
         </member>
+        <member name="M:cyclonestyle.Controllers.ApiMembersController.RegisterMembers(cyclonestyle.Models.RegisterMembersRequestModel)">
+            <summary>
+            会员用户注册
+            </summary>
+            <param name="condtion"></param>
+            <returns></returns>
+        </member>
         <member name="M:cyclonestyle.Controllers.ApiMembersController.LogOnMembers(cyclonestyle.Models.RequestLogOnMembersModel)">
             <summary>
             会员用户登录
@@ -1746,19 +1768,13 @@
             </summary>
             <returns>布尔值，true表示已登录，false表示未登陆</returns>
         </member>
-        <member name="M:cyclonestyle.Controllers.ApiMembersController.CheckLoginName(System.String)">
+        <member name="M:cyclonestyle.Controllers.ApiMembersController.CheckMobilePhoneisInUse(System.String,System.String)">
             <summary>
-            检查登录名出现的次数
+            检查手机号出现的次数
             </summary>
-            <param name="LoginName">登录名</param>
-            <returns>返回出现的次数，如果大于0则表示该登录名已使用</returns>
-        </member>
-        <member name="M:cyclonestyle.Controllers.ApiMembersController.RegisterMembers(cyclonestyle.Models.RegisterMembersRequestModel)">
-            <summary>
-            会员用户注册
-            </summary>
-            <param name="condtion">此注册方法中登录名请限制为用户手机号码</param>
-            <returns></returns>
+            <param name="mobilePhone">手机号码</param>
+            <param name="userid">可选，排除的用户ID</param>
+            <returns>返回出现的次数，如果大于0则表示该手机号码已使用</returns>
         </member>
         <member name="M:cyclonestyle.Controllers.ApiMembersController.GetMemberInfo(cyclonestyle.Models.GetMembersInfoRequestModel)">
             <summary>
@@ -1788,7 +1804,7 @@
             <param name="q">关键字,登录名,姓名，手机，昵称</param>
             <param name="orgid">用户所在组织的ID，选填，前台如要检索某一个组织下的用户则必填该项</param>
             <param name="userid">用户的ID</param>
-            <returns>返回用户Id+姓名/昵称[登录名]格式数据</returns>
+            <returns>返回用户Id+姓名/昵称[手机号]格式数据</returns>
         </member>
         <member name="M:cyclonestyle.Controllers.ApiMembersController.GetMembersList(cyclonestyle.Models.GetMembersListRequstModel)">
             <summary>
@@ -2291,7 +2307,7 @@
         </member>
         <member name="T:cyclonestyle.Controllers.WebHomeController">
             <summary>
-            基础页
+            基础页，通用页面
             </summary>
         </member>
         <member name="M:cyclonestyle.Controllers.WebHomeController.Index">
@@ -2815,6 +2831,14 @@
             <param name="locationInfo"></param>
             <returns></returns>
         </member>
+        <member name="M:cyclonestyle.DataBase.BaseSysTemDataBaseManager.MemberCheckMobilePhoneOrUUIdIsExist(cyclonestyle.Models.RegisterMembersRequestModel,System.String)">
+            <summary>
+            检查手机号码或者uuid出现的次数
+            </summary>
+            <param name="condtion"></param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
         <member name="M:cyclonestyle.DataBase.BaseSysTemDataBaseManager.MemberRegisterMembers(cyclonestyle.Models.RegisterMembersRequestModel)">
             <summary>
             会员自助注册
@@ -2822,7 +2846,7 @@
             <param name="condtion"></param>
             <returns></returns>
         </member>
-        <member name="M:cyclonestyle.DataBase.BaseSysTemDataBaseManager.MemberCheckMemberLoginNameandPwd(cyclonestyle.Models.RequestUserLogoModel)">
+        <member name="M:cyclonestyle.DataBase.BaseSysTemDataBaseManager.MemberCheckMemberLoginNameandPwd(cyclonestyle.Models.RequestLogOnMembersModel)">
             <summary>
             验证登录名及密码
             </summary>
@@ -4276,22 +4300,27 @@
         </member>
         <member name="P:cyclonestyle.Models.RequestLogOnMembersModel.DeviceInfo">
             <summary>
-            登陆设备信息
+            设备信息
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.RequestLogOnMembersModel.deviceUUid">
+            <summary>
+            设备ID（与下方手机号码 二选一必填）
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.RequestLogOnMembersModel.mobilePhone">
+            <summary>
+            手机号码
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.RequestLogOnMembersModel.UserPassWord">
+            <summary>
+            密码（默认为系统初始密码）
             </summary>
         </member>
         <member name="T:cyclonestyle.Models.RegisterMembersRequestModel">
             <summary>
             会员用户注册请求
-            </summary>
-        </member>
-        <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.LoginName">
-            <summary>
-            用户注册请求
-            </summary>
-        </member>
-        <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.PassWord">
-            <summary>
-            密码
             </summary>
         </member>
         <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.IpAddress">
@@ -4302,6 +4331,21 @@
         <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.RegisterWay">
             <summary>
             注册渠道
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.eMail">
+            <summary>
+            电子邮件地址,用于找回密码
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.roleId">
+            <summary>
+            角色
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.RegisterMembersRequestModel.loginName">
+            <summary>
+            登录名
             </summary>
         </member>
         <member name="T:cyclonestyle.Models.RegisterMembersReplayModel">
@@ -4347,6 +4391,11 @@
         <member name="P:cyclonestyle.Models.SearchMembersRequestModel.keyWords">
             <summary>
             登录名,姓名,电话,昵称
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.SearchMembersRequestModel.roleids">
+            <summary>
+            角色选择
             </summary>
         </member>
         <member name="P:cyclonestyle.Models.SearchMembersRequestModel.userId">
@@ -4453,6 +4502,16 @@
         <member name="P:cyclonestyle.Models.MembersBaseInfoModel.MobilePhone">
             <summary>
             手机号
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.MembersBaseInfoModel.uuId">
+            <summary>
+            注册时的设备ID
+            </summary>
+        </member>
+        <member name="P:cyclonestyle.Models.MembersBaseInfoModel.role">
+            <summary>
+            所属角色
             </summary>
         </member>
         <member name="P:cyclonestyle.Models.MembersBaseInfoModel.Email">

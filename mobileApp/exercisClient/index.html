@@ -53,11 +53,6 @@
 					}
 					self.append(sub);
 				}
-				var host = plus.storage.getItem("host");
-				var url = host + "api/ApiMembers/CheckisLogOn"; //远程访问HelloWord
-				mui.getJSON(url, function(json) {
-					console.log("当前用户登录情况" + json);
-				});
 			});
 			var activeTab = subpages[0]; //当前激活的选项（主界面）
 			var title = document.getElementById("title");

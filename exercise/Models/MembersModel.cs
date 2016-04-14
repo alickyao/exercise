@@ -8,28 +8,38 @@ namespace cyclonestyle.Models
     /// <summary>
     /// 会员用户登录请求
     /// </summary>
-    public class RequestLogOnMembersModel : RequestUserLogoModel {
+    public class RequestLogOnMembersModel {
         /// <summary>
-        /// 登陆设备信息
+        /// 设备信息
         /// </summary>
         public string DeviceInfo { get; set; }
+
+        /// <summary>
+        /// 设备ID（与下方手机号码 二选一必填）
+        /// </summary>
+        public string deviceUUid { get; set; }
+        /// <summary>
+        /// 手机号码
+        /// </summary>
+        public string mobilePhone { get; set; }
+
+        private string _pwd = System.Web.Security.FormsAuthentication.HashPasswordForStoringInConfigFile(System.Configuration.ConfigurationManager.AppSettings["DefaultSysUserPassWord"].ToString(), "MD5").ToLower();
+
+        /// <summary>
+        /// 密码（默认为系统初始密码）
+        /// </summary>
+        public string UserPassWord
+        {
+            get { return _pwd; }
+            set { _pwd = value; }
+        }
     }
 
     /// <summary>
     /// 会员用户注册请求
     /// </summary>
-    public class RegisterMembersRequestModel
+    public class RegisterMembersRequestModel: RequestLogOnMembersModel
     {
-        /// <summary>
-        /// 用户注册请求
-        /// </summary>
-        public string LoginName { get; set; }
-
-        /// <summary>
-        /// 密码
-        /// </summary>
-        public string PassWord { get; set; }
-
         /// <summary>
         /// 注册时的IP地址
         /// </summary>
@@ -39,6 +49,20 @@ namespace cyclonestyle.Models
         /// 注册渠道
         /// </summary>
         public string RegisterWay { get; set; }
+
+        /// <summary>
+        /// 电子邮件地址,用于找回密码
+        /// </summary>
+        public string eMail { get; set; }
+
+        /// <summary>
+        /// 角色
+        /// </summary>
+        internal long roleId { get; set; }
+        /// <summary>
+        /// 登录名
+        /// </summary>
+        internal string loginName { get; set; }
     }
 
     /// <summary>
@@ -83,6 +107,17 @@ namespace cyclonestyle.Models
         /// 登录名,姓名,电话,昵称
         /// </summary>
         public string keyWords { get; set; }
+
+        private List<long> _roleids = new List<long>() { 1009, 1008 };
+
+        /// <summary>
+        /// 角色选择
+        /// </summary>
+        public List<long> roleids {
+            get { return _roleids; }
+            set { _roleids = value; }
+        }
+
         /// <summary>
         /// 用户的ID
         /// </summary>
@@ -197,9 +232,20 @@ namespace cyclonestyle.Models
         public string MobilePhone { get; set; }
 
         /// <summary>
+        /// 注册时的设备ID
+        /// </summary>
+        public string uuId { get; set; }
+
+        /// <summary>
+        /// 所属角色
+        /// </summary>
+        public string role { get; set; }
+
+        /// <summary>
         /// Email地址
         /// </summary>
         public string Email { get; set; }
+
         /// <summary>
         /// 真实姓名
         /// </summary>

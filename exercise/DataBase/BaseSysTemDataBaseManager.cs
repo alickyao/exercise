@@ -133,6 +133,8 @@ namespace cyclonestyle.DataBase
             }
         }
 
+        
+
 
         /// <summary>
         /// 获取系统角色信息ByRoleId
@@ -1637,6 +1639,24 @@ namespace cyclonestyle.DataBase
         #endregion
 
         #region -- 会员 Member
+        /// <summary>
+        /// 检查手机号码或者uuid出现的次数
+        /// </summary>
+        /// <param name="condtion"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        internal static int MemberCheckMobilePhoneOrUUIdIsExist(RegisterMembersRequestModel condtion, string userId)
+        {
+            using (SysTemDataBaseDataContext context = new SysTemDataBaseDataContext(SqlConnection)) {
+                int count = (from x in context.Us_SysUser
+                             where (((x.MobilePhone == null || x.MobilePhone == "") ? false : (x.MobilePhone == condtion.mobilePhone))
+                             || ((x.uuId == null || x.uuId == "") ? false : (x.uuId == condtion.deviceUUid)))
+                             && (string.IsNullOrEmpty(userId) ? true : x.Us_SysUserId != userId)
+                             select x.Us_SysUserId
+                             ).Count();
+                return count;
+            }
+        }
 
         /// <summary>
         /// 会员自助注册
@@ -1652,11 +1672,13 @@ namespace cyclonestyle.DataBase
                     CreatedOn = DateTime.Now,
                     IsDeleted = false,
                     IsDisabled = false,
-                    LoginName = condtion.LoginName,
-                    PassWords = condtion.PassWord,
-                    MobilePhone = condtion.LoginName,
+                    LoginName = condtion.loginName,
+                    PassWords = condtion.UserPassWord,
+                    MobilePhone = condtion.mobilePhone,
+                    Email = condtion.eMail,
+                    uuId = condtion.deviceUUid,
                     Us_SysUserId = NewUserId,
-                    Us_SysRoleId = 1009
+                    Us_SysRoleId = condtion.roleId
                 };
                 context.Us_SysUser.InsertOnSubmit(dbuser);
                 context.SubmitChanges();
@@ -1676,17 +1698,17 @@ namespace cyclonestyle.DataBase
         /// </summary>
         /// <param name="condtion"></param>
         /// <returns></returns>
-        internal static RegisterMembersReplayModel MemberCheckMemberLoginNameandPwd(RequestUserLogoModel condtion)
+        internal static RegisterMembersReplayModel MemberCheckMemberLoginNameandPwd(RequestLogOnMembersModel condtion)
         {
             using (SysTemDataBaseDataContext context = new SysTemDataBaseDataContext(SqlConnection))
             {
                 RegisterMembersReplayModel result = new RegisterMembersReplayModel();
-                //允许登陆后台的用户验证角色为Members
+                //允许登陆后台的用户验证角色为Members,guest
                 List<long> roles = new List<long>() { 
-                    1009
+                    1009,1008
                 };
 
-                Us_SysUser dbuser = context.Us_SysUser.SingleOrDefault(p => p.LoginName == condtion.UserName && p.PassWords.ToLower() == condtion.UserPassWord.ToLower() && p.IsDeleted == false && p.IsDisabled == false && roles.Contains(p.Us_SysRoleId));
+                Us_SysUser dbuser = context.Us_SysUser.SingleOrDefault(p => ((string.IsNullOrEmpty(condtion.mobilePhone)?true:(p.MobilePhone == condtion.mobilePhone)) && (string.IsNullOrEmpty(condtion.deviceUUid)? true :(p.uuId == condtion.deviceUUid))) && p.PassWords.ToLower() == condtion.UserPassWord.ToLower() && p.IsDeleted == false && p.IsDisabled == false && roles.Contains(p.Us_SysRoleId));
                 if (dbuser != null)
                 {
                     result.ReturnCode = EnumErrorCode.Success;
@@ -1720,7 +1742,8 @@ namespace cyclonestyle.DataBase
                     LoginName = dbuser.LoginName,
                     MobilePhone = dbuser.MobilePhone,
 
-
+                    role = dbuser.Us_SysRole[0].RoleName,
+                    uuId = dbuser.uuId,
 
                     UserId = dbuser.Us_SysUserId,
                     createdon = dbuser.CreatedOn,
@@ -1799,9 +1822,16 @@ namespace cyclonestyle.DataBase
                     userId = DepGetUserIdListBydepartment(condtion);
                 }
 
+                List<long> roles = new List<long>() {
+                    1008,1009
+                };//角色为会员与访客的用户
+                if (condtion.roleids != null) {
+                    roles = condtion.roleids;
+                }
+
                 result.total = (from c in context.Us_SysUser
                                 where (c.IsDeleted == false)
-                                && (c.Us_SysRoleId == 1009)//角色为会员的用户
+                                && (roles.Contains(c.Us_SysRoleId))
                                 && (string.IsNullOrEmpty(condtion.keyWords) ? true : SqlMethods.Like(c.FullName, string.Format("%{0}%", condtion.keyWords)) || SqlMethods.Like(c.MobilePhone, string.Format("%{0}%", condtion.keyWords)) || SqlMethods.Like(c.NickName, string.Format("%{0}%", condtion.keyWords)) || SqlMethods.Like(c.LoginName, string.Format("%{0}%", condtion.keyWords)))
                                 && (string.IsNullOrEmpty(condtion.userId) ? true : c.Us_SysUserId == condtion.userId)
                                 && (string.IsNullOrEmpty(condtion.orgId) ? true : userId.Contains(c.Us_SysUserId))
@@ -1810,7 +1840,7 @@ namespace cyclonestyle.DataBase
                 {
                     result.rows = (from c in context.Us_SysUser
                                    where (c.IsDeleted == false)
-                                   && (c.Us_SysRoleId == 1009)//角色为会员的用户
+                                   && (roles.Contains(c.Us_SysRoleId))
                                    && (string.IsNullOrEmpty(condtion.keyWords) ? true : SqlMethods.Like(c.FullName, string.Format("%{0}%", condtion.keyWords)) || SqlMethods.Like(c.MobilePhone, string.Format("%{0}%", condtion.keyWords)) || SqlMethods.Like(c.NickName, string.Format("%{0}%", condtion.keyWords)) || SqlMethods.Like(c.LoginName, string.Format("%{0}%", condtion.keyWords)))
                                    && (string.IsNullOrEmpty(condtion.userId) ? true : c.Us_SysUserId == condtion.userId)
                                    && (string.IsNullOrEmpty(condtion.orgId) ? true : userId.Contains(c.Us_SysUserId))//组织/部门限定
@@ -1828,6 +1858,8 @@ namespace cyclonestyle.DataBase
                                        Sex = (EnumSex)(c.Sex == null ? 0 : c.Sex),
                                        UserFace = c.UserFace,
                                        UserId = c.Us_SysUserId,
+                                       role = c.Us_SysRole[0].RoleName,
+                                       uuId = c.uuId,
                                        userDepartmentList = (from d in c.Us_MemberDepartment
                                                              where (1 == 1)
                                                              && ((!string.IsNullOrEmpty(condtion.orgId) && !condtion.getOtherOrgDepartmentInfo) ? d.Us_DepDepartMentRootId == condtion.orgId : true)//获取用户的部门信息条件设置，当orgid不为空并且不获取其他组织的部门的时候，过滤掉其他组织的部门
@@ -1859,9 +1891,13 @@ namespace cyclonestyle.DataBase
         internal static List<MembersBaseInfoModel> MemberGetMemberListByIdsOrLoginName(GetMembersListRequstModel condtion)
         {
             using (SysTemDataBaseDataContext context = new SysTemDataBaseDataContext(SqlConnection)) {
+                List<long> roles = new List<long>() {
+                    1008,1009
+                };//角色为会员与访客的用户
+
                 List<MembersBaseInfoModel> result = (from c in context.Us_SysUser
                                                      where (condtion.userIds.Contains(c.Us_SysUserId) || condtion.loginNames.Contains(c.LoginName))
-                                                     && (c.Us_SysRoleId == 1009)//角色为会员的用户
+                                                     && (roles.Contains(c.Us_SysRoleId))
                                                      && (c.IsDeleted == false)
                                                      orderby c.CreatedOn descending
                                                      select new MembersBaseInfoModel {
@@ -1870,6 +1906,8 @@ namespace cyclonestyle.DataBase
                                                          Email = c.Email,
                                                          FullName = c.FullName,
                                                          IdCard = c.IdCard,
+                                                         role = c.Us_SysRole[0].RoleName,
+                                                         uuId = c.uuId,
                                                          IdType = (EnumUserIdType)(c.IdType == null ? 0 : c.IdType),
                                                          LoginName = c.LoginName,
                                                          MobilePhone = c.MobilePhone,

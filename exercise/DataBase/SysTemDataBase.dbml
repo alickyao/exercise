@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?><Database Name="cyclone" Class="UsungSysTemDataBaseDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="exercise" Class="SysTemDataBaseDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Connection Mode="WebSettings" ConnectionString="Data Source=127.0.0.1;Initial Catalog=exercise;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="cycloneConnectionString" Provider="System.Data.SqlClient" />
   <Table Name="dbo.Us_SysRole" Member="Us_SysRole">
     <Type Name="Us_SysRole">
@@ -180,34 +180,6 @@
       <Column Name="modifiedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
-  <Table Name="dbo.Us_SysUser" Member="Us_SysUser">
-    <Type Name="Us_SysUser">
-      <Column Name="Us_SysUserId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
-      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="IsDisabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
-      <Column Name="Us_SysRoleId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
-      <Column Name="CreatedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="LoginName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="PassWords" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
-      <Column Name="FullName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="JobTitle" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="MobilePhone" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="MobilePhones" Type="System.String" DbType="VarChar(245)" CanBeNull="true" />
-      <Column Name="Email" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="Sex" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="IdType" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="IdCard" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="NickName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="UserFace" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="baiduPushUserId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="baiduPushchannelId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="baiduPushdeviceType" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
-      <Column Name="getuiPushClientId" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="getuiPushDeviceType" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
-      <Association Name="Us_SysUser_Us_SysRole" Member="Us_SysRole" ThisKey="Us_SysRoleId" OtherKey="Us_SysRoleId" Type="Us_SysRole" />
-      <Association Name="Us_SysUser_Us_MemberDepartment" Member="Us_MemberDepartment" ThisKey="Us_SysUserId" OtherKey="Us_SysUserId" Type="Us_MemberDepartment" />
-    </Type>
-  </Table>
   <Table Name="dbo.Us_RunSentPush" Member="Us_RunSentPush">
     <Type Name="Us_RunSentPush">
       <Column Name="Us_RunSentPushId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
@@ -231,6 +203,35 @@
       <Column Name="deviceType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" />
       <Column Name="sentUserId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Association Name="Us_RunSentPush_Us_RunSentPushDetail" Member="Us_RunSentPush" ThisKey="Us_RunSentPushId" OtherKey="Us_RunSentPushId" Type="Us_RunSentPush" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Us_SysUser" Member="Us_SysUser">
+    <Type Name="Us_SysUser">
+      <Column Name="Us_SysUserId" Type="System.String" DbType="VarChar(50) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="IsDeleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="IsDisabled" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Us_SysRoleId" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="CreatedOn" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="LoginName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="PassWords" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="FullName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="JobTitle" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="MobilePhone" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="uuId" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="MobilePhones" Type="System.String" DbType="VarChar(245)" CanBeNull="true" />
+      <Column Name="Email" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="Sex" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IdType" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IdCard" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="NickName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="UserFace" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="baiduPushUserId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="baiduPushchannelId" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="baiduPushdeviceType" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Column Name="getuiPushClientId" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="getuiPushDeviceType" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
+      <Association Name="Us_SysUser_Us_SysRole" Member="Us_SysRole" ThisKey="Us_SysRoleId" OtherKey="Us_SysRoleId" Type="Us_SysRole" />
+      <Association Name="Us_SysUser_Us_MemberDepartment" Member="Us_MemberDepartment" ThisKey="Us_SysUserId" OtherKey="Us_SysUserId" Type="Us_MemberDepartment" />
     </Type>
   </Table>
   <Function Name="dbo.f_split" Method="f_split" IsComposable="true">
