@@ -14,6 +14,29 @@
 	<script type="text/javascript" charset="UTF-8">
 		(function($){
 			
+			var jumpToHome = function(){
+				mui.openWindow({
+				    url:"index.html",
+				    id:"index.html",
+				    styles:{
+				      top:0,//新页面顶部位置
+				      bottom:0,//新页面底部位置
+				    },
+				    createNew:false,//是否重复创建同样id的webview，默认为false:不重复创建，直接显示
+				    extras:{
+				      //自定义扩展参数，可以用来处理页面间传值
+				    },
+				    show:{
+				      autoShow:true,//页面loaded事件发生后自动显示，默认为true
+				      aniShow:"fade-in",//页面显示动画，默认为”slide-in-right“；
+				    },
+				    waiting:{
+				      autoShow:true,//自动显示等待框，默认为true
+				      title:'正在加载...'//等待对话框上显示的提示内容
+				    }
+				});
+			};
+			
 			$.init({
 				swipeBack: false
 			});
@@ -39,26 +62,59 @@
 								else{
 									//当前未登录
 									console.log("当前用户未登录");
-									var uuid = plus.device.uuid;//获取该设备的uuid
-									var mobilePhone = plus.storage.getItem("mobilePhone");//获取登录名
+									//var uuid = plus.device.uuid;//获取该设备的uuid
+									var DeviceInfo = plus.device.model;
+									var uuid = "9089098234213";//随便设置一个uuid
+									var UsermobilePhone = plus.storage.getItem("UsermobilePhone");//获取存储在本地的手机号码
 									var UserPassWord = plus.storage.getItem("UserPassWord");//获取密码
 									var loginrequest= {
-										deviceUUid : null,
-										mobilePhone : null,
-										UserPassWord :null
+										deviceUUid : undefined,
+										mobilePhone : undefined,
+										UserPassWord :undefined,
+										DeviceInfo :DeviceInfo
 									};
-									if (userloginname==null){
+									if (UsermobilePhone==null){
 										//使用设备号登录
 										loginrequest.deviceUUid = uuid;
 									}
 									else{
 										//使用保存在本地的用户名和密码登录
-										loginrequest.mobilePhone = mobilePhone;
+										loginrequest.mobilePhone = UsermobilePhone;
 										loginrequest.UserPassWord = UserPassWord;
 									}
-									//尝试登录
-									//成功后跳转到主界面
-									//失败跳转到登录界面
+									console.log(loginrequest);
+									$.post(host+"api/ApiMembers/LogOnMembers",loginrequest,function(json){
+										if (json.ReturnCode == 0){
+											//成功后跳转到主界面
+										}
+										else{
+											console.log(json.ReturnMessage);
+											//失败，根据情况判断，如果是使用uuid进行登录失败，则表示该设备还未注册，需提交注册接口，如果是使用手机号与密码进行登录则跳转到登录界面
+											if (loginrequest.mobilePhone==null){
+												//uuid登录失败，提交注册接口
+												var registerrequest = {
+												  "RegisterWay": "移动APP端口",
+												  "DeviceInfo": DeviceInfo,
+												  "deviceUUid": uuid
+												};
+												$.post(host+"api/ApiMembers/RegisterMembers",registerrequest,function(json){
+													if(json.ReturnCode=="0"){
+														//注册成功
+														//提交登录
+														
+													}
+													else{
+														//注册失败
+														console.log(json.ReturnMessage);
+													}
+												})
+											}
+											else{
+												
+											}
+										}
+									});
+									//jumpToHome();
 								}
 							},
 							error:function(xhr,type,errorThrown){

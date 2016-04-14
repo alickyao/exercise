@@ -46,6 +46,9 @@
 			"css/mui.min.css",
 			"js/global.js",
 			"js/pfun.js"
+		],
+		"refer": [
+			"index.html"
 		]
 	}
 }
