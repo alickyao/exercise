@@ -17,9 +17,11 @@ namespace cyclonestyle.BLL
     {
         //http的域名
         private static String HOST = "http://sdk.open.api.igexin.com/apiex.htm";
-        private static String APPID = "fx7foBoSGKAuhzQXbN9LP";                     //您应用的AppId
-        private static String APPKEY = "DfapF9ksAj5p41Yg5tzad3";                    //您应用的AppKey
-        private static String MASTERSECRET = "fWMwLvANDY6WVWJvSuWG78";              //您应用的MasterSecret 
+        private static String APPID = "M1swc9kds09LncjWcf8jO2";                     //您应用的AppId
+        private static String APPKEY = "y7xrMzVw6Y7Ed2ba0d9h7A";                    //您应用的AppKey
+        private static String MASTERSECRET = "kkje3xSRqQ6KNxTSeuMNz8";              //您应用的MasterSecret 
+
+
         private static String CLIENTID = "b73ad667a6d2a3a72b17664c9ca91269";        //您获取的clientID
 
         //配置

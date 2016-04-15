@@ -1897,7 +1897,7 @@ namespace cyclonestyle.DataBase
 
                 List<MembersBaseInfoModel> result = (from c in context.Us_SysUser
                                                      where (condtion.userIds.Contains(c.Us_SysUserId) || condtion.loginNames.Contains(c.LoginName))
-                                                     && (roles.Contains(c.Us_SysRoleId))
+                                                     //&& (roles.Contains(c.Us_SysRoleId))
                                                      && (c.IsDeleted == false)
                                                      orderby c.CreatedOn descending
                                                      select new MembersBaseInfoModel {

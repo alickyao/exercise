@@ -8,6 +8,13 @@
 		<script src="js/mui.min.js"></script>
 		<script src="js/global.js"></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
+		
+		<!-- 环信集成 -->
+		<script src="js/jquery-1.11.1.js"></script>
+		<script src="js/easemob/strophe.js"></script>
+		<script src="js/easemob/json2.js"></script>
+		<script src="js/easemob/easemob.im-1.0.7.js"></script>
+		
 	</head>
 
 	<body>
@@ -40,6 +47,7 @@
 			};
 			var aniShow = {};
 			mui.plusReady(function() {
+				
 				//加载主要的3个页面
 				var self = plus.webview.currentWebview();
 				for (var i = 0; i < 3; i++) {

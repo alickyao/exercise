@@ -31,7 +31,7 @@ namespace cyclonestyle.Models
         public string UserPassWord
         {
             get { return _pwd; }
-            set { _pwd = value; }
+            set { if (value != null && value != "") { _pwd = value; } }
         }
     }
 

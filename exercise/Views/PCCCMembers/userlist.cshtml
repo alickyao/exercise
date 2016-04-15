@@ -268,9 +268,7 @@
                                 var pushwin = $("#@(PageId)sendpushdialog");
                                 var userids = "";
                                 $.each(rows, function (i, n) {
-                                    if (n.MobilePhone != null && n.MobilePhone != "") {
-                                        userids += n.UserId + ",";
-                                    }
+                                    userids += n.UserId + ",";
                                 });
                                 pushwin.dialog({
                                     href: '/PCCCSms/sendpushbyusers?userIds=' + userids
